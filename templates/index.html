@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flowist</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 60px;
+            height: 100vh;
+            background-color: #7dc5f2;
+            color: white;
+            padding: 10px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            margin: 15px 0;
+        }
+
+        .sidebar a:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            flex: 1;
+            padding: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Menu</h2>
+        <a href="/">Home</a>
+        <a href="/tasks">Tasks</a>
+        <a href="/about">Cats</a>
+    </div>
+
+    <div class="content">
+        <h1>Today</h1>
+        <p>Feed your cat!</p>
+    </div>
+
+</body>
+</html>
