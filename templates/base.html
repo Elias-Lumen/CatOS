@@ -7,14 +7,71 @@
         content="width=device-width, initial-scale=1.0"
     >
     <title>
+        {% block title %}
         Flowist
+        {% endblock %}
     </title>
+
+<!-- Shared CSS -->
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/base.css') }}"
+>
+
+<!-- Individual CSS -->
+{% block styles %}
+
+{% endblock %}
 </head>
 
 <body>
     <aside>
+        <nav>
+
+            <a href="/settings">
+                Settings
+            </a>
+
+            <a href="/Task">
+                Add task
+            </a>
+
+            <a href="/search">
+                Search
+            </a>
+
+            <a href="/Today_Task">
+                Today
+            </a>
+
+            <a href="/labels">
+                Filters & Labels
+            </a>
+
+            <a href="/upcoming">
+                Upcoming
+            </a>
+
+            <a href="/data">
+                Data
+            </a>
+
+            <a href="/Today_Task">
+                Today
+            </a>
+
+            <a href="/cat">
+                "cat name"  <!--what user name the cat, use python(?)-->
+            </a>
+
+        </nav>
     </aside>
     <main>
+
+        {% block content %}
+         <!--use for the individual  page-->
+        {% endblock %}
+
     </main>
 </body>
 
