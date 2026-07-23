@@ -6,10 +6,13 @@
         name="viewport"
         content="width=device-width, initial-scale=1.0"
     >
-    <title>
+
+    <!--when it add another html it will be look like flowist/-->
+
+    <title> 
         {% block title %}
-        Flowist
-        {% endblock %}
+        {% endblock %}    
+        - Flowist      
     </title>
 
 <!-- Shared CSS -->
@@ -25,54 +28,118 @@
 </head>
 
 <body>
-    <aside>
-        <nav>
+    <aside class="sidebar" id="sidebar">
 
-            <a href="/settings">
-                Settings
+        <button
+            class="sidebar-toggle"
+            id="sidebarToggle"
+            type="button"
+            aria-label="Collapse sidebar"
+        >
+            ‹
+        </button>
+
+        <nav class="sidebar-nav">
+
+            <a class="nav-link" href="{{ url_for('setting') }}">
+                <img
+                    class="nav-icon"
+                    src="{{ url_for('static', filename='images/user.svg') }}"
+                    alt=""
+                >
+                <span class="nav-text">Settings</span>
             </a>
 
-            <a href="/Task">
-                Add task
+            <a class="nav-link" href="{{ url_for('task') }}">
+                <img
+                    class="nav-icon"
+                    src="{{ url_for('static', filename='icons/add_task.svg') }}"
+                    alt=""
+                >
+                <span class="nav-text">Add task</span>
             </a>
 
-            <a href="/search">
-                Search
+            <a class="nav-link" href="{{ url_for('search') }}">
+                <img
+                    class="nav-icon"
+                    src="{{ url_for('static', filename='icons/calendar_search.svg') }}"
+                    alt=""
+                >
+                <span class="nav-text">Search</span>
             </a>
 
-            <a href="/Today_Task">
-                Today
+            <a class="nav-link" href="{{ url_for('today_task') }}">
+                <img
+                    class="nav-icon"
+                    src="{{ url_for('static', filename='icons/calendars.svg') }}"
+                    alt=""
+                >
+                <span class="nav-text">Today</span>
             </a>
 
-            <a href="/labels">
-                Filters & Labels
+            <a class="nav-link" href="{{ url_for('labels') }}">
+                <img
+                    class="nav-icon"
+                    src="{{ url_for('static', filename='icons/filter.svg') }}"
+                    alt=""
+                >
+                <span class="nav-text">Filters & Labels</span>
             </a>
 
-            <a href="/upcoming">
-                Upcoming
+            <a class="nav-link" href="{{ url_for('upcoming') }}">
+                <img
+                    class="nav-icon"
+                    src="{{ url_for('static', filename='icons/calendar_upcoming.svg') }}"
+                    alt=""
+                >
+                <span class="nav-text">Upcoming</span>
             </a>
 
-            <a href="/data">
-                Data
+            <a class="nav-link" href="{{ url_for('data') }}">
+                <img
+                    class="nav-icon"
+                    src="{{ url_for('static', filename='icons/data.svg') }}"
+                    alt=""
+                >
+                <span class="nav-text">Data</span>
             </a>
 
-            <a href="/Today_Task">
-                Today
+            <a class="nav-link" href="{{ url_for('cat') }}">
+                <img
+                    class="nav-icon"
+                    src="{{ url_for('static', filename='icons/cat.svg') }}"
+                    alt=""
+                >
+                <span class="nav-text">{{ cat_name | default('Cat') }}</span>
             </a>
 
-            <a href="/cat">
-                "cat name"  <!--what user name the cat, use python(?)-->
+            <div class="nav-spacer"></div>
+
+            <a class="nav-link" href="{{ url_for('help') }}">
+                <img
+                    class="nav-icon"
+                    src="{{ url_for('static', filename='icons/question_mark.svg') }}"
+                    alt=""
+                >
+                <span class="nav-text">Need help?</span>
             </a>
 
         </nav>
+
+        <div class="sidebar-resizer" id="sidebarResizer"></div>
     </aside>
+
     <main>
-
         {% block content %}
-         <!--use for the individual  page-->
         {% endblock %}
+        <!--load individual html-->
 
+        {% block scripts %}
+        {% endblock %}
+        <!--load individual Javascript-->
     </main>
-</body>
 
-</html>
+    <script
+        src="{{ url_for('static', filename='js/sidebar.js') }}"
+    ></script>
+</body>
