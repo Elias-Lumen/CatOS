@@ -29,7 +29,7 @@ body {
     border-right: 1px solid #dddddd;
 
     flex-shrink: 0;
-    overflow: hidden;
+    overflow: visible;
 
     transition:
         width 0.2s ease,
@@ -39,6 +39,7 @@ body {
 
 .sidebar-nav {
     display: flex;
+    overflow: hidden;
     flex-direction: column;
     height: 100%;
     gap: 6px;
@@ -49,8 +50,8 @@ body {
     align-items: center;
     gap: 12px;
 
-    min-height: 42px;
-    padding: 10px 12px;
+    min-height: 21px;
+    padding: 4px 6px;
 
     color: #222222;
     text-decoration: none;
@@ -64,9 +65,9 @@ body {
 }
 
 .nav-icon {
-    width: 20px;
-    height: 20px;
-    min-width: 20px;
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
     object-fit: contain;
 }
 
@@ -78,14 +79,49 @@ body {
     flex: 1;
 }
 
+.sidebar-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    min-height: 42px;
+    margin-bottom: 6px;
+    padding: 0 12px;
+}
+
+.profile-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    min-width: 0;
+    color: #222;
+    text-decoration: none;
+}
+
+.profile-avatar {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    object-fit: contain;
+}
+
+.profile-text {
+    overflow: hidden;
+    white-space: nowrap;
+}
+
 .sidebar-toggle {
-    position: absolute;
-    top: 14px;
-    right: 8px;
-    z-index: 2;
+    margin-left: auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     width: 28px;
     height: 28px;
+    padding: 0;
 
     border: none;
     border-radius: 6px;
@@ -98,6 +134,7 @@ body {
 .sidebar-toggle:hover {
     background: #dddddd;
 }
+
 
 .sidebar-resizer {
     position: absolute;
@@ -136,7 +173,7 @@ body {
 }
 
 .sidebar.collapsed .sidebar-toggle {
-    right: 18px;
+    right: -12px;
 }
 
 main {
