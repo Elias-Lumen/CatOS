@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Register | Flowist</title>
+</head>
+
+<body>
+    <h1>Create your Flowist account</h1>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form
+        method="POST"
+        action="{{ url_for('register') }}"
+    >
+        <div>
+            <label for="username">Username</label>
+
+            <input
+                id="username"
+                name="username"
+                type="text"
+                required
+            >
+        </div>
+
+        <div>
+            <label for="password">Password</label>
+
+            <input
+                id="password"
+                name="password"
+                type="password"
+                required
+            >
+        </div>
+
+        <div>
+            <label for="confirm_password">
+                Confirm password
+            </label>
+
+            <input
+                id="confirm_password"
+                name="confirm_password"
+                type="password"
+                required
+            >
+        </div>
+
+        <button type="submit">
+            Create account
+        </button>
+    </form>
+
+    <p>
+        Already have an account?
+        <a href="{{ url_for('login') }}">
+            Sign in!
+        </a>
+    </p>
+</body>
+</html>

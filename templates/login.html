@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/login.css') }}"
+    >
+    <title>Login | Flowist</title>
+
+</head>
+
+<body>
+    <main class="login-container">
+        <header class="login-header">
+            <h1>Flowist</h1>
+            <p>Welcome back.</p>
+        </header>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="message">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('login') }}">
+            <div class="form-group">
+                <label for="username">
+                    Username
+                </label>
+
+                <input
+                    id="username"
+                    name="username"
+                    type="text"
+                    autocomplete="username"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    autocomplete="current-password"
+                    required
+                >
+            </div>
+
+            <button type="submit">
+                Login
+            </button>
+        </form>
+        
+        <p class="register-link">
+            Don't have an account?
+            <a href="{{ url_for('register') }}">
+                Create one!
+            </a>
+        </p>
+    </main>
+</body>
+</html>
