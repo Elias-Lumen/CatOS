@@ -127,6 +127,7 @@ def data():
 def cat():
     return render_template("cat.html")
 
+# should add a use's individual cat name (maybe user can edit it?)
 
 @app.route("/help")
 def help():
