@@ -78,7 +78,7 @@ body {
 }
 
 .login-container input:focus {
-    outline: 2px solid #ff9d00;
+    outline: 2px solid hwb(205 11% 0%);
     outline-offset: 2px;
 }
 
