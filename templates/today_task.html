@@ -5,6 +5,46 @@ Today
 {% endblock %}
 
 {% block content %}
-<h1>Today</h1>
-<p>This is the Today page.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Tasks | Flowist</title>
+</head>
+
+<body>
+    <main>
+        <h1>Tasks</h1>
+
+        <form method="POST">
+            <label for="title">
+                Task title
+            </label>
+
+            <input
+                id="title"
+                name="title"
+                type="text"
+                required
+            >
+
+            <button type="submit">
+                Add task
+            </button>
+        </form>
+
+        <section>
+            <h2>Your tasks</h2>
+
+            <p>No tasks yet.</p>
+        </section>
+    </main>
+</body>
+</html>
 {% endblock %}
