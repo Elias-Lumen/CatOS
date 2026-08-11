@@ -1,90 +1,274 @@
 {% extends "base.html" %}
 
 {% block title %}
-Tasks
+Today
+{% endblock %}
+
+{% block styles %}
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/today_task.css') }}"
+>
 {% endblock %}
 
 {% block content %}
 
-<div class="task-page">
+<div class="today-layout">
 
-    <h1>Tasks</h1>
+    <div class="today-main">
 
-    <form method="POST" class="task-composer" action="{{ url_for('home') }}">
+        <header class="today-header">
+            <h1>Today</h1>
 
-        <input
-            type="text"
-            name="title"
-            class="task-title"
-            placeholder="Task name"
-            required
+            <div class="today-count">
+                ✓ {{ tasks|length }} tasks
+            </div>
+        </header>
+
+
+        <!-- OVERDUE -->
+        <section class="task-group">
+
+            <button
+                class="group-header"
+                type="button"
+                data-target="overdueTasks"
+            >
+                <div class="group-title-wrap">
+                    <span class="group-arrow">⌄</span>
+                    <span class="group-title">Overdue</span>
+                </div>
+
+                <span class="group-action">
+                    Reschedule
+                </span>
+            </button>
+
+            <div class="group-line"></div>
+
+            <div
+                class="group-content"
+                id="overdueTasks"
+            >
+                <div class="empty-group">
+                    No overdue tasks.
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- TODAY -->
+        <section class="task-group">
+
+            <button
+                class="group-header"
+                type="button"
+                data-target="todayTasks"
+            >
+                <div class="group-title-wrap">
+                    <span class="group-arrow">⌄</span>
+
+                    <span class="group-title">
+                        Today
+                    </span>
+                </div>
+            </button>
+
+            <div class="group-line"></div>
+
+            <div
+                class="group-content"
+                id="todayTasks"
+            >
+
+                {% if tasks %}
+
+                    {% for task in tasks %}
+
+                        <article class="task-row">
+
+                            <button
+                                type="button"
+                                class="task-circle priority-{{ task['priority'] }}"
+                            ></button>
+
+                            <div class="task-content">
+
+                                <div class="task-name">
+                                    {{ task["title"] }}
+                                </div>
+
+                                {% if task["description"] %}
+                                    <div class="task-description">
+                                        {{ task["description"] }}
+                                    </div>
+                                {% endif %}
+
+                                <div class="task-meta">
+
+                                    {% if task["due_date"] %}
+                                        <span class="task-date">
+                                            Due {{ task["due_date"] }}
+                                        </span>
+                                    {% endif %}
+
+                                    {% if task["tag"] %}
+                                        <span class="task-tag">
+                                            # {{ task["tag"] }}
+                                        </span>
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </article>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty-group">
+                        No tasks yet.
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+
+        <!-- ADD TASK BUTTON -->
+        <button
+            class="show-composer-button"
+            id="showComposer"
+            type="button"
+        >
+            + Add task
+        </button>
+
+
+        <!-- TASK COMPOSER -->
+        <form
+            method="POST"
+            action="{{ url_for('home') }}"
+            class="task-composer hidden"
+            id="taskComposer"
         >
 
-        <textarea
-            name="description"
-            class="task-description"
-            placeholder="Description"
-        ></textarea>
-
-        <div class="task-options">
-
             <input
-                type="date"
-                name="due_date"
-                class="task-option"
+                type="text"
+                name="title"
+                class="composer-title"
+                placeholder="Task name"
+                required
             >
 
-            <select
-                name="priority"
-                class="task-option"
-            >
-                <option value="low">Low priority</option>
-                <option value="medium" selected>Medium priority</option>
-                <option value="high">High priority</option>
-            </select>
+            <textarea
+                name="description"
+                class="composer-description"
+                placeholder="Description"
+                rows="2"
+            ></textarea>
 
-        </div>
+            <div class="composer-bottom">
 
-        <div class="task-actions">
-            <button type="reset" class="cancel-button">
-                Cancel
-            </button>
+                <div class="composer-options">
 
-            <button type="submit" class="add-task-button">
-                Add task
-            </button>
-        </div>
+                    <label class="composer-option">
+                        Deadline
 
-    </form>
-    <section>
+                        <input
+                            type="date"
+                            name="due_date"
+                        >
+                    </label>
 
-    <h2>Your tasks</h2>
+                    <label class="composer-option">
+                        Priority
 
-    {% if tasks %}
-        {% for task in tasks %}
-            <div class="task-item">
-                <h3>{{ task["title"] }}</h3>
+                        <select name="priority">
+                            <option value="low">
+                                Low
+                            </option>
 
-                {% if task["description"] %}
-                    <p>{{ task["description"] }}</p>
-                {% endif %}
+                            <option
+                                value="medium"
+                                selected
+                            >
+                                Medium
+                            </option>
 
-                <p>
-                    Priority: {{ task["priority"] }}
-                </p>
+                            <option value="high">
+                                High
+                            </option>
+                        </select>
+                    </label>
 
-                {% if task["due_date"] %}
-                    <p>
-                        Due: {{ task["due_date"] }}
-                    </p>
-                {% endif %}
+                </div>
+
+                <div class="composer-actions">
+
+                    <button
+                        type="button"
+                        class="cancel-button"
+                        id="cancelComposer"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="add-task-button"
+                    >
+                        Add task
+                    </button>
+
+                </div>
+
             </div>
-        {% endfor %}
-    {% else %}
-        <p>No tasks yet.</p>
-    {% endif %}
-</section>
+
+        </form>
+
+    </div>
+
+
+    <!-- RIGHT SIDE STATS -->
+    <aside class="today-stats">
+
+        <div class="progress-ring">
+
+            <div class="progress-value">
+                80%
+            </div>
+
+        </div>
+
+        <div class="progress-legend">
+
+            <div>
+                <span class="legend-dot done"></span>
+                Done
+            </div>
+
+            <div>
+                <span class="legend-dot incomplete"></span>
+                Incomplete
+            </div>
+
+        </div>
+
+    </aside>
 
 </div>
 
+{% endblock %}
+
+
+{% block scripts %}
+<script
+    src="{{ url_for('static', filename='js/today_task.js') }}"
+></script>
 {% endblock %}
