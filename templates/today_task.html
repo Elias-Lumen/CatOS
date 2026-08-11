@@ -1,50 +1,90 @@
 {% extends "base.html" %}
 
 {% block title %}
-Today
+Tasks
 {% endblock %}
 
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<div class="task-page">
 
-    <title>Tasks | Flowist</title>
-</head>
+    <h1>Tasks</h1>
 
-<body>
-    <main>
-        <h1>Tasks</h1>
+    <form method="POST" class="task-composer" action="{{ url_for('home') }}">
 
-        <form method="POST">
-            <label for="title">
-                Task title
-            </label>
+        <input
+            type="text"
+            name="title"
+            class="task-title"
+            placeholder="Task name"
+            required
+        >
+
+        <textarea
+            name="description"
+            class="task-description"
+            placeholder="Description"
+        ></textarea>
+
+        <div class="task-options">
 
             <input
-                id="title"
-                name="title"
-                type="text"
-                required
+                type="date"
+                name="due_date"
+                class="task-option"
             >
 
-            <button type="submit">
+            <select
+                name="priority"
+                class="task-option"
+            >
+                <option value="low">Low priority</option>
+                <option value="medium" selected>Medium priority</option>
+                <option value="high">High priority</option>
+            </select>
+
+        </div>
+
+        <div class="task-actions">
+            <button type="reset" class="cancel-button">
+                Cancel
+            </button>
+
+            <button type="submit" class="add-task-button">
                 Add task
             </button>
-        </form>
+        </div>
 
-        <section>
-            <h2>Your tasks</h2>
+    </form>
+    <section>
 
-            <p>No tasks yet.</p>
-        </section>
-    </main>
-</body>
-</html>
+    <h2>Your tasks</h2>
+
+    {% if tasks %}
+        {% for task in tasks %}
+            <div class="task-item">
+                <h3>{{ task["title"] }}</h3>
+
+                {% if task["description"] %}
+                    <p>{{ task["description"] }}</p>
+                {% endif %}
+
+                <p>
+                    Priority: {{ task["priority"] }}
+                </p>
+
+                {% if task["due_date"] %}
+                    <p>
+                        Due: {{ task["due_date"] }}
+                    </p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No tasks yet.</p>
+    {% endif %}
+</section>
+
+</div>
+
 {% endblock %}

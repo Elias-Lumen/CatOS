@@ -8,7 +8,7 @@ from flask import (
     url_for,
 )
 
-from database import create_tables  # connect database.py
+from database import create_tables, create_task, get_tasks_by_user # connect database.py
 from routes.auth import login_user, register_user # connect 
 
 
@@ -17,14 +17,41 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = "flowist-development-secret-key"
 
 
-@app.route("/")
+# home page and the today page is the same page
+@app.route("/", methods=["GET", "POST"])
 def home():
+    # User must be logged in
     if "user_id" not in session:
         return redirect(url_for("login"))
 
-    return render_template("today_task.html")
+    # Add a new task
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        description = request.form.get("description", "").strip()
+        priority = request.form.get("priority", "medium")
+        due_date = request.form.get("due_date") or None
 
+        if title:
+            create_task(
+                user_id=session["user_id"],
+                title=title,
+                description=description,
+                priority=priority,
+                due_date=due_date
+            )
 
+        return redirect(url_for("home"))
+
+    # Get all tasks belonging to the current user
+    tasks = get_tasks_by_user(session["user_id"])
+
+    # Show tasks on the Today page
+    return render_template(
+        "today_task.html",
+        tasks=tasks
+    )
+
+# register function
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
@@ -57,6 +84,8 @@ def register():
     return render_template("register.html")
 
 @app.route("/login", methods=["GET", "POST"])
+
+# login function
 def login():
     # user post login table
     if request.method == "POST":
@@ -81,31 +110,52 @@ def login():
     # 用户只是打开 /login 页面
     return render_template("login.html")
 
-
+# the botton in the setting to make sure can logout
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect(url_for("login"))
 
-
+# setting 
 @app.route("/setting")
 def setting():
     return render_template("setting.html")
 
 
-@app.route("/task")
+@app.route("/task", methods=["GET", "POST"])
 def task():
-    return render_template("task.html")
+    if "user_id" not in session:
+        return redirect(url_for("login"))
 
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        description = request.form.get("description", "").strip()
+        priority = request.form.get("priority", "medium")
+        due_date = request.form.get("due_date") or None
+
+        if title:
+            create_task(
+                user_id=session["user_id"],
+                title=title,
+                description=description,
+                priority=priority,
+                due_date=due_date
+            )
+
+        return redirect(url_for("task"))
+
+    tasks = get_tasks_by_user(session["user_id"])
+
+    return render_template(
+        "task.html",
+        tasks=tasks
+    )
+# this should be the fload task additor (CSS)
+# 
 
 @app.route("/search")
 def search():
     return render_template("search.html")
-
-
-@app.route("/today")
-def today_task():
-    return render_template("today_task.html")
 
 
 @app.route("/labels")

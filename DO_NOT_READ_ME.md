@@ -1,6 +1,6 @@
 ## Must
-- [ ] Login
-- [ ] Sidebar
+- [x] Login
+- [x] Sidebar
 - [ ] Task
 - [ ] cat
 

@@ -71,7 +71,7 @@ def create_tasks_table(connection):
     """)
 
 
-# subtask
+# add subtask table should have no line when have no subtask
 def create_subtasks_table(connection):
     connection.execute("""
         CREATE TABLE IF NOT EXISTS subtasks (
@@ -109,7 +109,7 @@ def create_subtasks_table(connection):
         )
     """)
 
-# cats
+# create cats table
 def create_cat_table(connection):
     connection.execute("""
         CREATE TABLE IF NOT EXISTS cat (
@@ -140,7 +140,71 @@ def create_cat_table(connection):
         )
     """)
 
+# creat task
+def create_task(
+    user_id,
+    title,
+    description=None,
+    tag=None,
+    state="not_started",
+    priority="medium",
+    due_date=None
+):
+    connection = get_connection()
 
+    try:
+        connection.execute(
+            """
+            INSERT INTO tasks (
+                user_id,
+                title,
+                description,
+                tag,
+                state,
+                priority,
+                due_date
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                user_id,
+                title,
+                description,
+                tag,
+                state,
+                priority,
+                due_date
+            )
+        )
+
+        connection.commit()
+
+    except sqlite3.Error:
+        connection.rollback()
+        raise
+
+    finally:
+        connection.close()
+
+
+def get_tasks_by_user(user_id):
+    conn = get_connection()
+
+    tasks = conn.execute(
+        """
+        SELECT *
+        FROM tasks
+        WHERE user_id = ?
+        ORDER BY created_at DESC
+        """,
+        (user_id,)
+    ).fetchall()
+
+    conn.close()
+    return tasks
+
+# if need add function, add above
+# final check
 def create_tables():
     connection = get_connection()
 
