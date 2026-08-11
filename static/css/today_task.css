@@ -1,0 +1,475 @@
+.today-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 190px;
+    gap: 56px;
+
+    width: 100%;
+    max-width: 1100px;
+
+    margin: 0 auto;
+    padding: 10px 20px 80px;
+}
+
+
+/* MAIN */
+
+.today-main {
+    min-width: 0;
+}
+
+
+/* HEADER */
+
+.today-header {
+    margin-bottom: 30px;
+}
+
+.today-header h1 {
+    margin: 0;
+
+    font-size: 48px;
+    font-weight: 700;
+
+    letter-spacing: -0.04em;
+    color: #111;
+}
+
+.today-count {
+    margin-top: 8px;
+
+    font-size: 14px;
+    color: #999;
+}
+
+
+/* TASK GROUP */
+
+.task-group {
+    margin-top: 28px;
+}
+
+.group-header {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0;
+
+    border: none;
+    background: transparent;
+
+    font-family: inherit;
+    color: inherit;
+
+    cursor: pointer;
+}
+
+.group-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.group-title {
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.group-arrow {
+    display: inline-block;
+
+    color: #888;
+
+    transition: transform 0.18s ease;
+}
+
+.group-header.collapsed .group-arrow {
+    transform: rotate(-90deg);
+}
+
+.group-action {
+    font-size: 14px;
+    font-weight: 600;
+
+    color: #333;
+}
+
+.group-line {
+    height: 1px;
+
+    margin-top: 7px;
+
+    background: #dddddd;
+}
+
+.group-content {
+    display: block;
+
+    margin-top: 6px;
+}
+
+.group-content.collapsed {
+    display: none;
+}
+
+
+/* TASK ROW */
+
+.task-row {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 10px;
+
+    padding: 11px 8px;
+
+    border-radius: 5px;
+}
+
+.task-row:hover {
+    background: #f4f4f4;
+}
+
+.task-circle {
+    width: 18px;
+    height: 18px;
+
+    margin-top: 2px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+    background: transparent;
+
+    cursor: pointer;
+}
+
+.priority-low {
+    border: 1.5px solid #bbbbbb;
+}
+
+.priority-medium {
+    border: 1.5px solid #e7a52c;
+}
+
+.priority-high {
+    border: 1.5px solid #ef4b4b;
+}
+
+.task-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.task-name {
+    font-size: 15px;
+    font-weight: 500;
+
+    color: #222;
+}
+
+.task-description {
+    margin-top: 4px;
+
+    font-size: 13px;
+    line-height: 1.4;
+
+    color: #777;
+}
+
+.task-meta {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    margin-top: 5px;
+
+    font-size: 12px;
+    color: #888;
+}
+
+.task-date {
+    color: #d95b5b;
+}
+
+.task-tag {
+    color: #777;
+}
+
+
+/* EMPTY */
+
+.empty-group {
+    padding: 18px 8px;
+
+    font-size: 13px;
+    color: #aaa;
+}
+
+
+/* ADD TASK */
+
+.show-composer-button {
+    margin-top: 24px;
+
+    padding: 6px 0;
+
+    border: none;
+    background: transparent;
+
+    font-size: 14px;
+    color: #666;
+
+    cursor: pointer;
+}
+
+.show-composer-button:hover {
+    color: #222;
+}
+
+
+/* COMPOSER */
+
+.task-composer {
+    margin-top: 12px;
+    padding: 15px;
+
+    border: 1px solid #cccccc;
+    border-radius: 10px;
+
+    background: white;
+}
+
+.task-composer.hidden {
+    display: none;
+}
+
+.composer-title,
+.composer-description {
+    width: 100%;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    font-family: inherit;
+}
+
+.composer-title {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.composer-title::placeholder,
+.composer-description::placeholder {
+    color: #aaa;
+}
+
+.composer-description {
+    margin-top: 8px;
+
+    resize: none;
+
+    font-size: 13px;
+    line-height: 1.4;
+
+    color: #555;
+}
+
+.composer-bottom {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    margin-top: 14px;
+}
+
+.composer-options {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 8px;
+}
+
+.composer-option {
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    padding: 7px 9px;
+
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+
+    background: #fafafa;
+
+    font-size: 12px;
+    color: #666;
+}
+
+.composer-option input,
+.composer-option select {
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    font: inherit;
+    color: inherit;
+}
+
+.composer-actions {
+    display: flex;
+
+    gap: 8px;
+}
+
+.cancel-button,
+.add-task-button {
+    padding: 8px 13px;
+
+    border: none;
+    border-radius: 8px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.cancel-button {
+    background: #eeeeee;
+    color: #555;
+}
+
+.cancel-button:hover {
+    background: #e3e3e3;
+}
+
+.add-task-button {
+    background: #333;
+    color: white;
+}
+
+.add-task-button:hover {
+    background: #222;
+}
+
+
+/* RIGHT SIDE STATS */
+
+.today-stats {
+    padding-top: 50px;
+}
+
+.progress-ring {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 145px;
+    height: 145px;
+
+    border-radius: 50%;
+
+    background:
+        conic-gradient(
+            #b5b5b5 0deg 288deg,
+            #dddddd 288deg 360deg
+        );
+}
+
+.progress-ring::after {
+    content: "";
+
+    position: absolute;
+
+    width: 108px;
+    height: 108px;
+
+    border-radius: 50%;
+
+    background: white;
+}
+
+.progress-value {
+    position: relative;
+    z-index: 1;
+
+    font-size: 30px;
+
+    color: #888;
+}
+
+.progress-legend {
+    margin-top: 18px;
+
+    font-size: 13px;
+    color: #999;
+}
+
+.progress-legend div {
+    margin-top: 7px;
+}
+
+.legend-dot {
+    display: inline-block;
+
+    width: 11px;
+    height: 11px;
+
+    margin-right: 8px;
+
+    border-radius: 50%;
+}
+
+.legend-dot.done {
+    background: #dddddd;
+}
+
+.legend-dot.incomplete {
+    background: #b5b5b5;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+    .today-layout {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .today-stats {
+        display: none;
+    }
+}
+
+@media (max-width: 700px) {
+    .today-layout {
+        padding-left: 4px;
+        padding-right: 4px;
+    }
+
+    .today-header h1 {
+        font-size: 38px;
+    }
+
+    .composer-bottom {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .composer-actions {
+        justify-content: flex-end;
+    }
+}
