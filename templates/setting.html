@@ -1,11 +1,89 @@
- <a class="nav-link" href="{{ url_for('logout') }}">
-     <img
-        class="nav-icon"
-        src="{{ url_for('static', filename='icons/logout.svg') }}"
-        alt=""
-    >
+{% extends "base.html" %}
 
-    <span class="nav-text">
-        Logout
-    </span>
-</a>
+{% block title %}Settings{% endblock %}
+
+{% block styles %}
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/setting.css') }}"
+>
+{% endblock %}
+
+{% block content %}
+
+<div class="setting-page">
+
+    <h1 class="page-title">
+        Settings
+    </h1>
+
+    <div class="setting-card">
+
+        <a class="nav-link" href="{{ url_for('home') }}">
+            <img
+                class="nav-icon"
+                src="{{ url_for('static', filename='icons/home.svg') }}"
+                alt=""
+            >
+
+            <span class="nav-text">
+                Home
+            </span>
+        </a>
+
+        <div class="setting-divider"></div>
+
+        <div class="profile-section">
+
+            <h2>Profile</h2>
+
+            <div class="avatar-container">
+
+                <img
+                    class="avatar-preview"
+                    src="{{ avatar_url }}"
+                    alt="Avatar"
+                >
+
+            </div>
+
+            <form
+                method="POST"
+                enctype="multipart/form-data"
+            >
+
+                <input
+                    type="file"
+                    name="avatar"
+                    accept=".png,.jpg,.jpeg,.webp"
+                >
+
+                <button class="save-button">
+                    Upload Avatar
+                </button>
+
+            </form>
+
+        </div>
+
+        <div class="setting-divider"></div>
+
+        <a class="nav-link" href="{{ url_for('logout') }}">
+
+            <img
+                class="nav-icon"
+                src="{{ url_for('static', filename='icons/logout.svg') }}"
+                alt=""
+            >
+
+            <span class="nav-text">
+                Logout
+            </span>
+
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}
