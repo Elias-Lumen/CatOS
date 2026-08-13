@@ -51,9 +51,10 @@ def create_tasks_table(connection):
                     )
                 ),
 
-            priority TEXT NOT NULL DEFAULT 'medium'
+            priority TEXT NOT NULL DEFAULT 'normal'
                 CHECK (
                     priority IN (
+                        'normal',
                         'low',
                         'medium',
                         'high'
@@ -90,9 +91,10 @@ def create_subtasks_table(connection):
                     )
                 ),
 
-            priority TEXT NOT NULL DEFAULT 'medium'
+            priority TEXT NOT NULL DEFAULT 'normal'
                 CHECK (
                     priority IN (
+                        'normal',
                         'low',
                         'medium',
                         'high'
@@ -147,7 +149,7 @@ def create_task(
     description=None,
     tag=None,
     state="not_started",
-    priority="medium",
+    priority="normal",
     due_date=None
 ):
     connection = get_connection()

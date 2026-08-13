@@ -146,16 +146,20 @@
     cursor: pointer;
 }
 
+.priority-normal {
+    border: 1.5px solid #d5d5d5;
+}
+
 .priority-low {
-    border: 1.5px solid #bbbbbb;
+    border: 1.5px solid #4a47ff;
 }
 
 .priority-medium {
-    border: 1.5px solid #e7a52c;
+    border: 1.5px solid #ffb52d;
 }
 
 .priority-high {
-    border: 1.5px solid #ef4b4b;
+    border: 1.5px solid #ff4040;
 }
 
 .task-content {
@@ -192,7 +196,7 @@
 }
 
 .task-date {
-    color: #d95b5b;
+    color: #1722ff;
 }
 
 .task-tag {
@@ -472,4 +476,89 @@
     .composer-actions {
         justify-content: flex-end;
     }
+}
+
+/* PRIORITY PICKER */
+
+.priority-picker {
+    position: relative;
+}
+
+.priority-button {
+    cursor: pointer;
+}
+
+.priority-button-icon {
+    width: 16px;
+    height: 16px;
+
+    object-fit: contain;
+}
+
+
+/* PRIORITY MENU */
+
+.priority-menu {
+    position: absolute;
+
+    left: 0;
+    bottom: calc(100% + 8px);
+
+    width: 150px;
+    padding: 6px;
+
+    border: 1px solid #dddddd;
+    border-radius: 10px;
+
+    background: white;
+
+    box-shadow:
+        0 4px 14px rgba(0, 0, 0, 0.10);
+
+    z-index: 20;
+}
+
+.priority-menu.hidden {
+    display: none;
+}
+
+
+/* PRIORITY ITEMS */
+
+.priority-item {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 9px 10px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: transparent;
+
+    font-family: inherit;
+    font-size: 13px;
+
+    color: #444;
+
+    cursor: pointer;
+}
+
+.priority-item:hover {
+    background: #f3f3f3;
+}
+
+.priority-item.selected {
+    background: #f5f5f5;
+}
+
+.priority-item img {
+    width: 17px;
+    height: 17px;
+
+    object-fit: contain;
 }
