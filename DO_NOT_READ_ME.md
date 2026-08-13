@@ -1,11 +1,11 @@
 ## Must
 - [x] Login
 - [x] Sidebar
-- [ ] Task
+- [ ] Task？
 - [ ] cat
 
 ##
-- [ ] Sidebar resize
+- [x] Sidebar resize
 - [ ] Dark mode
 - [ ] live-2D cat
 - [ ] radome cat
@@ -15,6 +15,6 @@
 
 ##
 - [ ] Cloud sync
-- [ ] Custom icons
+- [ ] Custom icon1s
 
 

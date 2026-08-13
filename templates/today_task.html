@@ -186,26 +186,96 @@ Today
                         >
                     </label>
 
-                    <label class="composer-option">
-                        Priority
+                    <div class="priority-picker">
 
-                        <select name="priority">
-                            <option value="low">
-                                Low
-                            </option>
+                    <!-- Button -->
+                    <button
+                        type="button"
+                        class="composer-option priority-button"
+                        id="priorityButton"
+                    >
+                        <img
+                            src="{{ url_for('static', filename='icons/priority-normal.svg') }}"
+                            class="priority-button-icon"
+                            id="priorityButtonIcon"
+                            alt=""
+                        >
 
-                            <option
-                                value="medium"
-                                selected
+                        <span id="priorityButtonText">
+                            Normal
+                        </span>
+                    </button>
+
+
+                    <!-- Dropdown -->
+                    <div
+                        class="priority-menu hidden"
+                        id="priorityMenu"
+                    >
+
+                        <button
+                            type="button"
+                            class="priority-item"
+                            data-priority="high"
+                        >
+                            <img
+                                src="{{ url_for('static', filename='icons/priority-high.svg') }}"
+                                alt=""
                             >
-                                Medium
-                            </option>
+                            <span>High</span>
+                        </button>
 
-                            <option value="high">
-                                High
-                            </option>
-                        </select>
-                    </label>
+
+                        <button
+                            type="button"
+                            class="priority-item"
+                            data-priority="medium"
+                        >
+                            <img
+                                src="{{ url_for('static', filename='icons/priority-medium.svg') }}"
+                                alt=""
+                            >
+                            <span>Medium</span>
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="priority-item"
+                            data-priority="low"
+                        >
+                            <img
+                                src="{{ url_for('static', filename='icons/priority-low.svg') }}"
+                                alt=""
+                            >
+                            <span>Low</span>
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="priority-item selected"
+                            data-priority="normal"
+                        >
+                            <img
+                                src="{{ url_for('static', filename='icons/priority-normal.svg') }}"
+                                alt=""
+                            >
+                            <span>Normal</span>
+                        </button>
+
+                    </div>
+
+
+    <!-- Flask receives this value -->
+    <input
+        type="hidden"
+        name="priority"
+        id="priorityValue"
+        value="normal"
+    >
+
+</div>
 
                 </div>
 

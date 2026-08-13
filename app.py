@@ -14,7 +14,7 @@ from routes.auth import login_user, register_user # connect
 
 app = Flask(__name__)
 
-app.config["SECRET_KEY"] = "flowist-development-secret-key"
+app.config["SECRET_KEY"] = "CatOS-development-secret-key"
 
 
 # home page and the today page is the same page
@@ -28,7 +28,7 @@ def home():
     if request.method == "POST":
         title = request.form.get("title", "").strip()
         description = request.form.get("description", "").strip()
-        priority = request.form.get("priority", "medium")
+        priority = request.form.get("priority", "normal")# if don't select priority, it will be normal
         due_date = request.form.get("due_date") or None
 
         if title:
@@ -130,7 +130,7 @@ def task():
     if request.method == "POST":
         title = request.form.get("title", "").strip()
         description = request.form.get("description", "").strip()
-        priority = request.form.get("priority", "medium")
+        priority = request.form.get("priority", "normal")
         due_date = request.form.get("due_date") or None
 
         if title:

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" stroke-linejoin="round" stroke-width="2">
+ <g class="layer" display="inline">
+  <title>Layer 1</title>
+  <path d="m11.41,9.99a3.56,3.54 0 0 1 2.69,3.16l-0.46,2.5a2.49,2.48 0 0 1 -5.01,1.29q-0.18,-1.43 -1.56,-1.73a2.49,2.48 0 0 1 1.65,-4.98l2.71,-0.26z" fill="#4a47ff" id="svg_1"/>
+  <g id="svg_2" transform="matrix(1 0 0 1 0 0)">
+   <ellipse cx="6.14" cy="8.15" fill="#4a47ff" id="svg_3" rx="1.84" ry="2.35" transform="rotate(3.38973 8.10199 7.05037) matrix(0.821879 0.569662 -0.569662 0.821879 7.69637 -3.14975)"/>
+   <ellipse cx="10.14" cy="5.54" fill="#4a47ff" id="svg_4" rx="1.64" ry="2.06" transform="matrix(0.983996 0.611302 -0.611302 0.983996 6.9264 -5.23899)"/>
+   <ellipse cx="14.44" cy="5.31" fill="#4a47ff" id="svg_5" rx="1.54" ry="2.29" transform="matrix(0.847661 0.77874 -0.672254 0.740416 8.3306 -6.07134)"/>
+   <ellipse cx="18.84" cy="8.21" fill="#4a47ff" id="svg_6" rx="1.74" ry="2.29" transform="rotate(-8.93008 17.2888 14.3691) matrix(0.597598 0.801796 -0.801796 0.597598 12.6085 -5.64185)"/>
+  </g>
+ </g>
+</svg>
