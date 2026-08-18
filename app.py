@@ -8,29 +8,46 @@ from flask import (
     url_for,
 )
 
-from database import create_tables, create_task, get_tasks_by_user # connect database.py
-from routes.auth import login_user, register_user # connect 
+# bring the database functions over here
+# otherwise app.py would have to do all the database work by itself
+from database import (
+    create_tables,
+    create_task,
+    get_tasks_by_user,
+)
+
+# login and register logic is kept in auth.py
+# so app.py does not become one giant file
+from routes.auth import login_user, register_user
 
 
 app = Flask(__name__)
 
+# Flask needs this for session and flash messages
+# this is only a development key for now
 app.config["SECRET_KEY"] = "CatOS-development-secret-key"
 
 
-# home page and the today page is the same page
+# home page and Today page are basically the same thing for now
 @app.route("/", methods=["GET", "POST"])
 def home():
-    # User must be logged in
+
+    # no sneaking into the app without logging in first
     if "user_id" not in session:
         return redirect(url_for("login"))
 
-    # Add a new task
+    # if the user submits the task form, make a new task
     if request.method == "POST":
         title = request.form.get("title", "").strip()
         description = request.form.get("description", "").strip()
-        priority = request.form.get("priority", "normal")# if don't select priority, it will be normal
+
+        # if the user does not choose one, just use normal
+        priority = request.form.get("priority", "normal")
+
+        # blank due date is easier to deal with as None
         due_date = request.form.get("due_date") or None
 
+        # a task without a title is not very useful
         if title:
             create_task(
                 user_id=session["user_id"],
@@ -40,93 +57,120 @@ def home():
                 due_date=due_date
             )
 
+        # reload the page after adding the task
+        # this also stops the form being submitted twice on refresh
         return redirect(url_for("home"))
 
-    # Get all tasks belonging to the current user
+    # only get tasks that belong to the current user
     tasks = get_tasks_by_user(session["user_id"])
 
-    # Show tasks on the Today page
+    # send the tasks to the Today page so Jinja can display them
     return render_template(
         "today_task.html",
         tasks=tasks
     )
 
-# register function
+
+# register page
 @app.route("/register", methods=["GET", "POST"])
 def register():
+
+    # POST means the user actually pressed the register button
     if request.method == "POST":
         username = request.form.get("username", "")
         password = request.form.get("password", "")
+
         confirm_password = request.form.get(
             "confirm_password",
             "",
         )
 
+        # stop here if they somehow typed two different passwords
         if password != confirm_password:
             flash("Passwords do not match.")
             return render_template("register.html")
 
+        # auth.py does the actual account creation
         user = register_user(username, password)
 
+        # None means something went wrong
+        # usually duplicate username or missing information
         if user is None:
             flash(
                 "Username already exists, or the form is incomplete."
             )
             return render_template("register.html")
 
-        # if sign up successful, login derictly
+        # registration worked
+        # log the user in straight away because making them log in again is annoying
         session.clear()
         session["user_id"] = user["id"]
         session["username"] = user["username"]
 
         return redirect(url_for("home"))
 
+    # if they only opened the page, just show the form
     return render_template("register.html")
 
-@app.route("/login", methods=["GET", "POST"])
 
-# login function
+# login page
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    # user post login table
+
+    # user pressed the login button
     if request.method == "POST":
         username = request.form.get("username", "")
         password = request.form.get("password", "")
 
+        # ask auth.py if these login details are actually correct
         user = login_user(username, password)
 
+        # wrong username or password
         if user is None:
             flash("Invalid username or password.")
             return render_template("login.html")
 
-        # clean perious any login
+        # remove anything left from an old login session
         session.clear()
 
-        # remember user
+        # remember who is logged in
         session["user_id"] = user["id"]
         session["username"] = user["username"]
 
         return redirect(url_for("home"))
 
-    # 用户只是打开 /login 页面
+    # they only opened /login, nothing exciting happened yet
     return render_template("login.html")
 
-# the botton in the setting to make sure can logout
+
+# log out button from Settings
 @app.route("/logout")
 def logout():
+
+    # forget the current user completely
     session.clear()
+
+    # send them back to login
     return redirect(url_for("login"))
 
-# setting 
+
+# settings page
+# avatar stuff will probably live here later
 @app.route("/setting")
 def setting():
     return render_template("setting.html")
 
 
+# separate task page
+# this is currently another place where tasks can be added
 @app.route("/task", methods=["GET", "POST"])
 def task():
+
+    # same rule as Home: login first
     if "user_id" not in session:
         return redirect(url_for("login"))
 
+    # user submitted a new task
     if request.method == "POST":
         title = request.form.get("title", "").strip()
         description = request.form.get("description", "").strip()
@@ -144,46 +188,63 @@ def task():
 
         return redirect(url_for("task"))
 
+    # get this user's tasks for the page
     tasks = get_tasks_by_user(session["user_id"])
 
     return render_template(
         "task.html",
         tasks=tasks
     )
-# this should be the fload task additor (CSS)
-# 
 
+
+# this page should eventually become the floating task editor
+# currently still under construction
 @app.route("/search")
 def search():
     return render_template("search.html")
 
 
+# filters and labels page
+# need to be done
 @app.route("/labels")
 def labels():
     return render_template("labels.html")
 
 
+# future tasks will go here
 @app.route("/upcoming")
 def upcoming():
     return render_template("upcoming.html")
 
 
+# task data / progress page
 @app.route("/data")
 def data():
     return render_template("data.html")
 
 
+# virtual cat page
 @app.route("/cat")
 def cat():
     return render_template("cat.html")
 
-# should add a use's individual cat name (maybe user can edit it?)
 
+# later each user should probably have their own cat name
+# maybe let them edit it in Settings too?
+
+
+# help page
 @app.route("/help")
 def help():
     return render_template("help.html")
 
 
+# only start the Flask server if this file is run directly
 if __name__ == "__main__":
+
+    # make sure all the database tables exist before CatOS starts
     create_tables()
+
+    # debug=True is useful while developing
+    # definitely not something I want forever
     app.run(debug=True)
