@@ -2,25 +2,29 @@ import sqlite3
 from pathlib import Path
 
 
+# find where this python file is, then find CatOS.db from the same folder
+# this makes the database path still work if the project is moved somewhere else
 BASE_DIR = Path(__file__).resolve().parent
 DATABASE_PATH = BASE_DIR / "CatOS.db"
 
 
-
+# connect to the CatOS database
 def get_connection():
     connection = sqlite3.connect(DATABASE_PATH)
 
-    # Allow query results to be accessed as user["username"]
-    # instead of user[1].
+    # make the results easier to read
+    # for example, use user["username"] instead of user[1]
     connection.row_factory = sqlite3.Row
 
-    # Enable foreign key constraints in SQLite.
+    # SQLite does not turn foreign keys on automatically
+    # this makes the relationships between the tables actually work
     connection.execute("PRAGMA foreign_keys = ON")
 
     return connection
 
 
-# User table use for store users' id and avatar
+# users table
+# stores the login information and profile picture for each user
 def create_users_table(connection):
     connection.execute("""
         CREATE TABLE IF NOT EXISTS users (
@@ -32,7 +36,8 @@ def create_users_table(connection):
     """)
 
 
-# tasks
+# tasks table
+# every task belongs to one user by using user_id
 def create_tasks_table(connection):
     connection.execute("""
         CREATE TABLE IF NOT EXISTS tasks (
@@ -42,6 +47,7 @@ def create_tasks_table(connection):
             description TEXT,
             tag TEXT,
 
+            -- task can only have one of these three states
             state TEXT NOT NULL DEFAULT 'not_started'
                 CHECK (
                     state IN (
@@ -51,6 +57,7 @@ def create_tasks_table(connection):
                     )
                 ),
 
+            -- normal is the default if the user does not choose a priority
             priority TEXT NOT NULL DEFAULT 'normal'
                 CHECK (
                     priority IN (
@@ -65,6 +72,8 @@ def create_tasks_table(connection):
             created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             completed_at TIMESTAMP,
 
+            -- connect the task to its user
+            -- if the user is deleted, their tasks should also be deleted
             FOREIGN KEY (user_id)
                 REFERENCES users(id)
                 ON DELETE CASCADE
@@ -72,7 +81,9 @@ def create_tasks_table(connection):
     """)
 
 
-# add subtask table should have no line when have no subtask
+# subtasks table
+# similar to tasks, but every subtask belongs to a main task
+# if a task has no subtasks, there just will not be any rows for it here
 def create_subtasks_table(connection):
     connection.execute("""
         CREATE TABLE IF NOT EXISTS subtasks (
@@ -82,6 +93,7 @@ def create_subtasks_table(connection):
             description TEXT,
             tag TEXT,
 
+            -- use the same states as the main tasks
             state TEXT NOT NULL DEFAULT 'not_started'
                 CHECK (
                     state IN (
@@ -91,6 +103,7 @@ def create_subtasks_table(connection):
                     )
                 ),
 
+            -- subtasks can have their own priority
             priority TEXT NOT NULL DEFAULT 'normal'
                 CHECK (
                     priority IN (
@@ -105,13 +118,17 @@ def create_subtasks_table(connection):
             created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             completed_at TIMESTAMP,
 
+            -- connect the subtask to its main task
+            -- deleting the main task will also delete its subtasks
             FOREIGN KEY (task_id)
                 REFERENCES tasks(id)
                 ON DELETE CASCADE
         )
     """)
 
-# create cats table
+
+# cat table
+# each user can have one cat, so user_id needs to be unique here
 def create_cat_table(connection):
     connection.execute("""
         CREATE TABLE IF NOT EXISTS cat (
@@ -119,8 +136,10 @@ def create_cat_table(connection):
             user_id INTEGER UNIQUE NOT NULL,
             cat_name TEXT NOT NULL,
 
+            -- what the cat is doing at the moment
             status TEXT NOT NULL DEFAULT 'idle',
 
+            -- keep these values between 0 and 100
             mood INTEGER NOT NULL DEFAULT 50
                 CHECK (mood BETWEEN 0 AND 100),
 
@@ -130,19 +149,75 @@ def create_cat_table(connection):
             hunger INTEGER NOT NULL DEFAULT 0
                 CHECK (hunger BETWEEN 0 AND 100),
 
+            -- remember when the user last interacted with their cat
             last_interaction TIMESTAMP NOT NULL
                 DEFAULT CURRENT_TIMESTAMP,
 
             equipped_item TEXT,
             cat_color TEXT,
 
+            -- connect the cat to its owner
             FOREIGN KEY (user_id)
                 REFERENCES users(id)
                 ON DELETE CASCADE
         )
     """)
 
-# creat task
+
+# get one user's information using their id
+# mainly useful when I need their username or avatar
+def get_user_by_id(user_id):
+    connection = get_connection()
+
+    user = connection.execute(
+        """
+        SELECT
+            id,
+            username,
+            avatar_url
+        FROM users
+        WHERE id = ?
+        """,
+        (user_id,)
+    ).fetchone()
+
+    connection.close()
+
+    return user
+
+
+# change the saved avatar path for one user
+def update_user_avatar(user_id, avatar_url):
+    connection = get_connection()
+
+    try:
+        # only update the user that is currently logged in
+        connection.execute(
+            """
+            UPDATE users
+            SET avatar_url = ?
+            WHERE id = ?
+            """,
+            (
+                avatar_url,
+                user_id
+            )
+        )
+
+        # actually save the change
+        connection.commit()
+
+    except sqlite3.Error:
+        # if something goes wrong, cancel the unfinished change
+        connection.rollback()
+        raise
+
+    finally:
+        # close the connection whether it worked or not
+        connection.close()
+
+
+# create a new task for a user
 def create_task(
     user_id,
     title,
@@ -155,6 +230,7 @@ def create_task(
     connection = get_connection()
 
     try:
+        # add all the task information into a new row
         connection.execute(
             """
             INSERT INTO tasks (
@@ -179,9 +255,11 @@ def create_task(
             )
         )
 
+        # save the new task
         connection.commit()
 
     except sqlite3.Error:
+        # do not leave a half-finished change in the database
         connection.rollback()
         raise
 
@@ -189,10 +267,11 @@ def create_task(
         connection.close()
 
 
+# get all tasks that belong to one user
 def get_tasks_by_user(user_id):
-    conn = get_connection()
+    connection = get_connection()
 
-    tasks = conn.execute(
+    tasks = connection.execute(
         """
         SELECT *
         FROM tasks
@@ -202,11 +281,16 @@ def get_tasks_by_user(user_id):
         (user_id,)
     ).fetchall()
 
-    conn.close()
+    connection.close()
+
     return tasks
 
-# if need add function, add above
-# final check
+
+# put any new database functions above this part
+
+
+# create all the tables when CatOS first starts
+# CREATE TABLE IF NOT EXISTS means existing tables will not be replaced
 def create_tables():
     connection = get_connection()
 
@@ -216,9 +300,11 @@ def create_tables():
         create_subtasks_table(connection)
         create_cat_table(connection)
 
+        # save all table changes together
         connection.commit()
 
     except sqlite3.Error:
+        # cancel the changes if one of the table creations fails
         connection.rollback()
         raise
 
@@ -226,5 +312,7 @@ def create_tables():
         connection.close()
 
 
+# this only runs when database.py is run directly
+# useful if I want to create/check the tables without starting the Flask app
 if __name__ == "__main__":
     create_tables()
