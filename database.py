@@ -280,8 +280,8 @@ def get_tasks_by_user(user_id):
             CASE priority   
                 WHEN 'high' THEN 1  
                 WHEN 'medium' THEN 2
-                WHEN 'normal' THEN 3
-                WHEN 'low' THEN 4
+                WHEN 'low' THEN 3
+                WHEN 'normal' THEN 4
             END,
             created_at DESC
         """,
