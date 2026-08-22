@@ -276,7 +276,14 @@ def get_tasks_by_user(user_id):
         SELECT *
         FROM tasks
         WHERE user_id = ?
-        ORDER BY created_at DESC
+        ORDER BY
+            CASE priority   # make the highest priority at top
+                WHEN 'high' THEN 1  
+                WHEN 'medium' THEN 2
+                WHEN 'normal' THEN 3
+                WHEN 'low' THEN 4
+            END,
+            created_at DESC
         """,
         (user_id,)
     ).fetchall()
