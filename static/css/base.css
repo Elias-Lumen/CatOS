@@ -22,7 +22,6 @@ body {
     width: 260px;
     min-width: 180px;
     max-width: 420px;
-    height: 100vh;
 
     padding: 12px 8px;
     background: #f4f4f4;
@@ -41,7 +40,7 @@ body {
     display: flex;
     overflow: hidden;
     flex-direction: column;
-    height: 100%;
+    flex: 1;
     gap: 6px;
 }
 

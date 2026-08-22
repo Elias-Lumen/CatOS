@@ -5,7 +5,7 @@ from pathlib import Path
 # find where this python file is, then find CatOS.db from the same folder
 # this makes the database path still work if the project is moved somewhere else
 BASE_DIR = Path(__file__).resolve().parent
-DATABASE_PATH = BASE_DIR / "CatOS.db"
+DATABASE_PATH = BASE_DIR / "CatOS.db"       # will genernal the db file
 
 
 # connect to the CatOS database
