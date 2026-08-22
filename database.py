@@ -277,7 +277,7 @@ def get_tasks_by_user(user_id):
         FROM tasks
         WHERE user_id = ?
         ORDER BY
-            CASE priority   # make the highest priority at top
+            CASE priority   
                 WHEN 'high' THEN 1  
                 WHEN 'medium' THEN 2
                 WHEN 'normal' THEN 3
