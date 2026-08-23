@@ -609,3 +609,158 @@
     text-decoration-thickness: 1px;
     text-decoration-color: #bbb;
 }
+
+/* HIDDEN */
+
+.hidden {
+    display: none;
+}
+
+
+/* TASK EDIT BUTTON */
+
+.task-edit-button {
+    flex-shrink: 0;
+
+    margin-top: 1px;
+    padding: 3px 6px;
+
+    border: none;
+    border-radius: 5px;
+
+    background: transparent;
+
+    font-size: 15px;
+    color: #aaa;
+
+    cursor: pointer;
+
+    opacity: 0;
+
+    transition:
+        opacity 0.15s ease,
+        background 0.15s ease,
+        color 0.15s ease;
+}
+
+.task-row:hover .task-edit-button {
+    opacity: 1;
+}
+
+.task-edit-button:hover {
+    background: #eaeaea;
+    color: #555;
+}
+
+
+/* TASK EDIT FORM */
+
+.task-edit-form {
+    width: 100%;
+}
+
+.edit-title,
+.edit-description {
+    width: 100%;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    font-family: inherit;
+}
+
+.edit-title {
+    font-size: 15px;
+    font-weight: 500;
+
+    color: #222;
+}
+
+.edit-description {
+    margin-top: 5px;
+
+    resize: none;
+
+    font-size: 13px;
+    line-height: 1.4;
+
+    color: #777;
+}
+
+
+/* EDIT OPTIONS */
+
+.edit-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-top: 9px;
+}
+
+.edit-options input,
+.edit-options select {
+    padding: 5px 7px;
+
+    border: 1px solid #ddd;
+    border-radius: 6px;
+
+    background: #fafafa;
+
+    font-family: inherit;
+    font-size: 12px;
+
+    color: #666;
+}
+
+
+/* EDIT ACTIONS */
+
+.edit-actions {
+    display: flex;
+    align-items: center;
+
+    gap: 6px;
+
+    margin-left: auto;
+}
+
+.edit-cancel,
+.edit-save {
+    padding: 6px 10px;
+
+    border: none;
+    border-radius: 6px;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.edit-cancel {
+    background: #eee;
+    color: #555;
+}
+
+.edit-cancel:hover {
+    background: #e3e3e3;
+}
+
+.edit-save {
+    background: #333;
+    color: white;
+}
+
+.edit-save:hover {
+    background: #222;
+}
+
+.task-row > form {
+    margin: 0;
+}

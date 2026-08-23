@@ -72,6 +72,94 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
+
+    // Open task editor
+    const editButtons =
+        document.querySelectorAll(".task-edit-button");
+
+    editButtons.forEach((button) => {
+
+        button.addEventListener("click", () => {
+
+            const taskId = button.dataset.taskId;
+
+            const taskDisplay =
+                document.getElementById(
+                    `taskDisplay${taskId}`
+                );
+
+            const taskEditForm =
+                document.getElementById(
+                    `taskEdit${taskId}`
+                );
+
+            if (!taskDisplay || !taskEditForm) {
+                return;
+            }
+
+            taskDisplay.classList.add("hidden");
+
+            taskEditForm.classList.remove("hidden");
+
+            button.classList.add("hidden");
+
+
+            const titleInput =
+                taskEditForm.querySelector(".edit-title");
+
+            if (titleInput) {
+                titleInput.focus();
+                titleInput.select();
+            }
+
+        });
+
+    });
+
+
+    // Close task editor
+    const cancelEditButtons =
+        document.querySelectorAll(".edit-cancel");
+
+    cancelEditButtons.forEach((button) => {
+
+        button.addEventListener("click", () => {
+
+            const taskId = button.dataset.taskId;
+
+            const taskDisplay =
+                document.getElementById(
+                    `taskDisplay${taskId}`
+                );
+
+            const taskEditForm =
+                document.getElementById(
+                    `taskEdit${taskId}`
+                );
+
+            const editButton =
+                document.querySelector(
+                    `.task-edit-button[data-task-id="${taskId}"]`
+                );
+
+            if (
+                !taskDisplay ||
+                !taskEditForm ||
+                !editButton
+            ) {
+                return;
+            }
+
+            taskEditForm.classList.add("hidden");
+
+            taskDisplay.classList.remove("hidden");
+
+            editButton.classList.remove("hidden");
+
+        });
+
+    });
+
 });
 
 const priorityButton = document.getElementById("priorityButton");
