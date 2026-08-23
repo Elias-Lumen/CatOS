@@ -14,6 +14,7 @@ from database import (
     create_tables,
     create_task,
     get_tasks_by_user,
+    toggle_task_completion,
 )
 
 # login and register logic is kept in auth.py
@@ -70,6 +71,18 @@ def home():
         tasks=tasks
     )
 
+@app.route("/task/<int:task_id>/toggle", methods=["POST"])
+def toggle_task(task_id):
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    toggle_task_completion(
+        task_id=task_id,
+        user_id=session["user_id"]
+    )
+
+    return redirect(url_for("home"))
 
 # register page
 @app.route("/register", methods=["GET", "POST"])

@@ -293,6 +293,67 @@ def get_tasks_by_user(user_id):
     return tasks
 
 
+
+def toggle_task_completion(task_id, user_id):
+    connection = get_connection()
+
+    try:
+        task = connection.execute(
+            """
+            SELECT state
+            FROM tasks
+            WHERE id = ? AND user_id = ?
+            """,
+            (task_id, user_id)
+        ).fetchone()
+
+        if task is None:
+            return False
+
+        if task["state"] == "completed":
+            new_state = "not_started"
+
+            connection.execute(
+                """
+                UPDATE tasks
+                SET state = ?,
+                    completed_at = NULL
+                WHERE id = ? AND user_id = ?
+                """,
+                (
+                    new_state,
+                    task_id,
+                    user_id
+                )
+            )
+
+        else:
+            new_state = "completed"
+
+            connection.execute(
+                """
+                UPDATE tasks
+                SET state = ?,
+                    completed_at = CURRENT_TIMESTAMP
+                WHERE id = ? AND user_id = ?
+                """,
+                (
+                    new_state,
+                    task_id,
+                    user_id
+                )
+            )
+
+        connection.commit()
+        return True
+
+    except sqlite3.Error:
+        connection.rollback()
+        raise
+
+    finally:
+        connection.close()
+
 # put any new database functions above this part
 
 

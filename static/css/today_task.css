@@ -562,3 +562,17 @@
 
     object-fit: contain;
 }
+
+.task-circle.completed {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 11px;
+    color: #777;
+}
+
+.task-name.completed {
+    text-decoration: line-through;
+    color: #aaa;
+}

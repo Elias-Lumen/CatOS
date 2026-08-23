@@ -88,14 +88,36 @@ Today
 
                         <article class="task-row">
 
-                            <button
-                                type="button"
-                                class="task-circle priority-{{ task['priority'] }}"
-                            ></button>
+                            <form
+                                method="POST"
+                                action="{{ url_for('toggle_task', task_id=task['id']) }}"
+                            >
+                                <button
+                                    type="submit"
+                                    class="
+                                        task-circle
+                                        priority-{{ task['priority'] }}
+                                        {% if task['state'] == 'completed' %}
+                                            completed
+                                        {% endif %}
+                                    "
+                                >
+                                    {% if task["state"] == "completed" %}
+                                        ✓
+                                    {% endif %}
+                                </button>
+                            </form>
 
                             <div class="task-content">
 
-                                <div class="task-name">
+                                <div
+                                    class="
+                                        task-name
+                                        {% if task['state'] == 'completed' %}
+                                            completed
+                                        {% endif %}
+                                    "
+                                >
                                     {{ task["title"] }}
                                 </div>
 
@@ -342,3 +364,4 @@ Today
     src="{{ url_for('static', filename='js/today_task.js') }}"
 ></script>
 {% endblock %}
+
