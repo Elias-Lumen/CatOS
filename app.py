@@ -15,6 +15,7 @@ from database import (
     create_task,
     get_tasks_by_user,
     toggle_task_completion,
+    update_task,
 )
 
 # login and register logic is kept in auth.py
@@ -81,6 +82,29 @@ def toggle_task(task_id):
         task_id=task_id,
         user_id=session["user_id"]
     )
+
+    return redirect(url_for("home"))
+
+@app.route("/task/<int:task_id>/edit", methods=["POST"])
+def edit_task(task_id):
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    title = request.form.get("title", "").strip()
+    description = request.form.get("description", "").strip()
+    priority = request.form.get("priority", "normal")
+    due_date = request.form.get("due_date") or None
+
+    if title:
+        update_task(
+            task_id=task_id,
+            user_id=session["user_id"],
+            title=title,
+            description=description,
+            priority=priority,
+            due_date=due_date
+        )
 
     return redirect(url_for("home"))
 

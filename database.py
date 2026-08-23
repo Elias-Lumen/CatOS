@@ -360,6 +360,50 @@ def toggle_task_completion(task_id, user_id):
     finally:
         connection.close()
 
+
+def update_task(
+    task_id,
+    user_id,
+    title,
+    description=None,
+    priority="normal",
+    due_date=None
+):
+    connection = get_connection()
+
+    try:
+        cursor = connection.execute(
+            """
+            UPDATE tasks
+            SET
+                title = ?,
+                description = ?,
+                priority = ?,
+                due_date = ?
+            WHERE id = ? AND user_id = ?
+            """,
+            (
+                title,
+                description,
+                priority,
+                due_date,
+                task_id,
+                user_id
+            )
+        )
+
+        connection.commit()
+
+        return cursor.rowcount > 0
+
+    except sqlite3.Error:
+        connection.rollback()
+        raise
+
+    finally:
+        connection.close()
+
+        
 # put any new database functions above this part
 
 
