@@ -576,3 +576,36 @@
     text-decoration: line-through;
     color: #aaa;
 }
+
+.task-circle {
+    position: relative;
+}
+
+.task-circle.completed::after {
+    content: "";
+
+    position: absolute;
+
+    width: 4px;
+    height: 8px;
+
+    left: 5px;
+    top: 2px;
+
+    border-right: 1.5px solid #888;
+    border-bottom: 1.5px solid #888;
+
+    transform: rotate(45deg);
+}
+
+.task-circle.completed {
+    border-color: #cfcfcf;
+    background: #f3f3f3;
+}
+
+.task-name.completed {
+    color: #aaa;
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+    text-decoration-color: #bbb;
+}

@@ -92,20 +92,16 @@ Today
                                 method="POST"
                                 action="{{ url_for('toggle_task', task_id=task['id']) }}"
                             >
-                                <button
-                                    type="submit"
-                                    class="
-                                        task-circle
-                                        priority-{{ task['priority'] }}
-                                        {% if task['state'] == 'completed' %}
-                                            completed
-                                        {% endif %}
-                                    "
-                                >
-                                    {% if task["state"] == "completed" %}
-                                        ✓
+                            <button
+                                type="submit"
+                                class="
+                                    task-circle
+                                    priority-{{ task['priority'] }}
+                                    {% if task['state'] == 'completed' %}
+                                        completed
                                     {% endif %}
-                                </button>
+                                "
+                            ></button>
                             </form>
 
                             <div class="task-content">
