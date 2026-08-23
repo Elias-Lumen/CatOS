@@ -277,12 +277,18 @@ def get_tasks_by_user(user_id):
         FROM tasks
         WHERE user_id = ?
         ORDER BY
-            CASE priority   
-                WHEN 'high' THEN 1  
+            CASE
+                WHEN state = 'completed' THEN 1
+                ELSE 0
+            END,
+
+            CASE priority
+                WHEN 'high' THEN 1
                 WHEN 'medium' THEN 2
                 WHEN 'low' THEN 3
                 WHEN 'normal' THEN 4
             END,
+
             created_at DESC
         """,
         (user_id,)
