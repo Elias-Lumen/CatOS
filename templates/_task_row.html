@@ -1,0 +1,191 @@
+<article class="task-row">
+
+    <form
+        method="POST"
+        action="{{ url_for('toggle_task', task_id=task['id']) }}"
+    >
+        <button
+            type="submit"
+            class="
+                task-circle
+                priority-{{ task['priority'] }}
+                {% if task['state'] == 'completed' %}
+                    completed
+                {% endif %}
+            "
+        ></button>
+    </form>
+
+
+    <div class="task-content">
+
+        <!-- Normal task display -->
+        <div
+            class="task-display"
+            id="taskDisplay{{ task['id'] }}"
+        >
+
+            <div
+                class="
+                    task-name
+                    {% if task['state'] == 'completed' %}
+                        completed
+                    {% endif %}
+                "
+            >
+                {{ task["title"] }}
+            </div>
+
+            {% if task["description"] %}
+                <div class="task-description">
+                    {{ task["description"] }}
+                </div>
+            {% endif %}
+
+            <div class="task-meta">
+
+                {% if task["due_date"] %}
+                    <span class="task-date">
+                        Due {{ task["due_date"] }}
+                    </span>
+                {% endif %}
+
+                {% if task["tag"] %}
+                    <span class="task-tag">
+                        # {{ task["tag"] }}
+                    </span>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- Edit task form -->
+        <form
+            method="POST"
+            action="{{ url_for('edit_task', task_id=task['id']) }}"
+            class="task-edit-form hidden"
+            id="taskEdit{{ task['id'] }}"
+        >
+
+            <input
+                type="text"
+                name="title"
+                class="edit-title"
+                value="{{ task['title'] }}"
+                required
+            >
+
+            <textarea
+                name="description"
+                class="edit-description"
+                rows="2"
+            >{{ task["description"] or "" }}</textarea>
+
+            <div class="edit-options">
+
+                <input
+                    type="date"
+                    name="due_date"
+                    value="{{ task['due_date'] or '' }}"
+                >
+
+                <select name="priority">
+
+                    <option
+                        value="high"
+                        {% if task["priority"] == "high" %}
+                            selected
+                        {% endif %}
+                    >
+                        High
+                    </option>
+
+                    <option
+                        value="medium"
+                        {% if task["priority"] == "medium" %}
+                            selected
+                        {% endif %}
+                    >
+                        Medium
+                    </option>
+
+                    <option
+                        value="low"
+                        {% if task["priority"] == "low" %}
+                            selected
+                        {% endif %}
+                    >
+                        Low
+                    </option>
+
+                    <option
+                        value="normal"
+                        {% if task["priority"] == "normal" %}
+                            selected
+                        {% endif %}
+                    >
+                        Normal
+                    </option>
+
+                </select>
+
+
+                <div class="edit-actions">
+
+                    <button
+                        type="button"
+                        class="edit-cancel"
+                        data-task-id="{{ task['id'] }}"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="edit-save"
+                    >
+                        Save
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <div class="task-actions">
+
+        <!-- EDIT BUTTON -->
+        <button
+            type="button"
+            class="task-edit-button"
+            data-task-id="{{ task['id'] }}"
+            aria-label="Edit task"
+        >
+            ✎
+        </button>
+
+
+        <!-- DELETE BUTTON -->
+        <form
+            method="POST"
+            action="{{ url_for('remove_task', task_id=task['id']) }}"
+            class="task-delete-form"
+        >
+            <button
+                type="submit"
+                class="task-delete-button"
+                aria-label="Delete task"
+            >
+                ×
+            </button>
+        </form>
+
+    </div>
+
+</article>

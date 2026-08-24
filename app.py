@@ -69,13 +69,39 @@ def home():
     # only get tasks that belong to the current user
     tasks = get_tasks_by_user(session["user_id"])
 
-    today = date.today().isoformat()
+    today_date = date.today()
+
+    overdue_tasks = []
+    today_tasks = []
 
     # send the tasks to the Today page so Jinja can display them
+    for task in tasks:
+
+        if task["due_date"]:
+            task_date = date.fromisoformat(task["due_date"])
+
+            if task_date < today_date:
+                overdue_tasks.append(task)
+            else:
+                today_tasks.append(task)
+
+        else:
+            today_tasks.append(task)
+
+    return render_template(
+        "today_task.html",
+        overdue_tasks=overdue_tasks,
+        today_tasks=today_tasks,
+        today=today_date.isoformat()
+    )
+
+
     return render_template(
         "today_task.html",
         tasks=tasks,
-        today=today
+        overdue_tasks=overdue_tasks,
+        today_tasks=today_tasks,
+        today=today_date.isoformat()
     )
 
 @app.route("/task/<int:task_id>/toggle", methods=["POST"])
