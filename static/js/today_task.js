@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // Show add-task composer
+    // Add task composer
     const showComposerButton =
         document.getElementById("showComposer");
 
@@ -36,13 +36,10 @@ document.addEventListener("DOMContentLoaded", () => {
         showComposerButton.addEventListener("click", () => {
 
             taskComposer.classList.remove("hidden");
-
             showComposerButton.style.display = "none";
 
             const titleInput =
-                taskComposer.querySelector(
-                    'input[name="title"]'
-                );
+                taskComposer.querySelector('input[name="title"]');
 
             if (titleInput) {
                 titleInput.focus();
@@ -53,7 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    // Hide composer when Cancel is clicked
     if (
         cancelComposerButton &&
         taskComposer &&
@@ -63,9 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
         cancelComposerButton.addEventListener("click", () => {
 
             taskComposer.reset();
-
             taskComposer.classList.add("hidden");
-
             showComposerButton.style.display = "inline-block";
 
         });
@@ -73,134 +67,194 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    // Open task editor
-    const editButtons =
-        document.querySelectorAll(".task-edit-button");
-
-    editButtons.forEach((button) => {
-
-        button.addEventListener("click", () => {
-
-            const taskId = button.dataset.taskId;
-
-            const taskDisplay =
-                document.getElementById(
-                    `taskDisplay${taskId}`
-                );
-
-            const taskEditForm =
-                document.getElementById(
-                    `taskEdit${taskId}`
-                );
-
-            if (!taskDisplay || !taskEditForm) {
-                return;
-            }
-
-            taskDisplay.classList.add("hidden");
-
-            taskEditForm.classList.remove("hidden");
-
-            button.classList.add("hidden");
-
-
-            const titleInput =
-                taskEditForm.querySelector(".edit-title");
-
-            if (titleInput) {
-                titleInput.focus();
-                titleInput.select();
-            }
-
-        });
-
-    });
-
-
     // Close task editor
-    const cancelEditButtons =
-        document.querySelectorAll(".edit-cancel");
+    function closeTaskEditor(taskId) {
 
-    cancelEditButtons.forEach((button) => {
+        const display =
+            document.getElementById(`taskDisplay${taskId}`);
 
-        button.addEventListener("click", () => {
+        const form =
+            document.getElementById(`taskEdit${taskId}`);
 
-            const taskId = button.dataset.taskId;
+        const editButton =
+            document.querySelector(
+                `.task-edit-button[data-task-id="${taskId}"]`
+            );
 
-            const taskDisplay =
-                document.getElementById(
-                    `taskDisplay${taskId}`
-                );
+        if (!display || !form || !editButton) {
+            return;
+        }
 
-            const taskEditForm =
-                document.getElementById(
-                    `taskEdit${taskId}`
-                );
+        form.classList.add("hidden");
+        display.classList.remove("hidden");
+        editButton.classList.remove("hidden");
 
-            const editButton =
-                document.querySelector(
-                    `.task-edit-button[data-task-id="${taskId}"]`
-                );
+    }
 
-            if (
-                !taskDisplay ||
-                !taskEditForm ||
-                !editButton
-            ) {
-                return;
-            }
 
-            taskEditForm.classList.add("hidden");
+    // Open task editor
+    document
+        .querySelectorAll(".task-edit-button")
+        .forEach((button) => {
 
-            taskDisplay.classList.remove("hidden");
+            button.addEventListener("click", () => {
 
-            editButton.classList.remove("hidden");
+                const taskId = button.dataset.taskId;
+
+                const display =
+                    document.getElementById(
+                        `taskDisplay${taskId}`
+                    );
+
+                const form =
+                    document.getElementById(
+                        `taskEdit${taskId}`
+                    );
+
+                if (!display || !form) {
+                    return;
+                }
+
+                display.classList.add("hidden");
+                form.classList.remove("hidden");
+                button.classList.add("hidden");
+
+
+                // Remember what the form looked like
+                // before the user changed anything
+                form.dataset.original =
+                    new URLSearchParams(
+                        new FormData(form)
+                    ).toString();
+
+
+                const titleInput =
+                    form.querySelector(".edit-title");
+
+                if (titleInput) {
+                    titleInput.focus();
+                    titleInput.select();
+                }
+
+            });
 
         });
 
-    });
 
-});
+    // Cancel editing
+    document
+        .querySelectorAll(".edit-cancel")
+        .forEach((button) => {
 
-const priorityButton = document.getElementById("priorityButton");
-const priorityMenu = document.getElementById("priorityMenu");
+            button.addEventListener("click", () => {
 
-const priorityValue = document.getElementById("priorityValue");
-const priorityButtonText = document.getElementById("priorityButtonText");
-const priorityButtonIcon = document.getElementById("priorityButtonIcon");
+                const taskId = button.dataset.taskId;
 
-const priorityItems = document.querySelectorAll(".priority-item");
+                closeTaskEditor(taskId);
 
+            });
 
-priorityButton.addEventListener("click", () => {
-    priorityMenu.classList.toggle("hidden");
-});
-
-
-priorityItems.forEach((item) => {
-    item.addEventListener("click", () => {
-
-        const priority = item.dataset.priority;
-
-        // Give the selected value to Flask
-        priorityValue.value = priority;
-
-        // Change button text
-        priorityButtonText.textContent =
-            priority.charAt(0).toUpperCase() + priority.slice(1);
-
-        // Change button icon
-        priorityButtonIcon.src =
-            `/static/icons/priority-${priority}.svg`;
-
-        // Update selected option
-        priorityItems.forEach((option) => {
-            option.classList.remove("selected");
         });
 
-        item.classList.add("selected");
 
-        // Close dropdown
-        priorityMenu.classList.add("hidden");
-    });
+    // Close editor automatically if nothing was changed
+    document
+        .querySelectorAll(".task-edit-form")
+        .forEach((form) => {
+
+            form.addEventListener("focusout", () => {
+
+                setTimeout(() => {
+
+                    // Still clicking inside the form
+                    if (form.contains(document.activeElement)) {
+                        return;
+                    }
+
+                    const current =
+                        new URLSearchParams(
+                            new FormData(form)
+                        ).toString();
+
+                    // Something changed, so keep it open
+                    if (current !== form.dataset.original) {
+                        return;
+                    }
+
+                    const taskId =
+                        form.id.replace("taskEdit", "");
+
+                    closeTaskEditor(taskId);
+
+                }, 0);
+
+            });
+
+        });
+
+
+    // Priority picker
+    const priorityButton =
+        document.getElementById("priorityButton");
+
+    const priorityMenu =
+        document.getElementById("priorityMenu");
+
+    const priorityValue =
+        document.getElementById("priorityValue");
+
+    const priorityButtonText =
+        document.getElementById("priorityButtonText");
+
+    const priorityButtonIcon =
+        document.getElementById("priorityButtonIcon");
+
+    const priorityItems =
+        document.querySelectorAll(".priority-item");
+
+
+    if (
+        priorityButton &&
+        priorityMenu &&
+        priorityValue &&
+        priorityButtonText &&
+        priorityButtonIcon
+    ) {
+
+        priorityButton.addEventListener("click", () => {
+
+            priorityMenu.classList.toggle("hidden");
+
+        });
+
+
+        priorityItems.forEach((item) => {
+
+            item.addEventListener("click", () => {
+
+                const priority = item.dataset.priority;
+
+                priorityValue.value = priority;
+
+                priorityButtonText.textContent =
+                    priority.charAt(0).toUpperCase()
+                    + priority.slice(1);
+
+                priorityButtonIcon.src =
+                    `/static/icons/priority-${priority}.svg`;
+
+                priorityItems.forEach((option) => {
+                    option.classList.remove("selected");
+                });
+
+                item.classList.add("selected");
+
+                priorityMenu.classList.add("hidden");
+
+            });
+
+        });
+
+    }
+
 });
