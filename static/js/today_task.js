@@ -256,5 +256,23 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
     }
+    // Confirm task deletion
+    document
+        .querySelectorAll(".task-delete-form")
+        .forEach((form) => {
 
+            form.addEventListener("submit", (event) => {
+
+                const confirmed =
+                    window.confirm(
+                        "Delete this task?"
+                    );
+
+                if (!confirmed) {
+                    event.preventDefault();
+                }
+
+            });
+
+        });
 });

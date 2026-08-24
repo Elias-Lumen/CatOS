@@ -764,3 +764,48 @@
 .task-row > form {
     margin: 0;
 }
+
+.task-actions {
+    display: flex;
+    align-items: center;
+
+    gap: 2px;
+
+    flex-shrink: 0;
+}
+
+.task-delete-form {
+    margin: 0;
+}
+
+.task-delete-button {
+    padding: 3px 6px;
+
+    border: none;
+    border-radius: 5px;
+
+    background: transparent;
+
+    font-size: 17px;
+    line-height: 1;
+
+    color: #aaa;
+
+    cursor: pointer;
+
+    opacity: 0;
+
+    transition:
+        opacity 0.15s ease,
+        background 0.15s ease,
+        color 0.15s ease;
+}
+
+.task-row:hover .task-delete-button {
+    opacity: 1;
+}
+
+.task-delete-button:hover {
+    background: #f3e8e8;
+    color: #aa5555;
+}

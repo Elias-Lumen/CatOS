@@ -245,14 +245,35 @@ Today
                             </div>
 
 
-                            <button
-                                type="button"
-                                class="task-edit-button"
-                                data-task-id="{{ task['id'] }}"
-                                aria-label="Edit task"
-                            >
-                                ✎
-                            </button>
+                            <div class="task-actions">
+
+                                <!-- EDIT BUTTON -->
+                                <button
+                                    type="button"
+                                    class="task-edit-button"
+                                    data-task-id="{{ task['id'] }}"
+                                    aria-label="Edit task"
+                                >
+                                    ✎
+                                </button>
+
+
+                                <!-- DELETE BUTTON -->
+                                <form
+                                    method="POST"
+                                    action="{{ url_for('remove_task', task_id=task['id']) }}"
+                                    class="task-delete-form"
+                                >
+                                    <button
+                                        type="submit"
+                                        class="task-delete-button"
+                                        aria-label="Delete task"
+                                    >
+                                        ×
+                                    </button>
+                                </form>
+
+                            </div>
 
                         </article>
 

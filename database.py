@@ -403,6 +403,31 @@ def update_task(
     finally:
         connection.close()
 
+def delete_task(task_id, user_id):
+    connection = get_connection()
+
+    try:
+        cursor = connection.execute(
+            """
+            DELETE FROM tasks
+            WHERE id = ? AND user_id = ?
+            """,
+            (
+                task_id,
+                user_id
+            )
+        )
+
+        connection.commit()
+
+        return cursor.rowcount > 0
+
+    except sqlite3.Error:
+        connection.rollback()
+        raise
+
+    finally:
+        connection.close()
         
 # put any new database functions above this part
 

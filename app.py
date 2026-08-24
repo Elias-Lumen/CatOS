@@ -16,6 +16,7 @@ from database import (
     get_tasks_by_user,
     toggle_task_completion,
     update_task,
+    delete_task,
 )
 
 # login and register logic is kept in auth.py
@@ -105,6 +106,19 @@ def edit_task(task_id):
             priority=priority,
             due_date=due_date
         )
+
+    return redirect(url_for("home"))
+
+@app.route("/task/<int:task_id>/delete", methods=["POST"])
+def remove_task(task_id):
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    delete_task(
+        task_id=task_id,
+        user_id=session["user_id"]
+    )
 
     return redirect(url_for("home"))
 
