@@ -8,6 +8,8 @@ from flask import (
     url_for,
 )
 
+from datetime import date
+
 # bring the database functions over here
 # otherwise app.py would have to do all the database work by itself
 from database import (
@@ -67,10 +69,13 @@ def home():
     # only get tasks that belong to the current user
     tasks = get_tasks_by_user(session["user_id"])
 
+    today = date.today().isoformat()
+
     # send the tasks to the Today page so Jinja can display them
     return render_template(
         "today_task.html",
-        tasks=tasks
+        tasks=tasks,
+        today=today
     )
 
 @app.route("/task/<int:task_id>/toggle", methods=["POST"])
