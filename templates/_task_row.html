@@ -167,7 +167,11 @@
             data-task-id="{{ task['id'] }}"
             aria-label="Edit task"
         >
-            ✎
+            <img
+                src="{{ url_for('static', filename='icons/edit.svg') }}"
+                alt=""
+                class="task-action-icon"
+            >
         </button>
 
 
@@ -182,7 +186,11 @@
                 class="task-delete-button"
                 aria-label="Delete task"
             >
-                ×
+                <img
+                    src="{{ url_for('static', filename='icons/delete.svg') }}"
+                    alt=""
+                    class="task-action-icon"
+                >
             </button>
         </form>
 
