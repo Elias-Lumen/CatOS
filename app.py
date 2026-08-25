@@ -1500,10 +1500,10 @@ def data():
         )
 
 
-    # TODAY
+        # TODAY
 
     today_date = date.today()
-
+    today_string = today_date.isoformat()
 
     created_today = 0
     completed_today = 0
@@ -1511,28 +1511,29 @@ def data():
 
     for task in tasks:
 
+        # created_at looks like:
+        # 2026-08-28 05:31:20
+        # We only need the date at the front.
         if task["created_at"]:
 
-            created_date = date.fromisoformat(
-                str(
-                    task["created_at"]
-                )[:10]
-            )
+            created_date = str(
+                task["created_at"]
+            )[:10]
 
-            if created_date == today_date:
+            if created_date == today_string:
 
                 created_today += 1
 
 
+        # Same idea here.
+        # If completed_at is today, count it.
         if task["completed_at"]:
 
-            completed_date = date.fromisoformat(
-                str(
-                    task["completed_at"]
-                )[:10]
-            )
+            completed_date = str(
+                task["completed_at"]
+            )[:10]
 
-            if completed_date == today_date:
+            if completed_date == today_string:
 
                 completed_today += 1
 
