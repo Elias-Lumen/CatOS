@@ -44,6 +44,12 @@
 
             <div class="task-meta">
 
+                {% if task["start_date"] %}
+                    <span class="task-date">
+                        Start {{ task["start_date"] }}
+                    </span>
+                {% endif %}
+
                 {% if task["due_date"] %}
                     <span class="task-date">
                         Due {{ task["due_date"] }}
@@ -84,6 +90,12 @@
             >{{ task["description"] or "" }}</textarea>
 
             <div class="edit-options">
+
+                <input
+                    type="date"
+                    name="start_date"
+                    value="{{ task['start_date'] or '' }}"
+                >
 
                 <input
                     type="date"

@@ -68,7 +68,8 @@ def create_tasks_table(connection):
                     )
                 ),
 
-            due_date TIMESTAMP,
+            start_date DATE,
+            due_date DATE,
             created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             completed_at TIMESTAMP,
 
@@ -225,6 +226,7 @@ def create_task(
     tag=None,
     state="not_started",
     priority="normal",
+    start_date=None,
     due_date=None
 ):
     connection = get_connection()
@@ -240,9 +242,10 @@ def create_task(
                 tag,
                 state,
                 priority,
+                start_date,
                 due_date
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 user_id,
@@ -251,6 +254,7 @@ def create_task(
                 tag,
                 state,
                 priority,
+                start_date,
                 due_date
             )
         )
@@ -367,6 +371,7 @@ def update_task(
     title,
     description=None,
     priority="normal",
+    start_date=None,
     due_date=None
 ):
     connection = get_connection()
@@ -379,6 +384,7 @@ def update_task(
                 title = ?,
                 description = ?,
                 priority = ?,
+                start_date = ?,
                 due_date = ?
             WHERE id = ? AND user_id = ?
             """,
@@ -386,6 +392,7 @@ def update_task(
                 title,
                 description,
                 priority,
+                start_date,
                 due_date,
                 task_id,
                 user_id
@@ -402,6 +409,7 @@ def update_task(
 
     finally:
         connection.close()
+
 
 def delete_task(task_id, user_id):
     connection = get_connection()

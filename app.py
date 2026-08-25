@@ -32,17 +32,35 @@ app = Flask(__name__)
 # this is only a development key for now
 app.config["SECRET_KEY"] = "CatOS-development-secret-key"
 
-# check that a due date is a real date before saving it
-def is_valid_due_date(due_date):
-    # no due date is allowed
-    if due_date is None:
+# check that a date is a real date before saving it
+def is_valid_date(date_value):
+    # no date is allowed
+    if date_value is None:
         return True
 
     try:
-        date.fromisoformat(due_date)
+        date.fromisoformat(date_value)
         return True
     except (ValueError, TypeError):
         return False
+
+
+# start date cannot be after the deadline
+def are_task_dates_valid(start_date, due_date):
+    if not is_valid_date(start_date):
+        return False
+
+    if not is_valid_date(due_date):
+        return False
+
+    if start_date and due_date:
+        start = date.fromisoformat(start_date)
+        due = date.fromisoformat(due_date)
+
+        if start > due:
+            return False
+
+    return True
     
 
 # home page and Today page are basically the same thing for now
@@ -62,11 +80,12 @@ def home():
         priority = request.form.get("priority", "normal")
 
         # do not allow an invalid date to reach the database
-        # blank due date is easier to deal with as None
+        # blank dates are easier to deal with as None
+        start_date = request.form.get("start_date") or None
         due_date = request.form.get("due_date") or None
 
-        if not is_valid_due_date(due_date):
-            flash("Invalid due date.")
+        if not are_task_dates_valid(start_date, due_date):
+            flash("Start date must be on or before the due date.")
             return redirect(url_for("home"))
 
         # a task without a title is not very useful
@@ -76,6 +95,7 @@ def home():
                 title=title,
                 description=description,
                 priority=priority,
+                start_date=start_date,
                 due_date=due_date
             )
 
@@ -94,14 +114,24 @@ def home():
     # send the tasks to the Today page so Jinja can display them
     for task in tasks:
 
-        if task["due_date"]:
-            task_date = date.fromisoformat(task["due_date"])
+        start_date = (
+            date.fromisoformat(task["start_date"])
+            if task["start_date"]
+            else None
+        )
 
-            if task_date < today_date:
-                overdue_tasks.append(task)
-            else:
-                today_tasks.append(task)
+        due_date = (
+            date.fromisoformat(task["due_date"])
+            if task["due_date"]
+            else None
+        )
 
+        # tasks that have not started yet belong in Upcoming
+        if start_date and start_date > today_date:
+            continue
+
+        if due_date and due_date < today_date:
+            overdue_tasks.append(task)
         else:
             today_tasks.append(task)
 
@@ -136,10 +166,11 @@ def edit_task(task_id):
     title = request.form.get("title", "").strip()
     description = request.form.get("description", "").strip()
     priority = request.form.get("priority", "normal")
+    start_date = request.form.get("start_date") or None
     due_date = request.form.get("due_date") or None
 
-    if not is_valid_due_date(due_date):
-        flash("Invalid due date.")
+    if not are_task_dates_valid(start_date, due_date):
+        flash("Start date must be on or before the due date.")
         return redirect(url_for("home"))
 
     if title:
@@ -149,6 +180,7 @@ def edit_task(task_id):
             title=title,
             description=description,
             priority=priority,
+            start_date=start_date,
             due_date=due_date
         )
 
@@ -271,10 +303,11 @@ def task():
         title = request.form.get("title", "").strip()
         description = request.form.get("description", "").strip()
         priority = request.form.get("priority", "normal")
+        start_date = request.form.get("start_date") or None
         due_date = request.form.get("due_date") or None
 
-        if not is_valid_due_date(due_date):
-            flash("Invalid due date.")
+        if not are_task_dates_valid(start_date, due_date):
+            flash("Start date must be on or before the due date.")
             return redirect(url_for("task"))
 
         if title:
@@ -283,6 +316,7 @@ def task():
                 title=title,
                 description=description,
                 priority=priority,
+                start_date=start_date,
                 due_date=due_date
             )
 
