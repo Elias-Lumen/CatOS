@@ -32,6 +32,18 @@ app = Flask(__name__)
 # this is only a development key for now
 app.config["SECRET_KEY"] = "CatOS-development-secret-key"
 
+# check that a due date is a real date before saving it
+def is_valid_due_date(due_date):
+    # no due date is allowed
+    if due_date is None:
+        return True
+
+    try:
+        date.fromisoformat(due_date)
+        return True
+    except (ValueError, TypeError):
+        return False
+    
 
 # home page and Today page are basically the same thing for now
 @app.route("/", methods=["GET", "POST"])
@@ -49,8 +61,13 @@ def home():
         # if the user does not choose one, just use normal
         priority = request.form.get("priority", "normal")
 
+        # do not allow an invalid date to reach the database
         # blank due date is easier to deal with as None
         due_date = request.form.get("due_date") or None
+
+        if not is_valid_due_date(due_date):
+            flash("Invalid due date.")
+            return redirect(url_for("home"))
 
         # a task without a title is not very useful
         if title:
@@ -120,6 +137,10 @@ def edit_task(task_id):
     description = request.form.get("description", "").strip()
     priority = request.form.get("priority", "normal")
     due_date = request.form.get("due_date") or None
+
+    if not is_valid_due_date(due_date):
+        flash("Invalid due date.")
+        return redirect(url_for("home"))
 
     if title:
         update_task(
@@ -251,6 +272,10 @@ def task():
         description = request.form.get("description", "").strip()
         priority = request.form.get("priority", "normal")
         due_date = request.form.get("due_date") or None
+
+        if not is_valid_due_date(due_date):
+            flash("Invalid due date.")
+            return redirect(url_for("task"))
 
         if title:
             create_task(
