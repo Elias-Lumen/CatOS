@@ -466,13 +466,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const icon =
                 document.createElement(
-                    "span"
+                    "img"
                 );
 
             icon.className =
                 "label-tag-icon";
 
-            icon.textContent = "◇";
+            icon.src =
+                "/static/icons/label.svg";
+
+            icon.alt = "";
 
 
             const name =

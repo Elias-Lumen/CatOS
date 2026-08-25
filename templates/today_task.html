@@ -14,6 +14,12 @@ Today
     href="{{ url_for('static', filename='css/today_task.css') }}"
 >
 
+<!-- TASK DETAIL MODAL -->
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/task_modal.css') }}"
+>
+
 {% endblock %}
 
 
@@ -225,9 +231,11 @@ Today
                             class="composer-option label-button"
                         >
 
-                            <span class="label-button-icon">
-                                ◇
-                            </span>
+                            <img
+                                src="{{ url_for('static', filename='icons/label.svg') }}"
+                                class="label-button-icon"
+                                alt=""
+                            >
 
                             <span class="label-button-text">
                                 Labels
@@ -259,9 +267,11 @@ Today
 
                                         <span class="label-item-left">
 
-                                            <span class="label-tag-icon">
-                                                ◇
-                                            </span>
+                                            <img
+                                                src="{{ url_for('static', filename='icons/label.svg') }}"
+                                                class="label-tag-icon"
+                                                alt=""
+                                            >
 
                                             <span class="label-name">
                                                 {{ tag["name"] }}
@@ -497,7 +507,12 @@ Today
 
 <!-- EXISTING TODAY PAGE LOGIC -->
 <script
-    src="{{ url_for('static', filename='js/today_task.js') }}"
+    src="{{ url_for('static', filename='js/today_task.js') }}?v=2"
+></script>
+
+<!-- TASK DETAIL MODAL LOGIC -->
+<script
+    src="{{ url_for('static', filename='js/task_modal.js') }}?v=2"
 ></script>
 
 {% endblock %}
