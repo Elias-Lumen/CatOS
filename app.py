@@ -35,6 +35,7 @@ from database import (
     delete_subtask,
     get_user_by_id,
     update_user_avatar,
+    search_tasks,
 )
 
 # login and register logic is kept in auth.py
@@ -1072,10 +1073,125 @@ def task():
 
 # this page should eventually become the floating task editor
 # currently still under construction
+# SEARCH PAGE
+# Search task titles/descriptions and narrow the results with filters.
 @app.route("/search")
 def search():
+
+    if "user_id" not in session:
+
+        return redirect(
+            url_for("login")
+        )
+
+
+    user_id = session["user_id"]
+
+
+    # GET values stay in the URL.
+    # This makes search results easy to refresh and test.
+    query = request.args.get(
+        "q",
+        ""
+    ).strip()
+
+    tag_id = request.args.get(
+        "label",
+        ""
+    ).strip()
+
+    priority = request.args.get(
+        "priority",
+        ""
+    ).strip()
+
+    state = request.args.get(
+        "status",
+        ""
+    ).strip()
+
+
+    # Only accept a number as a label id.
+    if tag_id.isdigit():
+
+        tag_id_value = int(
+            tag_id
+        )
+
+    else:
+
+        tag_id_value = None
+        tag_id = ""
+
+
+    # Ignore priority values that CatOS does not use.
+    valid_priorities = {
+        "normal",
+        "low",
+        "medium",
+        "high",
+    }
+
+    if priority not in valid_priorities:
+        priority = ""
+
+
+    # Ignore status values that CatOS does not use.
+    valid_states = {
+        "not_started",
+        "in_progress",
+        "completed",
+    }
+
+    if state not in valid_states:
+        state = ""
+
+
+    # Only search once the user has entered something
+    # or selected at least one filter.
+    search_active = bool(
+        query
+        or tag_id_value
+        or priority
+        or state
+    )
+
+
+    if search_active:
+
+        tasks = search_tasks(
+            user_id=user_id,
+            query=query,
+            tag_id=tag_id_value,
+            priority=priority or None,
+            state=state or None
+        )
+
+        # Add each task's labels before sending results to the template.
+        tasks = add_tags_to_tasks(
+            tasks,
+            user_id
+        )
+
+    else:
+
+        tasks = []
+
+
+    tags = get_tags_by_user(
+        user_id
+    )
+
+
     return render_template(
-        "search.html"
+        "search.html",
+        tasks=tasks,
+        tags=tags,
+        query=query,
+        selected_label=tag_id,
+        selected_priority=priority,
+        selected_status=state,
+        search_active=search_active
     )
 
 

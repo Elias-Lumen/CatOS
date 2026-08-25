@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Search
+{% endblock %}
+
+
+{% block styles %}
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/search.css') }}"
+>
+
+{% endblock %}
+
+
+{% block content %}
+
+<main class="search-page">
+
+    <header class="search-header">
+
+        <h1>
+            Search
+        </h1>
+
+        <p>
+            Find tasks by name, description, label, priority or status.
+        </p>
+
+    </header>
+
+
+    <!--
+        GET keeps the search in the URL.
+        That makes refreshing the page much less annoying.
+    -->
+    <form
+        method="GET"
+        action="{{ url_for('search') }}"
+        class="search-form"
+    >
+
+        <div class="search-input-row">
+
+            <input
+                type="search"
+                name="q"
+                class="search-input"
+                value="{{ query }}"
+                placeholder="Search tasks..."
+                autocomplete="off"
+            >
+
+            <button
+                type="submit"
+                class="search-button"
+            >
+                Search
+            </button>
+
+        </div>
+
+
+        <!-- Extra filters can be mixed together. -->
+        <div class="search-filters">
+
+
+            <!-- LABEL -->
+            <label class="search-filter">
+
+                <span>
+                    Label
+                </span>
+
+                <select name="label">
+
+                    <option value="">
+                        All labels
+                    </option>
+
+                    {% for tag in tags %}
+
+                        <option
+                            value="{{ tag['id'] }}"
+
+                            {% if
+                                selected_label
+                                ==
+                                tag['id'] | string
+                            %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ tag["name"] }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </label>
+
+
+            <!-- PRIORITY -->
+            <label class="search-filter">
+
+                <span>
+                    Priority
+                </span>
+
+                <select name="priority">
+
+                    <option value="">
+                        All priorities
+                    </option>
+
+                    <option
+                        value="high"
+                        {% if selected_priority == "high" %}
+                            selected
+                        {% endif %}
+                    >
+                        High
+                    </option>
+
+                    <option
+                        value="medium"
+                        {% if selected_priority == "medium" %}
+                            selected
+                        {% endif %}
+                    >
+                        Medium
+                    </option>
+
+                    <option
+                        value="low"
+                        {% if selected_priority == "low" %}
+                            selected
+                        {% endif %}
+                    >
+                        Low
+                    </option>
+
+                    <option
+                        value="normal"
+                        {% if selected_priority == "normal" %}
+                            selected
+                        {% endif %}
+                    >
+                        Normal
+                    </option>
+
+                </select>
+
+            </label>
+
+
+            <!-- STATUS -->
+            <label class="search-filter">
+
+                <span>
+                    Status
+                </span>
+
+                <select name="status">
+
+                    <option value="">
+                        All statuses
+                    </option>
+
+                    <option
+                        value="not_started"
+                        {% if selected_status == "not_started" %}
+                            selected
+                        {% endif %}
+                    >
+                        Not started
+                    </option>
+
+                    <option
+                        value="in_progress"
+                        {% if selected_status == "in_progress" %}
+                            selected
+                        {% endif %}
+                    >
+                        In progress
+                    </option>
+
+                    <option
+                        value="completed"
+                        {% if selected_status == "completed" %}
+                            selected
+                        {% endif %}
+                    >
+                        Completed
+                    </option>
+
+                </select>
+
+            </label>
+
+
+            <a
+                href="{{ url_for('search') }}"
+                class="clear-search-button"
+            >
+                Clear
+            </a>
+
+        </div>
+
+    </form>
+
+
+    <!-- RESULTS -->
+    <section class="search-results">
+
+
+        {% if not search_active %}
+
+            <div class="search-empty">
+
+                <h2>
+                    Find a task
+                </h2>
+
+                <p>
+                    Search above or choose a filter to get started.
+                </p>
+
+            </div>
+
+
+        {% elif tasks %}
+
+            <div class="search-results-header">
+
+                <span>
+                    {{ tasks | length }}
+                    {% if tasks | length == 1 %}
+                        result
+                    {% else %}
+                        results
+                    {% endif %}
+                </span>
+
+            </div>
+
+
+            <div class="search-result-list">
+
+                {% for task in tasks %}
+
+                    <article class="search-result-card">
+
+                        <div class="search-result-main">
+
+                            <div class="search-result-title-row">
+
+                                <span
+                                    class="
+                                        search-result-state
+                                        {{ task['state'] }}
+                                    "
+                                ></span>
+
+                                <h2
+                                    class="
+                                        search-result-title
+                                        {% if task['state'] == 'completed' %}
+                                            completed
+                                        {% endif %}
+                                    "
+                                >
+                                    {{ task["title"] }}
+                                </h2>
+
+                            </div>
+
+
+                            {% if task["description"] %}
+
+                                <p class="search-result-description">
+                                    {{ task["description"] }}
+                                </p>
+
+                            {% endif %}
+
+
+                            <div class="search-result-meta">
+
+                                <span
+                                    class="
+                                        search-priority
+                                        {{ task['priority'] }}
+                                    "
+                                >
+                                    {{ task["priority"] | capitalize }}
+                                </span>
+
+
+                                <span class="search-status">
+                                    {{ task["state"] | replace("_", " ") | title }}
+                                </span>
+
+
+                                {% if task["due_date"] %}
+
+                                    <span>
+                                        Due {{ task["due_date"] }}
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            {% if task["tags"] %}
+
+                                <div class="search-result-labels">
+
+                                    {% for tag in task["tags"] %}
+
+                                        <span class="search-result-label">
+                                            {{ tag["name"] }}
+                                        </span>
+
+                                    {% endfor %}
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+
+        {% else %}
+
+            <div class="search-empty">
+
+                <h2>
+                    No tasks found
+                </h2>
+
+                <p>
+                    Try another search or change your filters.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+
+    </section>
+
+</main>
+
+{% endblock %}

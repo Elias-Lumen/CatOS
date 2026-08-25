@@ -918,6 +918,135 @@ def delete_subtask(
         connection.close()
 
 
+# Search one user's tasks.
+# Every filter is optional, so the same function can handle simple
+# searches and more specific searches.
+def search_tasks(
+    user_id,
+    query="",
+    tag_id=None,
+    priority=None,
+    state=None
+):
+
+    connection = get_connection()
+
+    sql = """
+        SELECT DISTINCT
+            tasks.*
+        FROM tasks
+    """
+
+    values = []
+
+
+    # Only join the tag tables when a label filter is actually being used.
+    if tag_id:
+
+        sql += """
+            JOIN task_tags
+                ON task_tags.task_id = tasks.id
+
+            JOIN tags
+                ON tags.id = task_tags.tag_id
+        """
+
+
+    # Never allow search results from another account.
+    sql += """
+        WHERE tasks.user_id = ?
+    """
+
+    values.append(
+        user_id
+    )
+
+
+    # Search both title and description.
+    # LOWER makes the search ignore uppercase and lowercase differences.
+    if query:
+
+        sql += """
+            AND (
+                LOWER(tasks.title)
+                    LIKE LOWER(?)
+
+                OR
+
+                LOWER(
+                    COALESCE(
+                        tasks.description,
+                        ''
+                    )
+                )
+                    LIKE LOWER(?)
+            )
+        """
+
+        search_text = (
+            f"%{query}%"
+        )
+
+        values.extend([
+            search_text,
+            search_text
+        ])
+
+
+    if tag_id:
+
+        sql += """
+            AND tags.id = ?
+            AND tags.user_id = ?
+        """
+
+        values.extend([
+            tag_id,
+            user_id
+        ])
+
+
+    if priority:
+
+        sql += """
+            AND tasks.priority = ?
+        """
+
+        values.append(
+            priority
+        )
+
+
+    if state:
+
+        sql += """
+            AND tasks.state = ?
+        """
+
+        values.append(
+            state
+        )
+
+
+    # Keep the newest matching tasks near the top.
+    sql += """
+        ORDER BY
+            tasks.created_at DESC,
+            tasks.id DESC
+    """
+
+
+    tasks = connection.execute(
+        sql,
+        values
+    ).fetchall()
+
+    connection.close()
+
+    return tasks
+
+
+
 # put any new database functions above this part
 
 
