@@ -8,9 +8,9 @@
 - [x] User logout
 - [x] Session-based authentication
 - [x] Secure password hashing
-- [ ] Unique usernames
-- [ ] User data separation
-- [ ] Prevent unauthenticated users from accessing private pages
+- [x] Unique usernames
+- [x] User data separation
+- [x] Prevent unauthenticated users from accessing private pages
 
 ### Basic Task Management
 - [x] Create tasks
@@ -18,10 +18,10 @@
 - [x] Task description
 - [x] Due date
 - [x] Priority
-- [ ] Basic task status
-  - [ ] Not started
-  - [ ] Completed
-- [ ] Ensure users can only access their own tasks
+- [x] Basic task status
+  - [x] Not started
+  - [x] Completed
+- [x] Ensure users can only access their own tasks
 
 ### Database Foundation
 - [x] Create users table
@@ -38,27 +38,27 @@
 - [x] Login page
 - [x] Register page
 - [x] Today page structure
-- [ ] Task creation form
-- [ ] Consistent basic styling
+- [x] Task creation form
+- [x] Consistent basic styling
 
 ### Sprint 1 Testing
 
 #### Registration Testing
-- [ ] Register with a valid username and password
-- [ ] Register with an empty username
-- [ ] Register with an empty password
-- [ ] Register with both fields empty
-- [ ] Register using an existing username
-- [ ] Test a very short username
-- [ ] Test a very long username
+- [x] Register with a valid username and password
+- [x] Register with an empty username
+- [x] Register with an empty password
+- [x] Register with both fields empty
+- [x] Register using an existing username
+- [x] Test a very short username
+- [x] Test a very long username
 - [ ] Test usernames containing spaces or unusual characters
-- [ ] Test password confirmation does not match
+- [x] Test password confirmation does not match
 - [ ] Confirm passwords are stored as hashes rather than plain text
 
 #### Login Testing
-- [ ] Login with a valid username and password
-- [ ] Login with a correct username and incorrect password
-- [ ] Login with a username that does not exist
+- [x] Login with a valid username and password
+- [x] Login with a correct username and incorrect password
+- [x] Login with a username that does not exist
 - [ ] Login with an empty username
 - [ ] Login with an empty password
 - [ ] Login with both fields empty
@@ -94,8 +94,9 @@
 ## Sprint 2 — Complete Task Management and Date-Based Organisation
 
 ### Task Management
-- [ ] Edit tasks
-- [ ] Delete tasks
+- [x] Edit tasks
+- [x] Delete tasks
+- [ ] overdue date change color
 - [ ] Reschedule tasks
 - [ ] Mark tasks as completed
 - [ ] Change task status

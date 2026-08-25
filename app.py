@@ -90,19 +90,12 @@ def home():
 
     return render_template(
         "today_task.html",
-        overdue_tasks=overdue_tasks,
-        today_tasks=today_tasks,
-        today=today_date.isoformat()
-    )
-
-
-    return render_template(
-        "today_task.html",
         tasks=tasks,
         overdue_tasks=overdue_tasks,
         today_tasks=today_tasks,
         today=today_date.isoformat()
     )
+
 
 @app.route("/task/<int:task_id>/toggle", methods=["POST"])
 def toggle_task(task_id):
