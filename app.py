@@ -110,6 +110,22 @@ def add_tags_to_tasks(tasks, user_id):
     return tasks_with_tags
 
 
+# make saved labels available to the floating Add task modal
+# because the modal lives in base.html and can open from any page
+@app.context_processor
+def inject_global_task_modal_data():
+    if "user_id" not in session:
+        return {
+            "global_task_tags": []
+        }
+
+    return {
+        "global_task_tags": get_tags_by_user(
+            session["user_id"]
+        )
+    }
+
+
 # home page and Today page are basically the same thing for now
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -546,15 +562,14 @@ def setting():
     )
 
 
-# separate task page
-# this is currently another place where tasks can be added
+# create a task from the floating Add task modal
 @app.route(
     "/task",
-    methods=["GET", "POST"]
+    methods=["POST"]
 )
 def task():
 
-    # same rule as Home: login first
+    # user must be logged in before creating a task
     if "user_id" not in session:
         return redirect(
             url_for("login")
@@ -562,102 +577,103 @@ def task():
 
     user_id = session["user_id"]
 
-    # user submitted a new task
-    if request.method == "POST":
-        title = request.form.get(
-            "title",
-            ""
-        ).strip()
+    title = request.form.get(
+        "title",
+        ""
+    ).strip()
 
-        description = request.form.get(
-            "description",
-            ""
-        ).strip()
+    description = request.form.get(
+        "description",
+        ""
+    ).strip()
 
-        priority = request.form.get(
-            "priority",
-            "normal"
-        )
-
-        start_date = (
-            request.form.get("start_date")
-            or None
-        )
-
-        due_date = (
-            request.form.get("due_date")
-            or None
-        )
-
-        selected_tag_ids = (
-            request.form.getlist("tag_ids")
-        )
-
-        new_tags_text = request.form.get(
-            "new_tags",
-            ""
-        ).strip()
-
-        if not are_task_dates_valid(
-            start_date,
-            due_date
-        ):
-            flash(
-                "Start date must be on or before the due date."
-            )
-
-            return redirect(
-                url_for("task")
-            )
-
-        if title:
-            task_id = create_task(
-                user_id=user_id,
-                title=title,
-                description=description,
-                priority=priority,
-                start_date=start_date,
-                due_date=due_date
-            )
-
-            new_tag_ids = get_new_tag_ids(
-                user_id=user_id,
-                new_tags_text=new_tags_text
-            )
-
-            all_tag_ids = (
-                selected_tag_ids
-                + new_tag_ids
-            )
-
-            all_tag_ids = list(
-                dict.fromkeys(all_tag_ids)
-            )
-
-            set_task_tags(
-                task_id=task_id,
-                user_id=user_id,
-                tag_ids=all_tag_ids
-            )
-
-        return redirect(
-            url_for("task")
-        )
-
-    # get this user's tasks for the page
-    tasks = get_tasks_by_user(user_id)
-
-    tasks = add_tags_to_tasks(
-        tasks,
-        user_id
+    priority = request.form.get(
+        "priority",
+        "normal"
     )
 
-    tags = get_tags_by_user(user_id)
+    start_date = (
+        request.form.get("start_date")
+        or None
+    )
 
-    return render_template(
-        "task.html",
-        tasks=tasks,
-        tags=tags
+    due_date = (
+        request.form.get("due_date")
+        or None
+    )
+
+    # existing labels selected in the modal
+    selected_tag_ids = (
+        request.form.getlist("tag_ids")
+    )
+
+    # new labels typed by the user
+    new_tags_text = request.form.get(
+        "new_tags",
+        ""
+    ).strip()
+
+    # remember which page opened the modal
+    return_to = request.form.get(
+        "return_to",
+        ""
+    ).strip()
+
+    # only allow local paths as redirect destinations
+    if (
+        not return_to.startswith("/")
+        or return_to.startswith("//")
+    ):
+        return_to = url_for("home")
+
+    if not are_task_dates_valid(
+        start_date,
+        due_date
+    ):
+        flash(
+            "Start date must be on or before the due date."
+        )
+
+        return redirect(
+            return_to
+        )
+
+    if title:
+        task_id = create_task(
+            user_id=user_id,
+            title=title,
+            description=description,
+            priority=priority,
+            start_date=start_date,
+            due_date=due_date
+        )
+
+        # create any new labels typed into the modal
+        new_tag_ids = get_new_tag_ids(
+            user_id=user_id,
+            new_tags_text=new_tags_text
+        )
+
+        # combine existing and newly-created labels
+        all_tag_ids = (
+            selected_tag_ids
+            + new_tag_ids
+        )
+
+        # remove duplicates
+        all_tag_ids = list(
+            dict.fromkeys(all_tag_ids)
+        )
+
+        set_task_tags(
+            task_id=task_id,
+            user_id=user_id,
+            tag_ids=all_tag_ids
+        )
+
+    # return to the page where Add task was opened
+    return redirect(
+        return_to
     )
 
 

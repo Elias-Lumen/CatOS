@@ -1,114 +1,89 @@
 /*
-    CatOS - Task Detail Modal
-    -------------------------
-    Styles for the floating task detail window.
-
-    The modal is intentionally kept in a separate stylesheet
-    so the existing Today page styles remain easier to maintain.
+    CatOS - Floating Add Task Modal
+    --------------------------------
+    Styling for the Add task popup from the sidebar.
+    Black / white / grey only. Keeping this here so I do not get creative later.
 */
 
+:root {
+    --catos-black: #222222;
+    --catos-text: #333333;
+    --catos-text-soft: #666666;
+    --catos-muted: #999999;
 
-/* CLICKABLE TASK AREA */
+    --catos-border: #dddddd;
+    --catos-border-soft: #eeeeee;
 
-.task-open-area {
+    --catos-hover: #f4f4f4;
+    --catos-soft: #fafafa;
+    --catos-white: #ffffff;
+}
+
+
+/* Make this button behave like a button without looking different from the other sidebar links. */
+.nav-button {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font: inherit;
+    text-align: left;
     cursor: pointer;
-
-    border-radius: 6px;
-
-    transition:
-        background 0.15s ease;
 }
 
 
-/*
-    Prevent the browser focus outline from looking harsh,
-    but still provide a visible keyboard focus state.
-*/
-.task-open-area:focus-visible {
-    outline: 2px solid #cbb7c1;
-    outline-offset: 4px;
-}
-
-
-/* MODAL OVERLAY */
-
-.task-modal-overlay {
+/* Darken the page behind the popup so the task form is the obvious focus. */
+.add-task-overlay {
     position: fixed;
-
     inset: 0;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    padding: 32px;
+    padding: 30px;
 
-    /*
-        Dark transparent background behind the floating panel.
-        backdrop-filter gives the page underneath a very light blur.
-    */
     background: rgba(0, 0, 0, 0.42);
 
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
 
-    z-index: 2000;
-
-    /*
-        Fade animation when the modal first appears.
-    */
-    animation:
-        task-modal-overlay-in
-        0.16s ease-out;
+    z-index: 3000;
 }
 
 
-/*
-    The global .hidden class already exists in today_task.css,
-    but this rule is intentionally repeated here to ensure the
-    modal cannot override it through display:flex.
-*/
-.task-modal-overlay.hidden {
+/* Hide it first; JS removes this when Add task is clicked. */
+.add-task-overlay.hidden {
     display: none;
 }
 
 
-/* MODAL WINDOW */
-
-.task-modal {
-    width: min(620px, 100%);
-
-    max-height: min(
-        760px,
-        calc(100vh - 64px)
+/* The actual popup. Keep it fairly narrow so the form does not feel stretched. */
+.add-task-modal {
+    width: min(
+        620px,
+        calc(100vw - 40px)
     );
 
-    display: flex;
-    flex-direction: column;
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
 
-    overflow: hidden;
+    border: 1px solid var(--catos-border);
+    border-radius: 10px;
 
-    border:
-        1px solid
-        rgba(80, 60, 70, 0.10);
-
-    border-radius: 18px;
-
-    background: #ffffff;
+    background: var(--catos-white);
 
     box-shadow:
         0 24px 70px
-        rgba(0, 0, 0, 0.24);
+        rgba(0, 0, 0, 0.22);
 
     animation:
-        task-modal-window-in
-        0.18s ease-out;
+        add-task-modal-in
+        0.16s ease-out;
 }
 
 
-/* MODAL HEADER */
-
-.task-modal-header {
+/* Title on the left, close button on the right. Nice and boring. */
+.add-task-modal-header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -116,94 +91,38 @@
     gap: 20px;
 
     padding:
+        22px
         24px
-        26px
-        18px;
+        17px;
 
-    border-bottom:
-        1px solid
-        #eeeeee;
+    border-bottom: 1px solid var(--catos-border-soft);
 }
 
 
-.task-modal-title-area {
-    display: flex;
-    align-items: flex-start;
-
-    gap: 12px;
-
-    min-width: 0;
-}
-
-
-.task-modal-title {
+.add-task-modal-header h2 {
     margin: 0;
-
-    min-width: 0;
 
     font-size: 22px;
     font-weight: 650;
-    line-height: 1.3;
-
     letter-spacing: -0.02em;
 
-    color: #222222;
-
-    overflow-wrap: anywhere;
+    color: var(--catos-black);
 }
 
 
-.task-modal-title.completed {
-    color: #999999;
+/* Small hint text, so keep it quiet and grey. */
+.add-task-modal-subtitle {
+    margin: 5px 0 0;
 
-    text-decoration:
-        line-through;
+    font-size: 12px;
+    line-height: 1.4;
 
-    text-decoration-thickness:
-        1px;
-
-    text-decoration-color:
-        #aaaaaa;
+    color: var(--catos-muted);
 }
 
 
-/* PRIORITY DOT */
-
-.task-modal-priority {
-    width: 11px;
-    height: 11px;
-
-    margin-top: 8px;
-
-    flex-shrink: 0;
-
-    border-radius: 50%;
-}
-
-
-.modal-priority-normal {
-    background: #d5d5d5;
-}
-
-
-.modal-priority-low {
-    background: #6562ff;
-}
-
-
-.modal-priority-medium {
-    background: #ffb52d;
-}
-
-
-.modal-priority-high {
-    background: #ff5656;
-}
-
-
-/* CLOSE BUTTON */
-
-.task-modal-close {
+/* Big enough to click easily, but not loud enough to steal attention. */
+.add-task-modal-close {
     width: 34px;
     height: 34px;
 
@@ -216,7 +135,7 @@
     padding: 0;
 
     border: none;
-    border-radius: 9px;
+    border-radius: 7px;
 
     background: transparent;
 
@@ -228,321 +147,244 @@
     color: #888888;
 
     cursor: pointer;
-
-    transition:
-        background 0.15s ease,
-        color 0.15s ease;
 }
 
 
-.task-modal-close:hover {
-    background: #f2f2f2;
-    color: #333333;
+.add-task-modal-close:hover {
+    background: var(--catos-hover);
+    color: var(--catos-black);
 }
 
 
-/* MODAL BODY */
+/* Stack the form fields with the same gap so the spacing stays consistent. */
+.add-task-modal-form {
+    display: flex;
+    flex-direction: column;
 
-.task-modal-body {
-    flex: 1;
-
-    overflow-y: auto;
+    gap: 16px;
 
     padding:
-        6px
-        26px
-        22px;
+        22px
+        24px
+        24px;
 }
 
 
-/* MODAL SECTION */
+/* Same border and font for every field so the form looks like one thing. */
+.modal-task-title,
+.modal-task-description,
+.modal-task-field input,
+.modal-task-field select {
+    width: 100%;
+    box-sizing: border-box;
 
-.task-modal-section {
-    padding: 20px 0;
+    border: 1px solid var(--catos-border);
+    border-radius: 8px;
 
-    border-bottom:
-        1px solid
-        #eeeeee;
+    outline: none;
+
+    background: var(--catos-white);
+
+    font-family: inherit;
+    color: var(--catos-text);
 }
 
 
-.task-modal-section:last-child {
-    border-bottom: none;
+/* Task name matters most, so it gets slightly bigger text. */
+.modal-task-title {
+    padding: 12px 13px;
+
+    font-size: 16px;
+    font-weight: 600;
 }
 
 
-.task-modal-section-label {
-    margin-bottom: 10px;
+/* Description can grow if someone decides to write an essay in here. */
+.modal-task-description {
+    padding: 12px 13px;
 
-    font-size: 12px;
-    font-weight: 650;
+    resize: vertical;
 
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-
-    color: #999999;
-}
-
-
-/* DESCRIPTION */
-
-.task-modal-description {
-    font-size: 14px;
-    line-height: 1.65;
-
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-
-    color: #4d4d4d;
-}
-
-
-.task-modal-empty {
     font-size: 13px;
+    line-height: 1.5;
+}
 
+
+.modal-task-title::placeholder,
+.modal-task-description::placeholder,
+.modal-task-field input::placeholder {
     color: #aaaaaa;
 }
 
 
-/* DETAIL TABLE */
+/* Darker border on focus so it is obvious which field is active. */
+.modal-task-title:focus,
+.modal-task-description:focus,
+.modal-task-field input:focus,
+.modal-task-field select:focus {
+    border-color: #888888;
 
-.task-modal-details {
-    display: flex;
-    flex-direction: column;
+    box-shadow:
+        0 0 0 2px
+        rgba(0, 0, 0, 0.06);
 }
 
 
-.task-modal-detail-row {
+/* Keep the two dates side by side here, otherwise the form gets too long. */
+.modal-task-row {
     display: grid;
+    grid-template-columns: 1fr 1fr;
 
-    grid-template-columns:
-        110px
-        minmax(0, 1fr);
+    gap: 12px;
+}
 
-    gap: 18px;
 
-    padding: 9px 0;
+/* Small label on top, actual input underneath. */
+.modal-task-field {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+
+.modal-task-field > span,
+.modal-field-label {
+    font-size: 12px;
+    font-weight: 600;
+
+    color: var(--catos-muted);
+}
+
+
+.modal-task-field input,
+.modal-task-field select {
+    padding: 9px 10px;
 
     font-size: 13px;
 }
 
 
-.task-modal-detail-name {
-    color: #999999;
-}
-
-
-.task-modal-detail-value {
+/* Labels can wrap instead of escaping out of the popup. */
+.modal-label-section {
     display: flex;
-    align-items: center;
+    flex-direction: column;
 
     gap: 8px;
-
-    min-width: 0;
-
-    color: #444444;
 }
 
 
-/*
-    Priority dots inside detail rows do not need
-    the larger top margin used beside the title.
-*/
-.task-modal-detail-value
-.task-modal-priority {
-    margin-top: 0;
-}
-
-
-/* STATUS */
-
-.task-modal-status {
-    display: inline-flex;
-
-    padding:
-        4px
-        8px;
-
-    border-radius: 999px;
-
-    background: #f3f3f3;
-
-    font-size: 12px;
-
-    color: #666666;
-}
-
-
-.task-modal-status.completed {
-    background: #f1edf0;
-
-    color: #876b79;
-}
-
-
-/* LABELS */
-
-.task-modal-tags {
+.modal-label-list {
     display: flex;
     flex-wrap: wrap;
 
-    gap: 7px;
+    gap: 8px;
 }
 
 
-.task-modal-tag {
+/* One saved label. Grey on purpose, no random pink resurrection. */
+.modal-label {
     display: inline-flex;
     align-items: center;
 
-    padding:
-        6px
-        9px;
+    gap: 7px;
 
-    border:
-        1px solid
-        #eadfe4;
+    padding: 7px 9px;
 
+    border: 1px solid var(--catos-border);
     border-radius: 8px;
 
-    background: #faf6f8;
+    background: var(--catos-soft);
 
     font-size: 12px;
+    color: var(--catos-text);
 
-    color: #876b79;
+    cursor: pointer;
 }
 
 
-/* MODAL FOOTER */
+.modal-label:hover {
+    background: var(--catos-hover);
+}
 
-.task-modal-footer {
+
+.modal-label input {
+    width: 15px;
+    height: 15px;
+
+    margin: 0;
+
+    accent-color: var(--catos-black);
+
+    cursor: pointer;
+}
+
+
+/* Stops an empty label section from looking like something failed to load. */
+.modal-label-empty {
+    font-size: 12px;
+    color: #aaaaaa;
+}
+
+
+/* Keep the action buttons together on the right where people expect them. */
+.add-task-modal-actions {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
 
-    gap: 12px;
+    gap: 9px;
 
-    padding:
-        16px
-        26px;
-
-    border-top:
-        1px solid
-        #eeeeee;
-
-    background: #fcfcfc;
+    margin-top: 4px;
 }
 
 
-/* FOOTER BUTTONS */
+.modal-cancel-button,
+.modal-add-button {
+    padding: 8px 13px;
 
-.task-modal-edit-button,
-.task-modal-delete-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    gap: 7px;
-
-    min-height: 36px;
-
-    padding:
-        8px
-        12px;
-
-    border-radius: 9px;
+    border: none;
+    border-radius: 8px;
 
     font-family: inherit;
     font-size: 13px;
     font-weight: 600;
 
     cursor: pointer;
-
-    transition:
-        background 0.15s ease,
-        border-color 0.15s ease,
-        color 0.15s ease;
 }
 
 
-.task-modal-edit-button img,
-.task-modal-delete-button img {
-    width: 15px;
-    height: 15px;
-
-    object-fit: contain;
+/* Cancel is lighter because it is not the main action. */
+.modal-cancel-button {
+    background: #eeeeee;
+    color: #555555;
 }
 
 
-/* EDIT */
-
-.task-modal-edit-button {
-    border:
-        1px solid
-        #d8c9d0;
-
-    background: #f7f0f4;
-
-    color: #674f5c;
+/* Main button, so this one gets the darkest colour. */
+.modal-add-button {
+    background: var(--catos-black);
+    color: var(--catos-white);
 }
 
 
-.task-modal-edit-button:hover {
-    background: #efe3e9;
-
-    border-color: #cbb5c0;
+.modal-cancel-button:hover {
+    background: #e3e3e3;
 }
 
 
-/* DELETE */
-
-.task-modal-delete-form {
-    margin: 0;
+.modal-add-button:hover {
+    background: #111111;
 }
 
 
-.task-modal-delete-button {
-    border:
-        1px solid
-        transparent;
-
-    background: transparent;
-
-    color: #8f6666;
-}
-
-
-.task-modal-delete-button:hover {
-    border-color: #f0dcdc;
-
-    background: #fff4f4;
-
-    color: #b34f4f;
-}
-
-
-/* BODY SCROLL LOCK */
-
+/* Do not let the page behind the popup wander around while this is open. */
 body.task-modal-open {
     overflow: hidden;
 }
 
 
-/* OPEN ANIMATIONS */
-
-@keyframes task-modal-overlay-in {
-
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-
-}
-
-
-@keyframes task-modal-window-in {
+/* Tiny opening animation so the popup does not just teleport onto the screen. */
+@keyframes add-task-modal-in {
 
     from {
         opacity: 0;
@@ -563,54 +405,29 @@ body.task-modal-open {
 }
 
 
-/* RESPONSIVE */
+/* On small screens the dates stack, otherwise everything gets squashed. */
+@media (max-width: 600px) {
 
-@media (max-width: 650px) {
-
-    .task-modal-overlay {
-        align-items: flex-end;
-
-        padding: 12px;
+    .add-task-overlay {
+        padding: 14px;
     }
 
 
-    .task-modal {
+    .add-task-modal {
         width: 100%;
-
-        max-height:
-            calc(100vh - 24px);
-
-        border-radius: 18px;
+        max-height: calc(100vh - 28px);
     }
 
 
-    .task-modal-header {
-        padding:
-            20px
-            20px
-            16px;
+    .modal-task-row {
+        grid-template-columns: 1fr;
     }
 
 
-    .task-modal-body {
-        padding:
-            4px
-            20px
-            18px;
-    }
-
-
-    .task-modal-footer {
-        padding:
-            14px
-            20px;
-    }
-
-
-    .task-modal-detail-row {
-        grid-template-columns:
-            90px
-            minmax(0, 1fr);
+    .add-task-modal-header,
+    .add-task-modal-form {
+        padding-left: 18px;
+        padding-right: 18px;
     }
 
 }

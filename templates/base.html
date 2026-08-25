@@ -7,27 +7,32 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <!--when it add another html it will be look like CatOS/-->
-
-    <title> 
+    <!-- when another html page is loaded it will look like CatOS / page -->
+    <title>
         {% block title %}
-        {% endblock %}    
-        - CatOS      
+        {% endblock %}
+        - CatOS
     </title>
 
-<!-- Shared CSS -->
-<link
-    rel="stylesheet"
-    href="{{ url_for('static', filename='css/base.css') }}"
->
+    <!-- Shared CSS -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/base.css') }}"
+    >
 
-<!-- Individual CSS -->
-{% block styles %}
+    <!-- Floating Add task modal CSS -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/task_modal.css') }}"
+    >
 
-{% endblock %}
+    <!-- Individual CSS -->
+    {% block styles %}
+    {% endblock %}
 </head>
 
 <body>
+
     <aside class="sidebar" id="sidebar">
 
         <button
@@ -41,104 +46,418 @@
 
         <nav class="sidebar-nav">
 
-            <a class="nav-link" href="{{ url_for('setting') }}">
+            <a
+                class="nav-link"
+                href="{{ url_for('setting') }}"
+            >
                 <img
                     class="nav-icon"
                     src="{{ url_for('static', filename='images/user.svg') }}"
                     alt=""
                 >
-                <span class="nav-text">Settings</span>
+                <span class="nav-text">
+                    Settings
+                </span>
             </a>
-            <a class="nav-link" href="{{ url_for('task') }}">
+
+
+            <!--
+                Add task is a button instead of a link.
+                It opens the floating task modal without leaving the page.
+            -->
+            <button
+                class="nav-link nav-button"
+                id="openTaskModal"
+                type="button"
+            >
                 <img
                     class="nav-icon"
                     src="{{ url_for('static', filename='icons/add_task.svg') }}"
                     alt=""
                 >
-                <span class="nav-text">Add task</span>
-            </a>
+                <span class="nav-text">
+                    Add task
+                </span>
+            </button>
 
-            <a class="nav-link" href="{{ url_for('search') }}">
+
+            <a
+                class="nav-link"
+                href="{{ url_for('search') }}"
+            >
                 <img
                     class="nav-icon"
                     src="{{ url_for('static', filename='icons/calendar_search.svg') }}"
                     alt=""
                 >
-                <span class="nav-text">Search</span>
+                <span class="nav-text">
+                    Search
+                </span>
             </a>
 
-            <a class="nav-link" href="{{ url_for('home') }}">
+
+            <a
+                class="nav-link"
+                href="{{ url_for('home') }}"
+            >
                 <img
                     class="nav-icon"
                     src="{{ url_for('static', filename='icons/calendars.svg') }}"
                     alt=""
                 >
-                <span class="nav-text">Today</span>
+                <span class="nav-text">
+                    Today
+                </span>
             </a>
 
-            <a class="nav-link" href="{{ url_for('labels') }}">
+
+            <a
+                class="nav-link"
+                href="{{ url_for('labels') }}"
+            >
                 <img
                     class="nav-icon"
                     src="{{ url_for('static', filename='icons/filter.svg') }}"
                     alt=""
                 >
-                <span class="nav-text">Filters & Labels</span>
+                <span class="nav-text">
+                    Filters & Labels
+                </span>
             </a>
 
-            <a class="nav-link" href="{{ url_for('upcoming') }}">
+
+            <a
+                class="nav-link"
+                href="{{ url_for('upcoming') }}"
+            >
                 <img
                     class="nav-icon"
                     src="{{ url_for('static', filename='icons/calendar_upcoming.svg') }}"
                     alt=""
                 >
-                <span class="nav-text">Upcoming</span>
+                <span class="nav-text">
+                    Upcoming
+                </span>
             </a>
 
-            <a class="nav-link" href="{{ url_for('data') }}">
+
+            <a
+                class="nav-link"
+                href="{{ url_for('data') }}"
+            >
                 <img
                     class="nav-icon"
                     src="{{ url_for('static', filename='icons/data.svg') }}"
                     alt=""
                 >
-                <span class="nav-text">Data</span>
+                <span class="nav-text">
+                    Data
+                </span>
             </a>
 
-            <a class="nav-link" href="{{ url_for('cat') }}">
+
+            <a
+                class="nav-link"
+                href="{{ url_for('cat') }}"
+            >
                 <img
                     class="nav-icon"
                     src="{{ url_for('static', filename='icons/cat.svg') }}"
                     alt=""
                 >
-                <span class="nav-text">{{ cat_name | default('Cat') }}</span>
+                <span class="nav-text">
+                    {{ cat_name | default('Cat') }}
+                </span>
             </a>
+
 
             <div class="nav-spacer"></div>
 
-            <a class="nav-link" href="{{ url_for('help') }}">
+
+            <a
+                class="nav-link"
+                href="{{ url_for('help') }}"
+            >
                 <img
                     class="nav-icon"
                     src="{{ url_for('static', filename='icons/question_mark.svg') }}"
                     alt=""
                 >
-                <span class="nav-text">Need help?</span>
+                <span class="nav-text">
+                    Need help?
+                </span>
             </a>
 
         </nav>
 
-        <div class="sidebar-resizer" id="sidebarResizer"></div>
+        <div
+            class="sidebar-resizer"
+            id="sidebarResizer"
+        ></div>
+
     </aside>
 
+
     <main class="main-content">
+
         {% block content %}
         {% endblock %}
-        <!--load individual html-->
 
+        <!-- load individual JavaScript -->
         {% block scripts %}
         {% endblock %}
-        <!--load individual Javascript-->
+
     </main>
 
+
+    <!--
+        GLOBAL ADD TASK MODAL
+
+        This lives in base.html so the Add task button can open it
+        from Today, Settings, Upcoming, Data, or any other CatOS page.
+    -->
+    <div
+        class="add-task-overlay hidden"
+        id="addTaskOverlay"
+        aria-hidden="true"
+    >
+
+        <section
+            class="add-task-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="addTaskModalTitle"
+        >
+
+            <!-- MODAL HEADER -->
+            <div class="add-task-modal-header">
+
+                <div>
+                    <h2 id="addTaskModalTitle">
+                        Add task
+                    </h2>
+
+                    <p class="add-task-modal-subtitle">
+                        Create a new task without leaving this page.
+                    </p>
+                </div>
+
+
+                <button
+                    type="button"
+                    class="add-task-modal-close"
+                    id="closeTaskModal"
+                    aria-label="Close Add task"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <!-- ADD TASK FORM -->
+            <form
+                method="POST"
+                action="{{ url_for('task') }}"
+                class="add-task-modal-form"
+                id="addTaskModalForm"
+            >
+
+                <!--
+                    Remember the page that opened the modal.
+                    app.py redirects back here after the task is created.
+                -->
+                <input
+                    type="hidden"
+                    name="return_to"
+                    value="{{ request.path }}"
+                >
+
+
+                <!-- TASK TITLE -->
+                <input
+                    type="text"
+                    name="title"
+                    class="modal-task-title"
+                    id="modalTaskTitle"
+                    placeholder="Task name"
+                    autocomplete="off"
+                    required
+                >
+
+
+                <!-- TASK DESCRIPTION -->
+                <textarea
+                    name="description"
+                    class="modal-task-description"
+                    placeholder="Description"
+                    rows="3"
+                ></textarea>
+
+
+                <!-- DATES -->
+                <div class="modal-task-row">
+
+                    <label class="modal-task-field">
+
+                        <span>
+                            Start
+                        </span>
+
+                        <input
+                            type="date"
+                            name="start_date"
+                        >
+
+                    </label>
+
+
+                    <label class="modal-task-field">
+
+                        <span>
+                            Deadline
+                        </span>
+
+                        <input
+                            type="date"
+                            name="due_date"
+                        >
+
+                    </label>
+
+                </div>
+
+
+                <!-- PRIORITY -->
+                <label class="modal-task-field">
+
+                    <span>
+                        Priority
+                    </span>
+
+                    <select name="priority">
+
+                        <option
+                            value="normal"
+                            selected
+                        >
+                            Normal
+                        </option>
+
+                        <option value="low">
+                            Low
+                        </option>
+
+                        <option value="medium">
+                            Medium
+                        </option>
+
+                        <option value="high">
+                            High
+                        </option>
+
+                    </select>
+
+                </label>
+
+
+                <!-- EXISTING LABELS -->
+                <div class="modal-label-section">
+
+                    <div class="modal-field-label">
+                        Labels
+                    </div>
+
+
+                    {% if global_task_tags %}
+
+                        <div class="modal-label-list">
+
+                            {% for tag in global_task_tags %}
+
+                                <label class="modal-label">
+
+                                    <input
+                                        type="checkbox"
+                                        name="tag_ids"
+                                        value="{{ tag['id'] }}"
+                                    >
+
+                                    <span>
+                                        # {{ tag["name"] }}
+                                    </span>
+
+                                </label>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="modal-label-empty">
+                            No saved labels yet.
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- CREATE NEW LABELS -->
+                <label class="modal-task-field">
+
+                    <span>
+                        New labels
+                    </span>
+
+                    <input
+                        type="text"
+                        name="new_tags"
+                        placeholder="School, DTP, Important"
+                        autocomplete="off"
+                    >
+
+                </label>
+
+
+                <!-- FORM ACTIONS -->
+                <div class="add-task-modal-actions">
+
+                    <button
+                        type="button"
+                        class="modal-cancel-button"
+                        id="cancelTaskModal"
+                    >
+                        Cancel
+                    </button>
+
+
+                    <button
+                        type="submit"
+                        class="modal-add-button"
+                    >
+                        Add task
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </div>
+
+
+    <!-- Shared sidebar JavaScript -->
     <script
         src="{{ url_for('static', filename='js/sidebar.js') }}"
     ></script>
+
+    <!-- Shared Add task modal JavaScript -->
+    <script
+        src="{{ url_for('static', filename='js/task_modal.js') }}"
+    ></script>
+
 </body>
+</html>

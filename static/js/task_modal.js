@@ -1,273 +1,170 @@
 /*
-    CatOS - Task Detail Modal
-    -------------------------
-    Controls opening and closing the floating task detail window.
-
-    The task modal is intentionally separate from today_task.js
-    so the existing composer / edit / label code does not need
-    to be changed.
+    CatOS - Floating Add Task Modal
+    --------------------------------
+    Opens the Add Task window from the sidebar
+    without leaving the current page.
 */
 
 document.addEventListener(
     "DOMContentLoaded",
     () => {
 
-        let activeModal = null;
+        // Main modal controls
+        const openButton =
+            document.getElementById(
+                "openTaskModal"
+            );
+
+        const overlay =
+            document.getElementById(
+                "addTaskOverlay"
+            );
+
+        const closeButton =
+            document.getElementById(
+                "closeTaskModal"
+            );
+
+        const cancelButton =
+            document.getElementById(
+                "cancelTaskModal"
+            );
+
+        const taskForm =
+            overlay
+                ? overlay.querySelector(
+                    ".add-task-modal-form"
+                )
+                : null;
+
+
+        // Stop here if this page does not contain the modal.
+        if (
+            !openButton ||
+            !overlay
+        ) {
+            return;
+        }
 
 
         /*
-            Open a task modal by task ID.
+            Open modal.
         */
-        function openTaskModal(taskId) {
+        function openTaskModal() {
 
-            const modal =
-                document.getElementById(
-                    `taskModal${taskId}`
-                );
-
-            if (!modal) {
-                return;
-            }
-
-
-            /*
-                Close another modal first if one is already open.
-            */
-            if (
-                activeModal &&
-                activeModal !== modal
-            ) {
-
-                closeTaskModal(
-                    activeModal
-                );
-
-            }
-
-
-            modal.classList.remove(
+            overlay.classList.remove(
                 "hidden"
             );
 
-            modal.setAttribute(
+            overlay.setAttribute(
                 "aria-hidden",
                 "false"
             );
-
 
             document.body.classList.add(
                 "task-modal-open"
             );
 
 
-            activeModal = modal;
-
-
-            /*
-                Move keyboard focus to the close button
-                after opening the dialog.
-            */
-            const closeButton =
-                modal.querySelector(
-                    "[data-close-task-modal]"
+            // Focus the task title automatically.
+            const titleInput =
+                overlay.querySelector(
+                    'input[name="title"]'
                 );
 
-            if (closeButton) {
-                closeButton.focus();
+            if (titleInput) {
+                titleInput.focus();
             }
 
         }
 
 
         /*
-            Close a task modal.
+            Close modal.
         */
-        function closeTaskModal(modal) {
+        function closeTaskModal() {
 
-            if (!modal) {
-                return;
-            }
-
-
-            modal.classList.add(
+            overlay.classList.add(
                 "hidden"
             );
 
-            modal.setAttribute(
+            overlay.setAttribute(
                 "aria-hidden",
                 "true"
             );
-
 
             document.body.classList.remove(
                 "task-modal-open"
             );
 
 
-            if (activeModal === modal) {
-                activeModal = null;
-            }
+            // Return keyboard focus to Add task.
+            openButton.focus();
 
         }
 
 
         /*
-            Open the modal when the normal task display
-            is clicked.
+            Open from sidebar.
         */
-        document
-            .querySelectorAll(
-                ".task-open-area"
-            )
-            .forEach((taskArea) => {
+        openButton.addEventListener(
+            "click",
+            () => {
 
-                taskArea.addEventListener(
-                    "click",
-                    () => {
+                openTaskModal();
 
-                        const taskId =
-                            taskArea.dataset.taskId;
-
-                        openTaskModal(
-                            taskId
-                        );
-
-                    }
-                );
-
-
-                /*
-                    Keyboard support:
-                    Enter or Space opens the task.
-                */
-                taskArea.addEventListener(
-                    "keydown",
-                    (event) => {
-
-                        if (
-                            event.key !== "Enter" &&
-                            event.key !== " "
-                        ) {
-                            return;
-                        }
-
-
-                        event.preventDefault();
-
-
-                        const taskId =
-                            taskArea.dataset.taskId;
-
-                        openTaskModal(
-                            taskId
-                        );
-
-                    }
-                );
-
-            });
+            }
+        );
 
 
         /*
-            Close buttons inside the modal.
+            Close using X button.
         */
-        document
-            .querySelectorAll(
-                "[data-close-task-modal]"
-            )
-            .forEach((button) => {
+        if (closeButton) {
 
-                button.addEventListener(
-                    "click",
-                    () => {
+            closeButton.addEventListener(
+                "click",
+                () => {
 
-                        const modal =
-                            button.closest(
-                                ".task-modal-overlay"
-                            );
+                    closeTaskModal();
 
-                        closeTaskModal(
-                            modal
-                        );
+                }
+            );
 
-                    }
-                );
-
-            });
+        }
 
 
         /*
-            Clicking the dark background closes the modal.
-
-            Clicking the white modal itself does not close it.
+            Close using Cancel button.
         */
-        document
-            .querySelectorAll(
-                ".task-modal-overlay"
-            )
-            .forEach((overlay) => {
+        if (cancelButton) {
 
-                overlay.addEventListener(
-                    "click",
-                    (event) => {
+            cancelButton.addEventListener(
+                "click",
+                () => {
 
-                        if (
-                            event.target !== overlay
-                        ) {
-                            return;
-                        }
+                    closeTaskModal();
 
+                }
+            );
 
-                        closeTaskModal(
-                            overlay
-                        );
-
-                    }
-                );
-
-            });
+        }
 
 
         /*
-            Escape closes the currently open task modal.
+            Click outside the white modal window
+            to close it.
         */
-        document.addEventListener(
-            "keydown",
+        overlay.addEventListener(
+            "click",
             (event) => {
 
                 if (
-                    event.key !== "Escape" ||
-                    !activeModal
+                    event.target === overlay
                 ) {
-                    return;
-                }
 
+                    closeTaskModal();
 
-                const modalToClose =
-                    activeModal;
-
-
-                closeTaskModal(
-                    modalToClose
-                );
-
-
-                /*
-                    Return focus to the task row that
-                    originally opened this modal.
-                */
-                const taskId =
-                    modalToClose.dataset.taskModal;
-
-
-                const taskArea =
-                    document.querySelector(
-                        `.task-open-area[data-task-id="${taskId}"]`
-                    );
-
-
-                if (taskArea) {
-                    taskArea.focus();
                 }
 
             }
@@ -275,94 +172,140 @@ document.addEventListener(
 
 
         /*
-            EDIT FROM MODAL
-
-            Instead of creating another editing system,
-            this button closes the modal and clicks the
-            existing inline edit button.
-
-            This keeps only one source of edit logic.
+            Escape closes the modal.
         */
-        document
-            .querySelectorAll(
-                "[data-modal-edit-task]"
-            )
-            .forEach((button) => {
+        document.addEventListener(
+            "keydown",
+            (event) => {
 
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        const taskId =
-                            button.dataset
-                                .modalEditTask;
+                if (
+                    event.key !== "Escape"
+                ) {
+                    return;
+                }
 
 
-                        const modal =
-                            button.closest(
-                                ".task-modal-overlay"
-                            );
+                if (
+                    overlay.classList.contains(
+                        "hidden"
+                    )
+                ) {
+                    return;
+                }
 
 
-                        closeTaskModal(
-                            modal
-                        );
+                closeTaskModal();
 
-
-                        const existingEditButton =
-                            document.querySelector(
-                                `.task-edit-button[data-task-id="${taskId}"]`
-                            );
-
-
-                        if (
-                            existingEditButton
-                        ) {
-
-                            existingEditButton.click();
-
-                        }
-
-                    }
-                );
-
-            });
+            }
+        );
 
 
         /*
-            DELETE CONFIRMATION INSIDE MODAL
-
-            The existing Today page already has delete
-            confirmation behaviour. This duplicate form
-            lives inside the modal, so it receives its own
-            confirmation here.
+            Prevent clicks inside the modal itself
+            from closing the window.
         */
-        document
-            .querySelectorAll(
-                ".task-modal-delete-form"
-            )
-            .forEach((form) => {
+        const modalWindow =
+            overlay.querySelector(
+                ".add-task-modal"
+            );
 
-                form.addEventListener(
-                    "submit",
-                    (event) => {
+        if (modalWindow) {
 
-                        const confirmed =
-                            window.confirm(
-                                "Delete this task?"
-                            );
+            modalWindow.addEventListener(
+                "click",
+                (event) => {
+
+                    event.stopPropagation();
+
+                }
+            );
+
+        }
 
 
-                        if (!confirmed) {
+        /*
+            Reset the form when the user manually closes it.
 
-                            event.preventDefault();
+            This keeps old title / description values from
+            appearing the next time the modal is opened.
+        */
+        function resetTaskForm() {
 
-                        }
+            if (!taskForm) {
+                return;
+            }
 
-                    }
-                );
+            taskForm.reset();
 
-            });
+        }
+
+
+        /*
+            Reset when Cancel is pressed.
+        */
+        if (cancelButton) {
+
+            cancelButton.addEventListener(
+                "click",
+                () => {
+
+                    resetTaskForm();
+
+                }
+            );
+
+        }
+
+
+        /*
+            Reset when the X button is pressed.
+        */
+        if (closeButton) {
+
+            closeButton.addEventListener(
+                "click",
+                () => {
+
+                    resetTaskForm();
+
+                }
+            );
+
+        }
+
+
+        /*
+            Reset when clicking the dark overlay.
+        */
+        overlay.addEventListener(
+            "click",
+            (event) => {
+
+                if (
+                    event.target !== overlay
+                ) {
+                    return;
+                }
+
+                resetTaskForm();
+
+            }
+        );
+
+
+        /*
+            Make sure the modal begins closed,
+            even if another CSS rule accidentally
+            interferes with the hidden class.
+        */
+        overlay.classList.add(
+            "hidden"
+        );
+
+        overlay.setAttribute(
+            "aria-hidden",
+            "true"
+        );
 
     }
 );

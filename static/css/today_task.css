@@ -1,3 +1,24 @@
+/*
+    CatOS - Today page
+    ------------------
+    Keeping the boring black / white / grey colours here so I do not have
+    to hunt through the whole file every time I want to tweak the theme.
+*/
+
+:root {
+    --catos-black: #222222;
+    --catos-text: #333333;
+    --catos-text-soft: #666666;
+    --catos-muted: #999999;
+
+    --catos-border: #dddddd;
+    --catos-border-soft: #eeeeee;
+
+    --catos-hover: #f4f4f4;
+    --catos-soft: #fafafa;
+    --catos-white: #ffffff;
+}
+
 .today-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 190px;
@@ -11,14 +32,14 @@
 }
 
 
-/* MAIN */
+/* Main area for the task list, nothing fancy here. */
 
 .today-main {
     min-width: 0;
 }
 
 
-/* HEADER */
+/* Big page title, with the task count underneath. */
 
 .today-header {
     margin-bottom: 30px;
@@ -31,23 +52,24 @@
     font-weight: 700;
 
     letter-spacing: -0.04em;
-    color: #111;
+    color: var(--catos-black);
 }
 
 .today-count {
     margin-top: 8px;
 
     font-size: 14px;
-    color: #999;
+    color: var(--catos-muted);
 }
 
 
-/* TASK GROUP */
+/* Keeps Overdue and Today separate so the list is easier to scan. */
 
 .task-group {
     margin-top: 28px;
 }
 
+/* Whole group header is clickable so collapsing it is easier. */
 .group-header {
     width: 100%;
 
@@ -80,7 +102,7 @@
 .group-arrow {
     display: inline-block;
 
-    color: #888;
+    color: var(--catos-muted);
 
     transition: transform 0.18s ease;
 }
@@ -93,7 +115,7 @@
     font-size: 14px;
     font-weight: 600;
 
-    color: #333;
+    color: var(--catos-text);
 }
 
 .group-line {
@@ -115,7 +137,7 @@
 }
 
 
-/* TASK ROW */
+/* One task row. Most of the task stuff starts here. */
 
 .task-row {
     display: flex;
@@ -129,9 +151,10 @@
 }
 
 .task-row:hover {
-    background: #f4f4f4;
+    background: var(--catos-hover);
 }
 
+/* The little circle on the left also shows task priority by colour. */
 .task-circle {
     position: relative;
 
@@ -173,7 +196,7 @@
     font-size: 15px;
     font-weight: 500;
 
-    color: #222;
+    color: var(--catos-black);
 }
 
 .task-description {
@@ -182,7 +205,7 @@
     font-size: 13px;
     line-height: 1.4;
 
-    color: #777;
+    color: var(--catos-text-soft);
 }
 
 .task-meta {
@@ -194,7 +217,7 @@
     margin-top: 5px;
 
     font-size: 12px;
-    color: #888;
+    color: var(--catos-muted);
 }
 
 .task-date {
@@ -202,11 +225,11 @@
 }
 
 .task-tag {
-    color: #777;
+    color: var(--catos-text-soft);
 }
 
 
-/* COMPLETED TASK */
+/* Finished tasks get a tick and fade a bit so they stop stealing attention. */
 
 .task-circle.completed {
     display: flex;
@@ -217,7 +240,7 @@
     background: #f3f3f3;
 
     font-size: 11px;
-    color: #777;
+    color: var(--catos-text-soft);
 }
 
 .task-circle.completed::after {
@@ -246,7 +269,7 @@
 }
 
 
-/* EMPTY */
+/* Just a small message so an empty group does not look broken. */
 
 .empty-group {
     padding: 18px 8px;
@@ -256,7 +279,7 @@
 }
 
 
-/* ADD TASK */
+/* Opens the small Add task box on the Today page. */
 
 .show-composer-button {
     margin-top: 24px;
@@ -267,17 +290,17 @@
     background: transparent;
 
     font-size: 14px;
-    color: #666;
+    color: var(--catos-text-soft);
 
     cursor: pointer;
 }
 
 .show-composer-button:hover {
-    color: #222;
+    color: var(--catos-black);
 }
 
 
-/* COMPOSER */
+/* The quick Add task box. Kept simple because it is meant to be fast. */
 
 .task-composer {
     margin-top: 12px;
@@ -286,7 +309,7 @@
     border: 1px solid #cccccc;
     border-radius: 10px;
 
-    background: white;
+    background: var(--catos-white);
 }
 
 .task-composer.hidden {
@@ -323,9 +346,10 @@
     font-size: 13px;
     line-height: 1.4;
 
-    color: #555;
+    color: var(--catos-text-soft);
 }
 
+/* Options stay on the left and the action buttons stay on the right. */
 .composer-bottom {
     display: flex;
     align-items: flex-end;
@@ -351,15 +375,15 @@
 
     padding: 7px 9px;
 
-    border: 1px solid #dddddd;
+    border: 1px solid var(--catos-border);
     border-radius: 8px;
 
-    background: #fafafa;
+    background: var(--catos-soft);
 
     font-family: inherit;
     font-size: 12px;
 
-    color: #666;
+    color: var(--catos-text-soft);
 }
 
 .composer-option input,
@@ -394,7 +418,7 @@
 
 .cancel-button {
     background: #eeeeee;
-    color: #555;
+    color: var(--catos-text-soft);
 }
 
 .cancel-button:hover {
@@ -402,16 +426,16 @@
 }
 
 .add-task-button {
-    background: #333;
-    color: white;
+    background: var(--catos-black);
+    color: var(--catos-white);
 }
 
 .add-task-button:hover {
-    background: #222;
+    background: #111111;
 }
 
 
-/* PRIORITY PICKER */
+/* Priority picker. The actual menu sits above this button. */
 
 .priority-picker {
     position: relative;
@@ -429,7 +453,7 @@
 }
 
 
-/* PRIORITY MENU */
+/* Opens above the button so it does not get cut off at the bottom. */
 
 .priority-menu {
     position: absolute;
@@ -440,10 +464,10 @@
     width: 150px;
     padding: 6px;
 
-    border: 1px solid #dddddd;
+    border: 1px solid var(--catos-border);
     border-radius: 10px;
 
-    background: white;
+    background: var(--catos-white);
 
     box-shadow:
         0 4px 14px rgba(0, 0, 0, 0.10);
@@ -494,7 +518,7 @@
 }
 
 
-/* LABEL PICKER */
+/* Label picker works pretty much the same way as priority. */
 
 .label-picker {
     position: relative;
@@ -509,11 +533,11 @@
     font-size: 17px;
     line-height: 1;
 
-    color: #777;
+    color: var(--catos-text-soft);
 }
 
 
-/* LABEL MENU */
+/* A bit wider because label names can get long. */
 
 .label-menu {
     position: absolute;
@@ -526,10 +550,10 @@
 
     padding: 8px;
 
-    border: 1px solid #dddddd;
+    border: 1px solid var(--catos-border);
     border-radius: 12px;
 
-    background: white;
+    background: var(--catos-white);
 
     box-shadow:
         0 8px 25px rgba(0, 0, 0, 0.13);
@@ -542,7 +566,7 @@
 }
 
 
-/* LABEL SEARCH */
+/* Search labels here instead of scrolling forever. */
 
 .label-search {
     width: 100%;
@@ -556,16 +580,16 @@
 
     outline: none;
 
-    background: white;
+    background: var(--catos-white);
 
     font-family: inherit;
     font-size: 13px;
 
-    color: #333;
+    color: var(--catos-text);
 }
 
 .label-search:focus {
-    border-color: #999;
+    border-color: var(--catos-muted);
 }
 
 .label-search::placeholder {
@@ -573,7 +597,7 @@
 }
 
 
-/* LABEL LIST */
+/* Existing labels go in this scrollable list. */
 
 .label-list {
     max-height: 240px;
@@ -598,7 +622,7 @@
 }
 
 .label-item:hover {
-    background: #f4f4f4;
+    background: var(--catos-hover);
 }
 
 .label-item-left {
@@ -615,7 +639,7 @@
 
     font-size: 18px;
 
-    color: #9a8390;
+    color: var(--catos-text-soft);
 }
 
 .label-name {
@@ -623,14 +647,14 @@
 
     font-size: 13px;
 
-    color: #333;
+    color: var(--catos-text);
 
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 
-/* LABEL CHECKBOX */
+/* Checkbox shows which labels will be added to the task. */
 
 .label-checkbox,
 .pending-label-checkbox {
@@ -639,13 +663,13 @@
 
     flex-shrink: 0;
 
-    accent-color: #876b79;
+    accent-color: var(--catos-black);
 
     cursor: pointer;
 }
 
 
-/* CREATE LABEL */
+/* If the label does not exist yet, make it from here. */
 
 .create-label-button {
     width: 100%;
@@ -663,13 +687,13 @@
     font-family: inherit;
     font-size: 13px;
 
-    color: #555;
+    color: var(--catos-text-soft);
 
     cursor: pointer;
 }
 
 .create-label-button:hover {
-    background: #f4f4f4;
+    background: var(--catos-hover);
 }
 
 .create-label-button.hidden {
@@ -677,12 +701,13 @@
 }
 
 
-/* RIGHT SIDE STATS */
+/* Little progress summary on the right, mostly just visual feedback. */
 
 .today-stats {
     padding-top: 50px;
 }
 
+/* Fake donut chart made with a conic gradient, no image needed. */
 .progress-ring {
     position: relative;
 
@@ -712,7 +737,7 @@
 
     border-radius: 50%;
 
-    background: white;
+    background: var(--catos-white);
 }
 
 .progress-value {
@@ -721,14 +746,14 @@
 
     font-size: 30px;
 
-    color: #888;
+    color: var(--catos-muted);
 }
 
 .progress-legend {
     margin-top: 18px;
 
     font-size: 13px;
-    color: #999;
+    color: var(--catos-muted);
 }
 
 .progress-legend div {
@@ -755,14 +780,14 @@
 }
 
 
-/* HIDDEN */
+/* Reused everywhere when JS needs to hide something. */
 
 .hidden {
     display: none;
 }
 
 
-/* TASK EDIT BUTTON */
+/* Keep Edit hidden until hover so every task row stays clean. */
 
 .task-edit-button {
     flex-shrink: 0;
@@ -794,11 +819,11 @@
 
 .task-edit-button:hover {
     background: #eaeaea;
-    color: #555;
+    color: var(--catos-text-soft);
 }
 
 
-/* TASK EDIT FORM */
+/* Replaces the normal task text while that task is being edited. */
 
 .task-edit-form {
     width: 100%;
@@ -820,7 +845,7 @@
     font-size: 15px;
     font-weight: 500;
 
-    color: #222;
+    color: var(--catos-black);
 }
 
 .edit-description {
@@ -831,11 +856,11 @@
     font-size: 13px;
     line-height: 1.4;
 
-    color: #777;
+    color: var(--catos-text-soft);
 }
 
 
-/* EDIT OPTIONS */
+/* Date, priority and labels live down here so the title stays uncluttered. */
 
 .edit-options {
     display: flex;
@@ -856,12 +881,12 @@
     border: 1px solid #ddd;
     border-radius: 6px;
 
-    background: #fafafa;
+    background: var(--catos-soft);
 
     font-family: inherit;
     font-size: 12px;
 
-    color: #666;
+    color: var(--catos-text-soft);
 }
 
 .edit-option-button {
@@ -872,7 +897,7 @@
 }
 
 
-/* EDIT ACTIONS */
+/* Save is the main action, Cancel is deliberately quieter. */
 
 .edit-actions {
     display: flex;
@@ -899,7 +924,7 @@
 
 .edit-cancel {
     background: #eee;
-    color: #555;
+    color: var(--catos-text-soft);
 }
 
 .edit-cancel:hover {
@@ -907,12 +932,12 @@
 }
 
 .edit-save {
-    background: #333;
-    color: white;
+    background: var(--catos-black);
+    color: var(--catos-white);
 }
 
 .edit-save:hover {
-    background: #222;
+    background: #111111;
 }
 
 .task-row > form {
@@ -932,6 +957,7 @@
     margin: 0;
 }
 
+/* Delete only appears on hover too, mostly to avoid accidental clicks. */
 .task-delete-button {
     padding: 3px 6px;
 
@@ -965,7 +991,7 @@
 }
 
 
-/* RESPONSIVE */
+/* Stack things on smaller screens before they start getting squashed. */
 
 @media (max-width: 900px) {
 
