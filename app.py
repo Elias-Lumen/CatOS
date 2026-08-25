@@ -13,7 +13,7 @@ from uuid import uuid4
 
 from werkzeug.utils import secure_filename
 
-from datetime import date
+from datetime import date, timedelta
 
 # bring the database functions over here
 # otherwise app.py would have to do all the database work by itself
@@ -39,6 +39,7 @@ from database import (
     get_tasks_by_tag,
     update_tag,
     delete_tag,
+    get_task_statistics,
 )
 
 # login and register logic is kept in auth.py
@@ -1451,11 +1452,166 @@ def upcoming():
     )
 
 
-# task data / progress page
+# DATA PAGE
+# Show task completion progress and simple daily / weekly statistics.
 @app.route("/data")
 def data():
+
+    if "user_id" not in session:
+
+        return redirect(
+            url_for("login")
+        )
+
+
+    user_id = session["user_id"]
+
+    tasks = get_task_statistics(
+        user_id
+    )
+
+
+    # OVERALL PROGRESS
+
+    total_tasks = len(
+        tasks
+    )
+
+    completed_tasks = sum(
+        1
+        for task in tasks
+        if task["state"] == "completed"
+    )
+
+
+    # Do not divide by zero when the user has no tasks.
+    if total_tasks == 0:
+
+        completion_rate = 0
+
+    else:
+
+        completion_rate = round(
+            (
+                completed_tasks
+                / total_tasks
+            )
+            * 100
+        )
+
+
+    # TODAY
+
+    today_date = date.today()
+
+
+    created_today = 0
+    completed_today = 0
+
+
+    for task in tasks:
+
+        if task["created_at"]:
+
+            created_date = date.fromisoformat(
+                str(
+                    task["created_at"]
+                )[:10]
+            )
+
+            if created_date == today_date:
+
+                created_today += 1
+
+
+        if task["completed_at"]:
+
+            completed_date = date.fromisoformat(
+                str(
+                    task["completed_at"]
+                )[:10]
+            )
+
+            if completed_date == today_date:
+
+                completed_today += 1
+
+
+    # THIS WEEK
+
+    # Monday is the first day of the week.
+    week_start = (
+        today_date
+        - timedelta(
+            days=today_date.weekday()
+        )
+    )
+
+
+    week_days = []
+
+
+    for day_number in range(7):
+
+        current_date = (
+            week_start
+            + timedelta(
+                days=day_number
+            )
+        )
+
+        completed_count = 0
+
+
+        for task in tasks:
+
+            if not task["completed_at"]:
+                continue
+
+
+            completed_date = date.fromisoformat(
+                str(
+                    task["completed_at"]
+                )[:10]
+            )
+
+
+            if completed_date == current_date:
+
+                completed_count += 1
+
+
+        week_days.append({
+            "name": current_date.strftime(
+                "%a"
+            ),
+            "date": current_date.isoformat(),
+            "completed": completed_count
+        })
+
+
+    # Used to scale the little weekly bars.
+    max_weekly_completed = max(
+        (
+            day["completed"]
+            for day in week_days
+        ),
+        default=0
+    )
+
+
     return render_template(
-        "data.html"
+        "data.html",
+
+        total_tasks=total_tasks,
+        completed_tasks=completed_tasks,
+        completion_rate=completion_rate,
+
+        created_today=created_today,
+        completed_today=completed_today,
+
+        week_days=week_days,
+        max_weekly_completed=max_weekly_completed
     )
 
 

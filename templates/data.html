@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Data
+{% endblock %}
+
+
+{% block styles %}
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/data.css') }}"
+>
+
+{% endblock %}
+
+
+{% block content %}
+
+<main class="data-page">
+
+
+    <!-- PAGE HEADER -->
+
+    <header class="data-header">
+
+        <h1>
+            Data
+        </h1>
+
+        <p>
+            See how your tasks are going.
+        </p>
+
+    </header>
+
+
+
+    <!-- OVERALL PROGRESS -->
+
+    <section class="data-card">
+
+        <div class="progress-header">
+
+            <div>
+
+                <span class="data-label">
+                    Progress
+                </span>
+
+                <div class="progress-percentage">
+                    {{ completion_rate }}%
+                </div>
+
+            </div>
+
+
+            <div class="progress-count">
+
+                {{ completed_tasks }}
+                of
+                {{ total_tasks }}
+                tasks completed
+
+            </div>
+
+        </div>
+
+
+        <!--
+            The number is already calculated in app.py.
+            This bar just shows it.
+        -->
+
+        <div class="progress-track">
+
+            <div
+                class="progress-fill"
+                style="width: {{ completion_rate }}%;"
+            >
+            </div>
+
+        </div>
+
+
+        {% if total_tasks == 0 %}
+
+            <p class="data-note">
+                No tasks yet.
+            </p>
+
+        {% endif %}
+
+    </section>
+
+
+
+    <!-- TODAY -->
+
+    <section class="data-card">
+
+        <div class="section-header">
+
+            <h2>
+                Today
+            </h2>
+
+        </div>
+
+
+        <div class="today-statistics">
+
+
+            <!-- Tasks created today -->
+
+            <div class="stat-box">
+
+                <div class="stat-number">
+                    {{ created_today }}
+                </div>
+
+                <div class="stat-name">
+                    Created
+                </div>
+
+            </div>
+
+
+
+            <!-- Tasks completed today -->
+
+            <div class="stat-box">
+
+                <div class="stat-number">
+                    {{ completed_today }}
+                </div>
+
+                <div class="stat-name">
+                    Completed
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- THIS WEEK -->
+
+    <section class="data-card">
+
+        <div class="section-header">
+
+            <h2>
+                This week
+            </h2>
+
+            <span>
+                Tasks completed each day
+            </span>
+
+        </div>
+
+
+        <div class="weekly-chart">
+
+
+            {% for day in week_days %}
+
+                <div class="weekly-day">
+
+
+                    <!-- Number completed -->
+
+                    <div class="weekly-value">
+                        {{ day["completed"] }}
+                    </div>
+
+
+
+                    <!-- Bar -->
+
+                    <div class="weekly-bar-area">
+
+                        {% if day["completed"] > 0 %}
+
+                            <div
+                                class="weekly-bar"
+
+                                {% if max_weekly_completed > 0 %}
+
+                                    style="
+                                        height:
+                                        calc(
+                                            {{ day['completed'] }}
+                                            /
+                                            {{ max_weekly_completed }}
+                                            *
+                                            100%
+                                        );
+                                    "
+
+                                {% endif %}
+                            >
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+
+                    <!-- Day name -->
+
+                    <div class="weekly-name">
+                        {{ day["name"] }}
+                    </div>
+
+
+                </div>
+
+            {% endfor %}
+
+
+        </div>
+
+    </section>
+
+
+</main>
+
+{% endblock %}

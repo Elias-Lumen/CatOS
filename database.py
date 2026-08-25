@@ -1175,6 +1175,29 @@ def search_tasks(
     return tasks
 
 
+# Get the task information needed for the Data page.
+def get_task_statistics(user_id):
+
+    connection = get_connection()
+
+    tasks = connection.execute(
+        """
+        SELECT
+            id,
+            state,
+            created_at,
+            completed_at
+        FROM tasks
+        WHERE user_id = ?
+        """,
+        (user_id,)
+    ).fetchall()
+
+    connection.close()
+
+    return tasks
+
+
 
 # put any new database functions above this part
 
