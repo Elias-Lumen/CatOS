@@ -994,6 +994,209 @@
 }
 
 
+/* Subtasks sit under the main task but stay visually quieter. */
+.subtask-section {
+    margin-top: 9px;
+}
+
+
+/* Small fold/unfold button for the subtask list. */
+.subtask-toggle,
+.show-subtask-form {
+    padding: 3px 0;
+
+    border: none;
+    background: transparent;
+
+    font-family: inherit;
+    font-size: 12px;
+
+    color: var(--catos-text-soft);
+
+    cursor: pointer;
+}
+
+
+.subtask-toggle:hover,
+.show-subtask-form:hover {
+    color: var(--catos-black);
+}
+
+
+/* Tiny arrow so it is obvious the list can open. */
+.subtask-arrow {
+    display: inline-block;
+
+    width: 14px;
+
+    color: var(--catos-muted);
+}
+
+
+/* Indent subtasks a little so they clearly belong to the parent task. */
+.subtask-list {
+    margin-top: 7px;
+    margin-left: 7px;
+    padding-left: 12px;
+
+    border-left:
+        1px solid
+        var(--catos-border-soft);
+}
+
+
+/* One subtask row. */
+.subtask-row {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    min-height: 28px;
+
+    font-size: 13px;
+}
+
+
+/* Do not let the small form add weird spacing. */
+.subtask-row form {
+    margin: 0;
+}
+
+
+/* Small completion circle, quieter than the parent task one. */
+.subtask-circle {
+    position: relative;
+
+    width: 15px;
+    height: 15px;
+
+    padding: 0;
+
+    border:
+        1.4px solid
+        #cfcfcf;
+
+    border-radius: 50%;
+
+    background: transparent;
+
+    cursor: pointer;
+}
+
+
+.subtask-circle.completed {
+    background: #f1f1f1;
+}
+
+
+/* Draw the little tick with CSS so no extra icon is needed. */
+.subtask-circle.completed::after {
+    content: "";
+
+    position: absolute;
+
+    width: 3px;
+    height: 6px;
+
+    left: 4px;
+    top: 2px;
+
+    border-right:
+        1.3px solid
+        #777777;
+
+    border-bottom:
+        1.3px solid
+        #777777;
+
+    transform:
+        rotate(45deg);
+}
+
+
+/* Finished subtasks fade like finished parent tasks. */
+.subtask-title.completed {
+    color: #aaaaaa;
+
+    text-decoration:
+        line-through;
+}
+
+
+/* Inline form for making another subtask. */
+.subtask-add-form {
+    display: flex;
+
+    gap: 7px;
+
+    margin-top: 7px;
+}
+
+
+.subtask-add-input {
+    flex: 1;
+
+    min-width: 0;
+
+    padding:
+        6px
+        8px;
+
+    border:
+        1px solid
+        var(--catos-border);
+
+    border-radius: 6px;
+
+    outline: none;
+
+    background:
+        var(--catos-white);
+
+    font-family: inherit;
+    font-size: 12px;
+
+    color:
+        var(--catos-text);
+}
+
+
+.subtask-add-input:focus {
+    border-color:
+        #999999;
+}
+
+
+/* Small Add button so it does not compete with the main task actions. */
+.subtask-add-button {
+    padding:
+        6px
+        9px;
+
+    border: none;
+    border-radius: 6px;
+
+    background:
+        var(--catos-black);
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+
+    color:
+        var(--catos-white);
+
+    cursor: pointer;
+}
+
+
+.subtask-add-button:hover {
+    background:
+        #111111;
+}
+
+
 /* Stack things on smaller screens before they start getting squashed. */
 
 @media (max-width: 900px) {

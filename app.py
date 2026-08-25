@@ -23,6 +23,9 @@ from database import (
     toggle_task_completion,
     update_task,
     delete_task,
+    create_subtask,
+    get_subtasks_by_task,
+    toggle_subtask_completion,
 )
 
 # login and register logic is kept in auth.py
@@ -93,21 +96,52 @@ def get_new_tag_ids(user_id, new_tags_text):
     return tag_ids
 
 
-# attach each task's tags before sending tasks to Jinja
+# Attach labels to every task before sending them to the page.
+# Otherwise the template knows the task, but not which labels belong to it.
 def add_tags_to_tasks(tasks, user_id):
+
     tasks_with_tags = []
 
     for task in tasks:
+
         task_data = dict(task)
 
-        task_data["tags"] = get_tags_by_task(
-            task_id=task["id"],
-            user_id=user_id
+        task_data["tags"] = list(
+            get_tags_by_task(
+                task_id=task["id"],
+                user_id=user_id
+            )
         )
 
-        tasks_with_tags.append(task_data)
+        tasks_with_tags.append(
+            task_data
+        )
 
     return tasks_with_tags
+
+
+# Attach subtasks to every task before sending them to the page.
+# Doing it here keeps the template nice and simple.
+def add_subtasks_to_tasks(tasks, user_id):
+
+    tasks_with_subtasks = []
+
+    for task in tasks:
+
+        task_data = dict(task)
+
+        task_data["subtasks"] = list(
+            get_subtasks_by_task(
+                task_id=task["id"],
+                user_id=user_id
+            )
+        )
+
+        tasks_with_subtasks.append(
+            task_data
+        )
+
+    return tasks_with_subtasks
 
 
 # make saved labels available to the floating Add task modal
@@ -225,6 +259,12 @@ def home():
 
     # add the many-to-many tag information to each task
     tasks = add_tags_to_tasks(
+        tasks,
+        user_id
+    )
+
+    # Add each task's subtasks too.
+    tasks = add_subtasks_to_tasks(
         tasks,
         user_id
     )
@@ -419,6 +459,55 @@ def remove_task(task_id):
         url_for("home")
     )
 
+
+@app.route(
+    "/task/<int:task_id>/subtask",
+    methods=["POST"]
+)
+def add_subtask(task_id):
+
+    if "user_id" not in session:
+        return redirect(
+            url_for("login")
+        )
+
+    title = request.form.get(
+        "title",
+        ""
+    ).strip()
+
+    if title:
+
+        create_subtask(
+            task_id=task_id,
+            user_id=session["user_id"],
+            title=title
+        )
+
+    return redirect(
+        url_for("home")
+    )
+
+
+@app.route(
+    "/subtask/<int:subtask_id>/toggle",
+    methods=["POST"]
+)
+def toggle_subtask(subtask_id):
+
+    if "user_id" not in session:
+        return redirect(
+            url_for("login")
+        )
+
+    toggle_subtask_completion(
+        subtask_id=subtask_id,
+        user_id=session["user_id"]
+    )
+
+    return redirect(
+        url_for("home")
+    )
 
 # register page
 @app.route(

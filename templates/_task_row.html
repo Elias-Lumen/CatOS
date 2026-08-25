@@ -90,7 +90,128 @@
 
         </div>
 
+    <!-- SUBTASKS -->
+    <div class="subtask-section">
 
+        {% set subtask_count = task["subtasks"]|length %}
+
+        {% set completed_subtasks =
+            task["subtasks"]
+            | selectattr("state", "equalto", "completed")
+            | list
+            | length
+        %}
+
+
+        <!-- Only show the toggle if this task already has subtasks. -->
+        {% if subtask_count > 0 %}
+
+            <button
+                type="button"
+                class="subtask-toggle"
+                data-subtask-target="subtasks{{ task['id'] }}"
+            >
+
+                <span class="subtask-arrow">
+                    ▸
+                </span>
+
+                <span>
+                    {{ completed_subtasks }}/{{ subtask_count }}
+                    subtasks
+                </span>
+
+            </button>
+
+        {% endif %}
+
+
+        <!-- Subtasks start folded away to keep the Today page tidy. -->
+        <div
+            class="subtask-list hidden"
+            id="subtasks{{ task['id'] }}"
+        >
+
+            {% for subtask in task["subtasks"] %}
+
+                <div class="subtask-row">
+
+                    <form
+                        method="POST"
+                        action="{{ url_for('toggle_subtask', subtask_id=subtask['id']) }}"
+                    >
+
+                        <button
+                            type="submit"
+                            class="
+                                subtask-circle
+                                {% if subtask['state'] == 'completed' %}
+                                    completed
+                                {% endif %}
+                            "
+                            aria-label="Toggle subtask"
+                        ></button>
+
+                    </form>
+
+
+                    <span
+                        class="
+                            subtask-title
+                            {% if subtask['state'] == 'completed' %}
+                                completed
+                            {% endif %}
+                        "
+                    >
+                        {{ subtask["title"] }}
+                    </span>
+
+                </div>
+
+            {% endfor %}
+
+
+            <!-- Small inline form, no need for another modal here. -->
+            <form
+                method="POST"
+                action="{{ url_for('add_subtask', task_id=task['id']) }}"
+                class="subtask-add-form"
+            >
+
+                <input
+                    type="text"
+                    name="title"
+                    class="subtask-add-input"
+                    placeholder="Add a subtask"
+                    required
+                >
+
+                <button
+                    type="submit"
+                    class="subtask-add-button"
+                >
+                    Add
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- If there are no subtasks yet, give the user a way to make the first one. -->
+        {% if subtask_count == 0 %}
+
+            <button
+                type="button"
+                class="show-subtask-form"
+                data-subtask-target="subtasks{{ task['id'] }}"
+            >
+                + Add subtask
+            </button>
+
+        {% endif %}
+
+    </div>
         <!-- EDIT TASK FORM -->
         <form
             method="POST"

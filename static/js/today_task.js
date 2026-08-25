@@ -20,6 +20,89 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
+    // SUBTASKS
+    // Keep them folded by default so one task cannot take over the whole page.
+
+    document
+        .querySelectorAll(
+            ".subtask-toggle, .show-subtask-form"
+        )
+        .forEach((button) => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const targetId =
+                        button.dataset
+                            .subtaskTarget;
+
+
+                    const list =
+                        document.getElementById(
+                            targetId
+                        );
+
+
+                    if (!list) {
+                        return;
+                    }
+
+
+                    list.classList.toggle(
+                        "hidden"
+                    );
+
+
+                    // Only the real subtask toggle has an arrow.
+                    const arrow =
+                        button.querySelector(
+                            ".subtask-arrow"
+                        );
+
+
+                    if (arrow) {
+
+                        arrow.textContent =
+                            list.classList.contains(
+                                "hidden"
+                            )
+                                ? "▸"
+                                : "▾";
+
+                    }
+
+
+                    // The + Add subtask button is only needed before the list opens.
+                    if (
+                        button.classList.contains(
+                            "show-subtask-form"
+                        )
+                    ) {
+
+                        button.classList.add(
+                            "hidden"
+                        );
+
+
+                        const input =
+                            list.querySelector(
+                                ".subtask-add-input"
+                            );
+
+
+                        if (input) {
+                            input.focus();
+                        }
+
+                    }
+
+                }
+            );
+
+        });
+
+
     // Add task composer
     const showComposerButton =
         document.getElementById("showComposer");
