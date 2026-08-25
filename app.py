@@ -13,7 +13,7 @@ from uuid import uuid4
 
 from werkzeug.utils import secure_filename
 
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 # bring the database functions over here
 # otherwise app.py would have to do all the database work by itself
@@ -1466,9 +1466,27 @@ def data():
 
     user_id = session["user_id"]
 
+
+    # Get the task information needed for the statistics.
     tasks = get_task_statistics(
         user_id
     )
+
+
+    # SQLite CURRENT_TIMESTAMP is stored in UTC.
+    # Convert it to the computer's current local time before comparing dates.
+    def local_date_from_sqlite(timestamp):
+
+        if not timestamp:
+            return None
+
+        utc_time = datetime.fromisoformat(
+            str(timestamp)
+        ).replace(
+            tzinfo=timezone.utc
+        )
+
+        return utc_time.astimezone().date()
 
 
     # OVERALL PROGRESS
@@ -1477,6 +1495,7 @@ def data():
         tasks
     )
 
+
     completed_tasks = sum(
         1
         for task in tasks
@@ -1484,7 +1503,8 @@ def data():
     )
 
 
-    # Do not divide by zero when the user has no tasks.
+    # No tasks means 0%.
+    # This also stops us dividing by zero.
     if total_tasks == 0:
 
         completion_rate = 0
@@ -1500,10 +1520,9 @@ def data():
         )
 
 
-        # TODAY
+    # TODAY
 
     today_date = date.today()
-    today_string = today_date.isoformat()
 
     created_today = 0
     completed_today = 0
@@ -1511,36 +1530,28 @@ def data():
 
     for task in tasks:
 
-        # created_at looks like:
-        # 2026-08-28 05:31:20
-        # We only need the date at the front.
-        if task["created_at"]:
+        created_date = local_date_from_sqlite(
+            task["created_at"]
+        )
 
-            created_date = str(
-                task["created_at"]
-            )[:10]
-
-            if created_date == today_string:
-
-                created_today += 1
+        completed_date = local_date_from_sqlite(
+            task["completed_at"]
+        )
 
 
-        # Same idea here.
-        # If completed_at is today, count it.
-        if task["completed_at"]:
+        if created_date == today_date:
 
-            completed_date = str(
-                task["completed_at"]
-            )[:10]
+            created_today += 1
 
-            if completed_date == today_string:
 
-                completed_today += 1
+        if completed_date == today_date:
+
+            completed_today += 1
 
 
     # THIS WEEK
 
-    # Monday is the first day of the week.
+    # Find Monday of the current week.
     week_start = (
         today_date
         - timedelta(
@@ -1552,6 +1563,8 @@ def data():
     week_days = []
 
 
+    # Make one statistics entry for each day,
+    # starting with Monday and ending with Sunday.
     for day_number in range(7):
 
         current_date = (
@@ -1561,25 +1574,14 @@ def data():
             )
         )
 
-        completed_count = 0
 
-
-        for task in tasks:
-
-            if not task["completed_at"]:
-                continue
-
-
-            completed_date = date.fromisoformat(
-                str(
-                    task["completed_at"]
-                )[:10]
-            )
-
-
-            if completed_date == current_date:
-
-                completed_count += 1
+        completed_count = sum(
+            1
+            for task in tasks
+            if local_date_from_sqlite(
+                task["completed_at"]
+            ) == current_date
+        )
 
 
         week_days.append({
@@ -1591,7 +1593,8 @@ def data():
         })
 
 
-    # Used to scale the little weekly bars.
+    # Find the biggest daily value.
+    # The HTML uses this to decide how tall each bar should be.
     max_weekly_completed = max(
         (
             day["completed"]
@@ -1599,6 +1602,25 @@ def data():
         ),
         default=0
     )
+
+
+    # Work out each bar height here.
+    # This keeps maths out of the HTML.
+    for day in week_days:
+
+        if max_weekly_completed == 0:
+
+            day["height"] = 0
+
+        else:
+
+            day["height"] = round(
+                (
+                    day["completed"]
+                    / max_weekly_completed
+                )
+                * 100
+            )
 
 
     return render_template(
@@ -1614,7 +1636,6 @@ def data():
         week_days=week_days,
         max_weekly_completed=max_weekly_completed
     )
-
 
 # virtual cat page
 @app.route("/cat")
