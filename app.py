@@ -75,6 +75,7 @@ def home():
     if request.method == "POST":
         title = request.form.get("title", "").strip()
         description = request.form.get("description", "").strip()
+        tag = request.form.get("tag", "").strip() or None
 
         # if the user does not choose one, just use normal
         priority = request.form.get("priority", "normal")
@@ -94,6 +95,7 @@ def home():
                 user_id=session["user_id"],
                 title=title,
                 description=description,
+                tag=tag,
                 priority=priority,
                 start_date=start_date,
                 due_date=due_date
@@ -157,6 +159,7 @@ def toggle_task(task_id):
 
     return redirect(url_for("home"))
 
+
 @app.route("/task/<int:task_id>/edit", methods=["POST"])
 def edit_task(task_id):
 
@@ -165,6 +168,7 @@ def edit_task(task_id):
 
     title = request.form.get("title", "").strip()
     description = request.form.get("description", "").strip()
+    tag = request.form.get("tag", "").strip() or None
     priority = request.form.get("priority", "normal")
     start_date = request.form.get("start_date") or None
     due_date = request.form.get("due_date") or None
@@ -179,12 +183,14 @@ def edit_task(task_id):
             user_id=session["user_id"],
             title=title,
             description=description,
+            tag=tag,
             priority=priority,
             start_date=start_date,
             due_date=due_date
         )
 
     return redirect(url_for("home"))
+
 
 @app.route("/task/<int:task_id>/delete", methods=["POST"])
 def remove_task(task_id):
@@ -198,6 +204,7 @@ def remove_task(task_id):
     )
 
     return redirect(url_for("home"))
+
 
 # register page
 @app.route("/register", methods=["GET", "POST"])
@@ -302,6 +309,7 @@ def task():
     if request.method == "POST":
         title = request.form.get("title", "").strip()
         description = request.form.get("description", "").strip()
+        tag = request.form.get("tag", "").strip() or None
         priority = request.form.get("priority", "normal")
         start_date = request.form.get("start_date") or None
         due_date = request.form.get("due_date") or None
@@ -315,6 +323,7 @@ def task():
                 user_id=session["user_id"],
                 title=title,
                 description=description,
+                tag=tag,
                 priority=priority,
                 start_date=start_date,
                 due_date=due_date

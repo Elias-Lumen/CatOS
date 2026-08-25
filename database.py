@@ -303,7 +303,6 @@ def get_tasks_by_user(user_id):
     return tasks
 
 
-
 def toggle_task_completion(task_id, user_id):
     connection = get_connection()
 
@@ -370,6 +369,7 @@ def update_task(
     user_id,
     title,
     description=None,
+    tag=None,
     priority="normal",
     start_date=None,
     due_date=None
@@ -383,6 +383,7 @@ def update_task(
             SET
                 title = ?,
                 description = ?,
+                tag = ?,
                 priority = ?,
                 start_date = ?,
                 due_date = ?
@@ -391,6 +392,7 @@ def update_task(
             (
                 title,
                 description,
+                tag,
                 priority,
                 start_date,
                 due_date,
