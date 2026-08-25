@@ -1,0 +1,442 @@
+/*
+    CatOS - Labels
+    --------------
+    One place to see, rename and remove reusable labels.
+*/
+
+
+.labels-page {
+    width:
+        min(
+            950px,
+            calc(100% - 48px)
+        );
+
+    margin: 0 auto;
+
+    padding:
+        42px
+        0
+        70px;
+}
+
+
+.labels-header {
+    margin-bottom: 24px;
+}
+
+
+.labels-header h1 {
+    margin: 0;
+
+    font-size: 30px;
+    font-weight: 650;
+
+    letter-spacing: -0.03em;
+
+    color: #222222;
+}
+
+
+.labels-header p {
+    margin:
+        7px
+        0
+        0;
+
+    font-size: 13px;
+
+    color: #888888;
+}
+
+
+/* Left side is labels, right side is their tasks. */
+.labels-layout {
+    display: grid;
+
+    grid-template-columns:
+        minmax(230px, 0.75fr)
+        minmax(320px, 1.4fr);
+
+    gap: 18px;
+}
+
+
+.labels-list,
+.label-tasks {
+    border:
+        1px solid
+        #e3e3e3;
+
+    border-radius: 13px;
+
+    background: #ffffff;
+}
+
+
+/* LABEL LIST */
+
+.labels-list {
+    overflow: hidden;
+}
+
+
+.label-row {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    min-height: 48px;
+
+    padding:
+        0
+        13px;
+
+    border-bottom:
+        1px solid
+        #eeeeee;
+}
+
+
+.label-row:last-child {
+    border-bottom: none;
+}
+
+
+.label-row:hover,
+.label-row.selected {
+    background: #f7f7f7;
+}
+
+
+.label-name {
+    flex: 1;
+
+    min-width: 0;
+
+    overflow: hidden;
+
+    font-size: 13px;
+    font-weight: 550;
+
+    color: #333333;
+
+    text-decoration: none;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+
+.label-actions {
+    display: flex;
+
+    gap: 3px;
+}
+
+
+.label-edit-button,
+.label-delete-button {
+    padding: 4px;
+
+    border: none;
+
+    background: transparent;
+
+    font-family: inherit;
+    font-size: 10px;
+
+    color: #999999;
+
+    cursor: pointer;
+}
+
+
+.label-edit-button:hover,
+.label-delete-button:hover {
+    color: #222222;
+}
+
+
+.label-delete-form {
+    margin: 0;
+}
+
+
+/* RENAME FORM */
+
+.label-edit-form {
+    position: absolute;
+
+    inset: 5px 7px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 5px;
+
+    background: #f7f7f7;
+}
+
+
+.label-edit-form.hidden {
+    display: none;
+}
+
+
+.label-edit-form input {
+    flex: 1;
+
+    min-width: 0;
+
+    padding:
+        6px
+        7px;
+
+    border:
+        1px solid
+        #cccccc;
+
+    border-radius: 5px;
+
+    outline: none;
+
+    font-family: inherit;
+    font-size: 12px;
+}
+
+
+.label-edit-form input:focus {
+    border-color: #777777;
+}
+
+
+.label-edit-form button {
+    padding:
+        6px
+        7px;
+
+    border: none;
+    border-radius: 5px;
+
+    font-family: inherit;
+    font-size: 10px;
+
+    cursor: pointer;
+}
+
+
+.label-edit-form button[type="submit"] {
+    background: #222222;
+
+    color: #ffffff;
+}
+
+
+.label-cancel-button {
+    background: #e7e7e7;
+
+    color: #555555;
+}
+
+
+/* TASK SIDE */
+
+.label-tasks {
+    min-height: 300px;
+
+    padding: 18px;
+}
+
+
+.label-task-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 14px;
+}
+
+
+.label-task-header h2 {
+    margin: 0;
+
+    font-size: 18px;
+    font-weight: 650;
+
+    color: #222222;
+}
+
+
+.label-task-header > span {
+    font-size: 11px;
+
+    color: #999999;
+}
+
+
+.label-task-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+
+.label-task {
+    padding:
+        12px
+        13px;
+
+    border:
+        1px solid
+        #e7e7e7;
+
+    border-radius: 8px;
+}
+
+
+.label-task-title {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    font-size: 13px;
+    font-weight: 550;
+
+    color: #333333;
+}
+
+
+.label-task-circle {
+    width: 8px;
+    height: 8px;
+
+    flex-shrink: 0;
+
+    border:
+        1.5px solid
+        #777777;
+
+    border-radius: 50%;
+}
+
+
+.label-task-circle.completed {
+    background: #333333;
+
+    border-color: #333333;
+}
+
+
+.completed-title {
+    color: #999999;
+
+    text-decoration: line-through;
+}
+
+
+.label-task p {
+    margin:
+        7px
+        0
+        0
+        16px;
+
+    font-size: 11px;
+    line-height: 1.45;
+
+    color: #777777;
+}
+
+
+.label-task-meta {
+    display: flex;
+
+    gap: 8px;
+
+    margin:
+        8px
+        0
+        0
+        16px;
+
+    font-size: 10px;
+
+    color: #999999;
+}
+
+
+/* EMPTY STATES */
+
+.labels-empty,
+.labels-empty-small {
+    color: #888888;
+
+    text-align: center;
+}
+
+
+.labels-empty {
+    padding:
+        65px
+        20px;
+}
+
+
+.labels-empty h2 {
+    margin:
+        0
+        0
+        6px;
+
+    font-size: 17px;
+
+    color: #555555;
+}
+
+
+.labels-empty p {
+    margin: 0;
+
+    font-size: 12px;
+}
+
+
+.labels-empty-small {
+    padding:
+        90px
+        20px;
+
+    font-size: 12px;
+}
+
+
+/* Smaller screens stack the two boxes. */
+@media (max-width: 700px) {
+
+    .labels-page {
+        width:
+            calc(100% - 28px);
+
+        padding-top: 25px;
+    }
+
+
+    .labels-layout {
+        grid-template-columns: 1fr;
+    }
+
+
+    .label-tasks {
+        min-height: 220px;
+    }
+
+}

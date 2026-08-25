@@ -36,6 +36,9 @@ from database import (
     get_user_by_id,
     update_user_avatar,
     search_tasks,
+    get_tasks_by_tag,
+    update_tag,
+    delete_tag,
 )
 
 # login and register logic is kept in auth.py
@@ -1195,12 +1198,139 @@ def search():
     )
 
 
-# filters and labels page
-# need to be done
+# LABELS PAGE
+# View all reusable labels and the tasks connected to them.
 @app.route("/labels")
 def labels():
+
+    if "user_id" not in session:
+
+        return redirect(
+            url_for("login")
+        )
+
+
+    user_id = session["user_id"]
+
+    tags = get_tags_by_user(
+        user_id
+    )
+
+
+    selected_tag_id = request.args.get(
+        "label",
+        ""
+    )
+
+
+    selected_tag = None
+    tasks = []
+
+
+    if selected_tag_id.isdigit():
+
+        selected_tag_id = int(
+            selected_tag_id
+        )
+
+
+        # Make sure the selected label belongs to this user.
+        selected_tag = next(
+            (
+                tag
+                for tag in tags
+                if tag["id"]
+                == selected_tag_id
+            ),
+            None
+        )
+
+
+        if selected_tag:
+
+            tasks = get_tasks_by_tag(
+                user_id=user_id,
+                tag_id=selected_tag_id
+            )
+
+            tasks = add_tags_to_tasks(
+                tasks,
+                user_id
+            )
+
+
     return render_template(
-        "labels.html"
+        "labels.html",
+        tags=tags,
+        selected_tag=selected_tag,
+        tasks=tasks
+    )
+
+
+# RENAME LABEL
+@app.route(
+    "/label/<int:tag_id>/edit",
+    methods=["POST"]
+)
+def edit_label(tag_id):
+
+    if "user_id" not in session:
+
+        return redirect(
+            url_for("login")
+        )
+
+
+    name = request.form.get(
+        "name",
+        ""
+    ).strip()
+
+
+    if name:
+
+        try:
+
+            update_tag(
+                tag_id=tag_id,
+                user_id=session["user_id"],
+                name=name
+            )
+
+        except Exception:
+
+            flash(
+                "That label name is already in use."
+            )
+
+
+    return redirect(
+        url_for("labels")
+    )
+
+
+# DELETE LABEL
+@app.route(
+    "/label/<int:tag_id>/delete",
+    methods=["POST"]
+)
+def remove_label(tag_id):
+
+    if "user_id" not in session:
+
+        return redirect(
+            url_for("login")
+        )
+
+
+    delete_tag(
+        tag_id=tag_id,
+        user_id=session["user_id"]
+    )
+
+
+    return redirect(
+        url_for("labels")
     )
 
 

@@ -1,0 +1,376 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Labels
+{% endblock %}
+
+
+{% block styles %}
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/labels.css') }}"
+>
+
+{% endblock %}
+
+
+{% block content %}
+
+<main class="labels-page">
+
+    <header class="labels-header">
+
+        <h1>
+            Labels
+        </h1>
+
+        <p>
+            Organise and reuse labels across your tasks.
+        </p>
+
+    </header>
+
+
+    {% if tags %}
+
+        <div class="labels-layout">
+
+
+            <!-- LABEL LIST -->
+            <section class="labels-list">
+
+                {% for tag in tags %}
+
+                    <div
+                        class="
+                            label-row
+                            {% if
+                                selected_tag
+                                and
+                                selected_tag['id']
+                                == tag['id']
+                            %}
+                                selected
+                            {% endif %}
+                        "
+                    >
+
+                        <a
+                            class="label-name"
+                            href="{{ url_for('labels', label=tag['id']) }}"
+                        >
+                            {{ tag["name"] }}
+                        </a>
+
+
+                        <div class="label-actions">
+
+                            <button
+                                type="button"
+                                class="label-edit-button"
+                                data-tag-id="{{ tag['id'] }}"
+                            >
+                                Edit
+                            </button>
+
+
+                            <form
+                                method="POST"
+                                action="{{ url_for('remove_label', tag_id=tag['id']) }}"
+                                class="label-delete-form"
+                            >
+
+                                <button
+                                    type="submit"
+                                    class="label-delete-button"
+                                >
+                                    Delete
+                                </button>
+
+                            </form>
+
+                        </div>
+
+
+                        <!-- Hidden until Edit is clicked. -->
+                        <form
+                            method="POST"
+                            action="{{ url_for('edit_label', tag_id=tag['id']) }}"
+                            class="label-edit-form hidden"
+                            id="labelEdit{{ tag['id'] }}"
+                        >
+
+                            <input
+                                type="text"
+                                name="name"
+                                value="{{ tag['name'] }}"
+                                required
+                            >
+
+                            <button type="submit">
+                                Save
+                            </button>
+
+                            <button
+                                type="button"
+                                class="label-cancel-button"
+                                data-tag-id="{{ tag['id'] }}"
+                            >
+                                Cancel
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                {% endfor %}
+
+            </section>
+
+
+            <!-- TASKS USING THE SELECTED LABEL -->
+            <section class="label-tasks">
+
+                {% if selected_tag %}
+
+                    <div class="label-task-header">
+
+                        <h2>
+                            {{ selected_tag["name"] }}
+                        </h2>
+
+                        <span>
+                            {{ tasks | length }}
+                            {% if tasks | length == 1 %}
+                                task
+                            {% else %}
+                                tasks
+                            {% endif %}
+                        </span>
+
+                    </div>
+
+
+                    {% if tasks %}
+
+                        <div class="label-task-list">
+
+                            {% for task in tasks %}
+
+                                <article class="label-task">
+
+                                    <div class="label-task-title">
+
+                                        <span
+                                            class="
+                                                label-task-circle
+                                                {% if task['state'] == 'completed' %}
+                                                    completed
+                                                {% endif %}
+                                            "
+                                        ></span>
+
+                                        <span
+                                            {% if task["state"] == "completed" %}
+                                                class="completed-title"
+                                            {% endif %}
+                                        >
+                                            {{ task["title"] }}
+                                        </span>
+
+                                    </div>
+
+
+                                    {% if task["description"] %}
+
+                                        <p>
+                                            {{ task["description"] }}
+                                        </p>
+
+                                    {% endif %}
+
+
+                                    <div class="label-task-meta">
+
+                                        <span>
+                                            {{ task["priority"] | capitalize }}
+                                        </span>
+
+                                        <span>
+                                            {{ task["state"] | replace("_", " ") | title }}
+                                        </span>
+
+                                    </div>
+
+                                </article>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                    {% else %}
+
+                        <div class="labels-empty-small">
+
+                            No tasks use this label yet.
+
+                        </div>
+
+                    {% endif %}
+
+
+                {% else %}
+
+                    <div class="labels-empty-small">
+
+                        Select a label to view its tasks.
+
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+        </div>
+
+
+    {% else %}
+
+        <div class="labels-empty">
+
+            <h2>
+                No labels yet
+            </h2>
+
+            <p>
+                Labels you create while editing tasks will appear here.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</main>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+
+        // Open the small rename form.
+        document
+            .querySelectorAll(
+                ".label-edit-button"
+            )
+            .forEach((button) => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        const tagId =
+                            button.dataset.tagId;
+
+                        const form =
+                            document.getElementById(
+                                `labelEdit${tagId}`
+                            );
+
+                        if (!form) {
+                            return;
+                        }
+
+                        form.classList.remove(
+                            "hidden"
+                        );
+
+                        const input =
+                            form.querySelector(
+                                "input"
+                            );
+
+                        if (input) {
+
+                            input.focus();
+                            input.select();
+
+                        }
+
+                    }
+                );
+
+            });
+
+
+        // Close the rename form without saving.
+        document
+            .querySelectorAll(
+                ".label-cancel-button"
+            )
+            .forEach((button) => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        const tagId =
+                            button.dataset.tagId;
+
+                        const form =
+                            document.getElementById(
+                                `labelEdit${tagId}`
+                            );
+
+                        if (form) {
+
+                            form.classList.add(
+                                "hidden"
+                            );
+
+                        }
+
+                    }
+                );
+
+            });
+
+
+        // Do not delete a label by accident.
+        document
+            .querySelectorAll(
+                ".label-delete-form"
+            )
+            .forEach((form) => {
+
+                form.addEventListener(
+                    "submit",
+                    (event) => {
+
+                        const confirmed =
+                            window.confirm(
+                                "Delete this label? Tasks using it will not be deleted."
+                            );
+
+                        if (!confirmed) {
+
+                            event.preventDefault();
+
+                        }
+
+                    }
+                );
+
+            });
+
+    }
+);
+
+</script>
+
+{% endblock %}

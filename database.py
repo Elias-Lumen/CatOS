@@ -375,6 +375,135 @@ def get_tags_by_user(user_id):
     return tags
 
 
+# Get all tasks using one label.
+def get_tasks_by_tag(
+    user_id,
+    tag_id
+):
+
+    connection = get_connection()
+
+    tasks = connection.execute(
+        """
+        SELECT tasks.*
+        FROM tasks
+
+        JOIN task_tags
+            ON task_tags.task_id = tasks.id
+
+        JOIN tags
+            ON tags.id = task_tags.tag_id
+
+        WHERE
+            tasks.user_id = ?
+            AND tags.user_id = ?
+            AND tags.id = ?
+
+        ORDER BY
+            CASE
+                WHEN tasks.state = 'completed' THEN 1
+                ELSE 0
+            END,
+
+            CASE tasks.priority
+                WHEN 'high' THEN 1
+                WHEN 'medium' THEN 2
+                WHEN 'low' THEN 3
+                WHEN 'normal' THEN 4
+            END,
+
+            tasks.created_at DESC
+        """,
+        (
+            user_id,
+            user_id,
+            tag_id
+        )
+    ).fetchall()
+
+    connection.close()
+
+    return tasks
+
+
+# Rename one label.
+def update_tag(
+    tag_id,
+    user_id,
+    name
+):
+
+    connection = get_connection()
+
+    try:
+
+        cursor = connection.execute(
+            """
+            UPDATE tags
+            SET name = ?
+            WHERE
+                id = ?
+                AND user_id = ?
+            """,
+            (
+                name,
+                tag_id,
+                user_id
+            )
+        )
+
+        connection.commit()
+
+        return cursor.rowcount > 0
+
+    except sqlite3.Error:
+
+        connection.rollback()
+        raise
+
+    finally:
+
+        connection.close()
+
+
+# Delete a label without deleting its tasks.
+def delete_tag(
+    tag_id,
+    user_id
+):
+
+    connection = get_connection()
+
+    try:
+
+        cursor = connection.execute(
+            """
+            DELETE FROM tags
+            WHERE
+                id = ?
+                AND user_id = ?
+            """,
+            (
+                tag_id,
+                user_id
+            )
+        )
+
+        connection.commit()
+
+        return cursor.rowcount > 0
+
+    except sqlite3.Error:
+
+        connection.rollback()
+        raise
+
+    finally:
+
+        connection.close()
+
+
+
 # get all tags attached to one task
 # also checks that the task belongs to the current user
 def get_tags_by_task(task_id, user_id):
