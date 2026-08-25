@@ -15,7 +15,11 @@ from datetime import date
 from database import (
     create_tables,
     create_task,
+    create_tag,
     get_tasks_by_user,
+    get_tags_by_user,
+    get_tags_by_task,
+    set_task_tags,
     toggle_task_completion,
     update_task,
     delete_task,
@@ -31,6 +35,7 @@ app = Flask(__name__)
 # Flask needs this for session and flash messages
 # this is only a development key for now
 app.config["SECRET_KEY"] = "CatOS-development-secret-key"
+
 
 # check that a date is a real date before saving it
 def is_valid_date(date_value):
@@ -61,7 +66,49 @@ def are_task_dates_valid(start_date, due_date):
             return False
 
     return True
-    
+
+
+# turn comma-separated new tag names into tag ids
+def get_new_tag_ids(user_id, new_tags_text):
+    tag_ids = []
+
+    if not new_tags_text:
+        return tag_ids
+
+    # allow users to type something like:
+    # School, DTP, Important
+    tag_names = new_tags_text.split(",")
+
+    for tag_name in tag_names:
+        tag_name = tag_name.strip()
+
+        if tag_name:
+            tag_id = create_tag(
+                user_id=user_id,
+                name=tag_name
+            )
+
+            tag_ids.append(tag_id)
+
+    return tag_ids
+
+
+# attach each task's tags before sending tasks to Jinja
+def add_tags_to_tasks(tasks, user_id):
+    tasks_with_tags = []
+
+    for task in tasks:
+        task_data = dict(task)
+
+        task_data["tags"] = get_tags_by_task(
+            task_id=task["id"],
+            user_id=user_id
+        )
+
+        tasks_with_tags.append(task_data)
+
+    return tasks_with_tags
+
 
 # home page and Today page are basically the same thing for now
 @app.route("/", methods=["GET", "POST"])
@@ -71,42 +118,103 @@ def home():
     if "user_id" not in session:
         return redirect(url_for("login"))
 
+    user_id = session["user_id"]
+
     # if the user submits the task form, make a new task
     if request.method == "POST":
         title = request.form.get("title", "").strip()
         description = request.form.get("description", "").strip()
-        tag = request.form.get("tag", "").strip() or None
+
+        # existing tags selected by the user
+        selected_tag_ids = request.form.getlist("tag_ids")
+
+        # new tags typed by the user
+        new_tags_text = request.form.get(
+            "new_tags",
+            ""
+        ).strip()
 
         # if the user does not choose one, just use normal
-        priority = request.form.get("priority", "normal")
+        priority = request.form.get(
+            "priority",
+            "normal"
+        )
 
         # do not allow an invalid date to reach the database
         # blank dates are easier to deal with as None
-        start_date = request.form.get("start_date") or None
-        due_date = request.form.get("due_date") or None
+        start_date = (
+            request.form.get("start_date")
+            or None
+        )
 
-        if not are_task_dates_valid(start_date, due_date):
-            flash("Start date must be on or before the due date.")
-            return redirect(url_for("home"))
+        due_date = (
+            request.form.get("due_date")
+            or None
+        )
+
+        if not are_task_dates_valid(
+            start_date,
+            due_date
+        ):
+            flash(
+                "Start date must be on or before the due date."
+            )
+
+            return redirect(
+                url_for("home")
+            )
 
         # a task without a title is not very useful
         if title:
-            create_task(
-                user_id=session["user_id"],
+            task_id = create_task(
+                user_id=user_id,
                 title=title,
                 description=description,
-                tag=tag,
                 priority=priority,
                 start_date=start_date,
                 due_date=due_date
             )
 
+            # create any new tags that the user typed
+            new_tag_ids = get_new_tag_ids(
+                user_id=user_id,
+                new_tags_text=new_tags_text
+            )
+
+            # combine selected existing tags and new tags
+            all_tag_ids = (
+                selected_tag_ids
+                + new_tag_ids
+            )
+
+            # remove duplicates while keeping the values usable
+            all_tag_ids = list(
+                dict.fromkeys(all_tag_ids)
+            )
+
+            set_task_tags(
+                task_id=task_id,
+                user_id=user_id,
+                tag_ids=all_tag_ids
+            )
+
         # reload the page after adding the task
         # this also stops the form being submitted twice on refresh
-        return redirect(url_for("home"))
+        return redirect(
+            url_for("home")
+        )
 
     # only get tasks that belong to the current user
-    tasks = get_tasks_by_user(session["user_id"])
+    tasks = get_tasks_by_user(user_id)
+
+    # add the many-to-many tag information to each task
+    tasks = add_tags_to_tasks(
+        tasks,
+        user_id
+    )
+
+    # get all saved tags so users can reuse them
+    tags = get_tags_by_user(user_id)
 
     today_date = date.today()
 
@@ -117,103 +225,203 @@ def home():
     for task in tasks:
 
         start_date = (
-            date.fromisoformat(task["start_date"])
+            date.fromisoformat(
+                task["start_date"]
+            )
             if task["start_date"]
             else None
         )
 
         due_date = (
-            date.fromisoformat(task["due_date"])
+            date.fromisoformat(
+                task["due_date"]
+            )
             if task["due_date"]
             else None
         )
 
         # tasks that have not started yet belong in Upcoming
-        if start_date and start_date > today_date:
+        if (
+            start_date
+            and start_date > today_date
+        ):
             continue
 
-        if due_date and due_date < today_date:
+        if (
+            due_date
+            and due_date < today_date
+        ):
             overdue_tasks.append(task)
+
         else:
             today_tasks.append(task)
 
     return render_template(
         "today_task.html",
         tasks=tasks,
+        tags=tags,
         overdue_tasks=overdue_tasks,
         today_tasks=today_tasks,
         today=today_date.isoformat()
     )
 
 
-@app.route("/task/<int:task_id>/toggle", methods=["POST"])
+@app.route(
+    "/task/<int:task_id>/toggle",
+    methods=["POST"]
+)
 def toggle_task(task_id):
 
     if "user_id" not in session:
-        return redirect(url_for("login"))
+        return redirect(
+            url_for("login")
+        )
 
     toggle_task_completion(
         task_id=task_id,
         user_id=session["user_id"]
     )
 
-    return redirect(url_for("home"))
+    return redirect(
+        url_for("home")
+    )
 
 
-@app.route("/task/<int:task_id>/edit", methods=["POST"])
+@app.route(
+    "/task/<int:task_id>/edit",
+    methods=["POST"]
+)
 def edit_task(task_id):
 
     if "user_id" not in session:
-        return redirect(url_for("login"))
+        return redirect(
+            url_for("login")
+        )
 
-    title = request.form.get("title", "").strip()
-    description = request.form.get("description", "").strip()
-    tag = request.form.get("tag", "").strip() or None
-    priority = request.form.get("priority", "normal")
-    start_date = request.form.get("start_date") or None
-    due_date = request.form.get("due_date") or None
+    user_id = session["user_id"]
 
-    if not are_task_dates_valid(start_date, due_date):
-        flash("Start date must be on or before the due date.")
-        return redirect(url_for("home"))
+    title = request.form.get(
+        "title",
+        ""
+    ).strip()
+
+    description = request.form.get(
+        "description",
+        ""
+    ).strip()
+
+    priority = request.form.get(
+        "priority",
+        "normal"
+    )
+
+    start_date = (
+        request.form.get("start_date")
+        or None
+    )
+
+    due_date = (
+        request.form.get("due_date")
+        or None
+    )
+
+    selected_tag_ids = (
+        request.form.getlist("tag_ids")
+    )
+
+    new_tags_text = request.form.get(
+        "new_tags",
+        ""
+    ).strip()
+
+    if not are_task_dates_valid(
+        start_date,
+        due_date
+    ):
+        flash(
+            "Start date must be on or before the due date."
+        )
+
+        return redirect(
+            url_for("home")
+        )
 
     if title:
-        update_task(
+        updated = update_task(
             task_id=task_id,
-            user_id=session["user_id"],
+            user_id=user_id,
             title=title,
             description=description,
-            tag=tag,
             priority=priority,
             start_date=start_date,
             due_date=due_date
         )
 
-    return redirect(url_for("home"))
+        if updated:
+            new_tag_ids = get_new_tag_ids(
+                user_id=user_id,
+                new_tags_text=new_tags_text
+            )
+
+            all_tag_ids = (
+                selected_tag_ids
+                + new_tag_ids
+            )
+
+            all_tag_ids = list(
+                dict.fromkeys(all_tag_ids)
+            )
+
+            set_task_tags(
+                task_id=task_id,
+                user_id=user_id,
+                tag_ids=all_tag_ids
+            )
+
+    return redirect(
+        url_for("home")
+    )
 
 
-@app.route("/task/<int:task_id>/delete", methods=["POST"])
+@app.route(
+    "/task/<int:task_id>/delete",
+    methods=["POST"]
+)
 def remove_task(task_id):
 
     if "user_id" not in session:
-        return redirect(url_for("login"))
+        return redirect(
+            url_for("login")
+        )
 
     delete_task(
         task_id=task_id,
         user_id=session["user_id"]
     )
 
-    return redirect(url_for("home"))
+    return redirect(
+        url_for("home")
+    )
 
 
 # register page
-@app.route("/register", methods=["GET", "POST"])
+@app.route(
+    "/register",
+    methods=["GET", "POST"]
+)
 def register():
 
     # POST means the user actually pressed the register button
     if request.method == "POST":
-        username = request.form.get("username", "")
-        password = request.form.get("password", "")
+        username = request.form.get(
+            "username",
+            ""
+        )
+
+        password = request.form.get(
+            "password",
+            ""
+        )
 
         confirm_password = request.form.get(
             "confirm_password",
@@ -222,11 +430,19 @@ def register():
 
         # stop here if they somehow typed two different passwords
         if password != confirm_password:
-            flash("Passwords do not match.")
-            return render_template("register.html")
+            flash(
+                "Passwords do not match."
+            )
+
+            return render_template(
+                "register.html"
+            )
 
         # auth.py does the actual account creation
-        user = register_user(username, password)
+        user = register_user(
+            username,
+            password
+        )
 
         # None means something went wrong
         # usually duplicate username or missing information
@@ -234,36 +450,62 @@ def register():
             flash(
                 "Username already exists, or the form is incomplete."
             )
-            return render_template("register.html")
+
+            return render_template(
+                "register.html"
+            )
 
         # registration worked
         # log the user in straight away because making them log in again is annoying
         session.clear()
+
         session["user_id"] = user["id"]
         session["username"] = user["username"]
 
-        return redirect(url_for("home"))
+        return redirect(
+            url_for("home")
+        )
 
     # if they only opened the page, just show the form
-    return render_template("register.html")
+    return render_template(
+        "register.html"
+    )
 
 
 # login page
-@app.route("/login", methods=["GET", "POST"])
+@app.route(
+    "/login",
+    methods=["GET", "POST"]
+)
 def login():
 
     # user pressed the login button
     if request.method == "POST":
-        username = request.form.get("username", "")
-        password = request.form.get("password", "")
+        username = request.form.get(
+            "username",
+            ""
+        )
+
+        password = request.form.get(
+            "password",
+            ""
+        )
 
         # ask auth.py if these login details are actually correct
-        user = login_user(username, password)
+        user = login_user(
+            username,
+            password
+        )
 
         # wrong username or password
         if user is None:
-            flash("Invalid username or password.")
-            return render_template("login.html")
+            flash(
+                "Invalid username or password."
+            )
+
+            return render_template(
+                "login.html"
+            )
 
         # remove anything left from an old login session
         session.clear()
@@ -272,10 +514,14 @@ def login():
         session["user_id"] = user["id"]
         session["username"] = user["username"]
 
-        return redirect(url_for("home"))
+        return redirect(
+            url_for("home")
+        )
 
     # they only opened /login, nothing exciting happened yet
-    return render_template("login.html")
+    return render_template(
+        "login.html"
+    )
 
 
 # log out button from Settings
@@ -286,57 +532,132 @@ def logout():
     session.clear()
 
     # send them back to login
-    return redirect(url_for("login"))
+    return redirect(
+        url_for("login")
+    )
 
 
 # settings page
 # avatar stuff will probably live here later
 @app.route("/setting")
 def setting():
-    return render_template("setting.html")
+    return render_template(
+        "setting.html"
+    )
 
 
 # separate task page
 # this is currently another place where tasks can be added
-@app.route("/task", methods=["GET", "POST"])
+@app.route(
+    "/task",
+    methods=["GET", "POST"]
+)
 def task():
 
     # same rule as Home: login first
     if "user_id" not in session:
-        return redirect(url_for("login"))
+        return redirect(
+            url_for("login")
+        )
+
+    user_id = session["user_id"]
 
     # user submitted a new task
     if request.method == "POST":
-        title = request.form.get("title", "").strip()
-        description = request.form.get("description", "").strip()
-        tag = request.form.get("tag", "").strip() or None
-        priority = request.form.get("priority", "normal")
-        start_date = request.form.get("start_date") or None
-        due_date = request.form.get("due_date") or None
+        title = request.form.get(
+            "title",
+            ""
+        ).strip()
 
-        if not are_task_dates_valid(start_date, due_date):
-            flash("Start date must be on or before the due date.")
-            return redirect(url_for("task"))
+        description = request.form.get(
+            "description",
+            ""
+        ).strip()
+
+        priority = request.form.get(
+            "priority",
+            "normal"
+        )
+
+        start_date = (
+            request.form.get("start_date")
+            or None
+        )
+
+        due_date = (
+            request.form.get("due_date")
+            or None
+        )
+
+        selected_tag_ids = (
+            request.form.getlist("tag_ids")
+        )
+
+        new_tags_text = request.form.get(
+            "new_tags",
+            ""
+        ).strip()
+
+        if not are_task_dates_valid(
+            start_date,
+            due_date
+        ):
+            flash(
+                "Start date must be on or before the due date."
+            )
+
+            return redirect(
+                url_for("task")
+            )
 
         if title:
-            create_task(
-                user_id=session["user_id"],
+            task_id = create_task(
+                user_id=user_id,
                 title=title,
                 description=description,
-                tag=tag,
                 priority=priority,
                 start_date=start_date,
                 due_date=due_date
             )
 
-        return redirect(url_for("task"))
+            new_tag_ids = get_new_tag_ids(
+                user_id=user_id,
+                new_tags_text=new_tags_text
+            )
+
+            all_tag_ids = (
+                selected_tag_ids
+                + new_tag_ids
+            )
+
+            all_tag_ids = list(
+                dict.fromkeys(all_tag_ids)
+            )
+
+            set_task_tags(
+                task_id=task_id,
+                user_id=user_id,
+                tag_ids=all_tag_ids
+            )
+
+        return redirect(
+            url_for("task")
+        )
 
     # get this user's tasks for the page
-    tasks = get_tasks_by_user(session["user_id"])
+    tasks = get_tasks_by_user(user_id)
+
+    tasks = add_tags_to_tasks(
+        tasks,
+        user_id
+    )
+
+    tags = get_tags_by_user(user_id)
 
     return render_template(
         "task.html",
-        tasks=tasks
+        tasks=tasks,
+        tags=tags
     )
 
 
@@ -344,32 +665,42 @@ def task():
 # currently still under construction
 @app.route("/search")
 def search():
-    return render_template("search.html")
+    return render_template(
+        "search.html"
+    )
 
 
 # filters and labels page
 # need to be done
 @app.route("/labels")
 def labels():
-    return render_template("labels.html")
+    return render_template(
+        "labels.html"
+    )
 
 
 # future tasks will go here
 @app.route("/upcoming")
 def upcoming():
-    return render_template("upcoming.html")
+    return render_template(
+        "upcoming.html"
+    )
 
 
 # task data / progress page
 @app.route("/data")
 def data():
-    return render_template("data.html")
+    return render_template(
+        "data.html"
+    )
 
 
 # virtual cat page
 @app.route("/cat")
 def cat():
-    return render_template("cat.html")
+    return render_template(
+        "cat.html"
+    )
 
 
 # later each user should probably have their own cat name
@@ -379,7 +710,9 @@ def cat():
 # help page
 @app.route("/help")
 def help():
-    return render_template("help.html")
+    return render_template(
+        "help.html"
+    )
 
 
 # only start the Flask server if this file is run directly

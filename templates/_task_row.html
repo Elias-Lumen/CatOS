@@ -42,6 +42,7 @@
                 </div>
             {% endif %}
 
+
             <div class="task-meta">
 
                 {% if task["start_date"] %}
@@ -56,11 +57,14 @@
                     </span>
                 {% endif %}
 
-                {% if task["tag"] %}
+
+                {% for tag in task["tags"] %}
+
                     <span class="task-tag">
-                        # {{ task["tag"] }}
+                        # {{ tag["name"] }}
                     </span>
-                {% endif %}
+
+                {% endfor %}
 
             </div>
 
@@ -89,6 +93,60 @@
                 rows="2"
             >{{ task["description"] or "" }}</textarea>
 
+
+            <!-- EDIT TAGS -->
+            <div class="tag-selector edit-tag-selector">
+
+                <div class="tag-selector-title">
+                    Tags
+                </div>
+
+
+                {% if tags %}
+
+                    <div class="tag-options">
+
+                        {% for tag in tags %}
+
+                            <label class="tag-option">
+
+                                <input
+                                    type="checkbox"
+                                    name="tag_ids"
+                                    value="{{ tag['id'] }}"
+
+                                    {% for task_tag in task["tags"] %}
+
+                                        {% if task_tag["id"] == tag["id"] %}
+                                            checked
+                                        {% endif %}
+
+                                    {% endfor %}
+                                >
+
+                                <span>
+                                    # {{ tag["name"] }}
+                                </span>
+
+                            </label>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% endif %}
+
+
+                <input
+                    type="text"
+                    name="new_tags"
+                    class="new-tag-input"
+                    placeholder="New tags, separated by commas"
+                >
+
+            </div>
+
+
             <div class="edit-options">
 
                 <input
@@ -101,13 +159,6 @@
                     type="date"
                     name="due_date"
                     value="{{ task['due_date'] or '' }}"
-                >
-
-                <input
-                    type="text"
-                    name="tag"
-                    value="{{ task['tag'] or '' }}"
-                    placeholder="Tag"
                 >
 
                 <select name="priority">

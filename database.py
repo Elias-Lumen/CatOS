@@ -5,7 +5,7 @@ from pathlib import Path
 # find where this python file is, then find CatOS.db from the same folder
 # this makes the database path still work if the project is moved somewhere else
 BASE_DIR = Path(__file__).resolve().parent
-DATABASE_PATH = BASE_DIR / "CatOS.db"       # will genernal the db file
+DATABASE_PATH = BASE_DIR / "CatOS.db"       # will generate the db file
 
 
 # connect to the CatOS database
@@ -45,7 +45,6 @@ def create_tasks_table(connection):
             user_id INTEGER NOT NULL,
             title TEXT NOT NULL,
             description TEXT,
-            tag TEXT,
 
             -- task can only have one of these three states
             state TEXT NOT NULL DEFAULT 'not_started'
@@ -82,6 +81,47 @@ def create_tasks_table(connection):
     """)
 
 
+# tags table
+# every tag belongs to one user
+def create_tags_table(connection):
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS tags (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+
+            -- one user cannot create two tags with exactly the same name
+            UNIQUE (user_id, name),
+
+            FOREIGN KEY (user_id)
+                REFERENCES users(id)
+                ON DELETE CASCADE
+        )
+    """)
+
+
+# task_tags is the junction table between tasks and tags
+# one task can have many tags, and one tag can belong to many tasks
+def create_task_tags_table(connection):
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS task_tags (
+            task_id INTEGER NOT NULL,
+            tag_id INTEGER NOT NULL,
+
+            -- both values together make one unique relationship
+            PRIMARY KEY (task_id, tag_id),
+
+            FOREIGN KEY (task_id)
+                REFERENCES tasks(id)
+                ON DELETE CASCADE,
+
+            FOREIGN KEY (tag_id)
+                REFERENCES tags(id)
+                ON DELETE CASCADE
+        )
+    """)
+
+
 # subtasks table
 # similar to tasks, but every subtask belongs to a main task
 # if a task has no subtasks, there just will not be any rows for it here
@@ -92,7 +132,6 @@ def create_subtasks_table(connection):
             task_id INTEGER NOT NULL,
             title TEXT NOT NULL,
             description TEXT,
-            tag TEXT,
 
             -- use the same states as the main tasks
             state TEXT NOT NULL DEFAULT 'not_started'
@@ -192,7 +231,6 @@ def update_user_avatar(user_id, avatar_url):
     connection = get_connection()
 
     try:
-        # only update the user that is currently logged in
         connection.execute(
             """
             UPDATE users
@@ -205,25 +243,22 @@ def update_user_avatar(user_id, avatar_url):
             )
         )
 
-        # actually save the change
         connection.commit()
 
     except sqlite3.Error:
-        # if something goes wrong, cancel the unfinished change
         connection.rollback()
         raise
 
     finally:
-        # close the connection whether it worked or not
         connection.close()
 
 
 # create a new task for a user
+# return the new task id so tags can be attached to it afterwards
 def create_task(
     user_id,
     title,
     description=None,
-    tag=None,
     state="not_started",
     priority="normal",
     start_date=None,
@@ -232,26 +267,23 @@ def create_task(
     connection = get_connection()
 
     try:
-        # add all the task information into a new row
-        connection.execute(
+        cursor = connection.execute(
             """
             INSERT INTO tasks (
                 user_id,
                 title,
                 description,
-                tag,
                 state,
                 priority,
                 start_date,
                 due_date
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 user_id,
                 title,
                 description,
-                tag,
                 state,
                 priority,
                 start_date,
@@ -259,11 +291,191 @@ def create_task(
             )
         )
 
-        # save the new task
+        task_id = cursor.lastrowid
+
         connection.commit()
 
+        return task_id
+
     except sqlite3.Error:
-        # do not leave a half-finished change in the database
+        connection.rollback()
+        raise
+
+    finally:
+        connection.close()
+
+
+# create a new tag for one user
+# if the same tag already exists, return its id instead
+def create_tag(user_id, name):
+    connection = get_connection()
+
+    try:
+        existing_tag = connection.execute(
+            """
+            SELECT id
+            FROM tags
+            WHERE user_id = ? AND name = ?
+            """,
+            (
+                user_id,
+                name
+            )
+        ).fetchone()
+
+        if existing_tag:
+            return existing_tag["id"]
+
+        cursor = connection.execute(
+            """
+            INSERT INTO tags (
+                user_id,
+                name
+            )
+            VALUES (?, ?)
+            """,
+            (
+                user_id,
+                name
+            )
+        )
+
+        tag_id = cursor.lastrowid
+
+        connection.commit()
+
+        return tag_id
+
+    except sqlite3.Error:
+        connection.rollback()
+        raise
+
+    finally:
+        connection.close()
+
+
+# get all tags that belong to one user
+def get_tags_by_user(user_id):
+    connection = get_connection()
+
+    tags = connection.execute(
+        """
+        SELECT
+            id,
+            name
+        FROM tags
+        WHERE user_id = ?
+        ORDER BY name COLLATE NOCASE
+        """,
+        (user_id,)
+    ).fetchall()
+
+    connection.close()
+
+    return tags
+
+
+# get all tags attached to one task
+# also checks that the task belongs to the current user
+def get_tags_by_task(task_id, user_id):
+    connection = get_connection()
+
+    tags = connection.execute(
+        """
+        SELECT
+            tags.id,
+            tags.name
+        FROM tags
+
+        JOIN task_tags
+            ON task_tags.tag_id = tags.id
+
+        JOIN tasks
+            ON tasks.id = task_tags.task_id
+
+        WHERE
+            task_tags.task_id = ?
+            AND tasks.user_id = ?
+
+        ORDER BY tags.name COLLATE NOCASE
+        """,
+        (
+            task_id,
+            user_id
+        )
+    ).fetchall()
+
+    connection.close()
+
+    return tags
+
+
+# replace all tag relationships for one task
+def set_task_tags(task_id, user_id, tag_ids):
+    connection = get_connection()
+
+    try:
+        # make sure this task really belongs to the current user
+        task = connection.execute(
+            """
+            SELECT id
+            FROM tasks
+            WHERE id = ? AND user_id = ?
+            """,
+            (
+                task_id,
+                user_id
+            )
+        ).fetchone()
+
+        if task is None:
+            return False
+
+        # remove the old tag relationships first
+        connection.execute(
+            """
+            DELETE FROM task_tags
+            WHERE task_id = ?
+            """,
+            (task_id,)
+        )
+
+        # attach every selected tag
+        for tag_id in tag_ids:
+
+            # only allow tags owned by the current user
+            tag = connection.execute(
+                """
+                SELECT id
+                FROM tags
+                WHERE id = ? AND user_id = ?
+                """,
+                (
+                    tag_id,
+                    user_id
+                )
+            ).fetchone()
+
+            if tag:
+                connection.execute(
+                    """
+                    INSERT INTO task_tags (
+                        task_id,
+                        tag_id
+                    )
+                    VALUES (?, ?)
+                    """,
+                    (
+                        task_id,
+                        tag_id
+                    )
+                )
+
+        connection.commit()
+
+        return True
+
+    except sqlite3.Error:
         connection.rollback()
         raise
 
@@ -369,7 +581,6 @@ def update_task(
     user_id,
     title,
     description=None,
-    tag=None,
     priority="normal",
     start_date=None,
     due_date=None
@@ -383,7 +594,6 @@ def update_task(
             SET
                 title = ?,
                 description = ?,
-                tag = ?,
                 priority = ?,
                 start_date = ?,
                 due_date = ?
@@ -392,7 +602,6 @@ def update_task(
             (
                 title,
                 description,
-                tag,
                 priority,
                 start_date,
                 due_date,
@@ -438,7 +647,8 @@ def delete_task(task_id, user_id):
 
     finally:
         connection.close()
-        
+
+
 # put any new database functions above this part
 
 
@@ -450,6 +660,8 @@ def create_tables():
     try:
         create_users_table(connection)
         create_tasks_table(connection)
+        create_tags_table(connection)
+        create_task_tags_table(connection)
         create_subtasks_table(connection)
         create_cat_table(connection)
 
@@ -457,7 +669,6 @@ def create_tables():
         connection.commit()
 
     except sqlite3.Error:
-        # cancel the changes if one of the table creations fails
         connection.rollback()
         raise
 

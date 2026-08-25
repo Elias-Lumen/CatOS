@@ -809,3 +809,82 @@
     background: #f3e8e8;
     color: #aa5555;
 }
+
+/* TAG SELECTOR */
+
+.tag-selector {
+    margin-top: 14px;
+}
+
+.tag-selector-title {
+    margin-bottom: 7px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    color: #666;
+}
+
+.tag-options {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 7px;
+
+    margin-bottom: 8px;
+}
+
+.tag-option {
+    display: flex;
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 6px 9px;
+
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+
+    background: #fafafa;
+
+    font-size: 12px;
+    color: #666;
+
+    cursor: pointer;
+}
+
+.tag-option input {
+    margin: 0;
+}
+
+.tag-option:has(input:checked) {
+    border-color: #c9aebb;
+    background: #f7edf1;
+
+    color: #5e4852;
+}
+
+.new-tag-input {
+    width: 100%;
+
+    padding: 7px 9px;
+
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    outline: none;
+
+    background: #fafafa;
+
+    font-family: inherit;
+    font-size: 12px;
+
+    color: #555;
+}
+
+.new-tag-input::placeholder {
+    color: #aaa;
+}
+
+.edit-tag-selector {
+    margin-top: 9px;
+}
