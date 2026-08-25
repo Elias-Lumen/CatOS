@@ -40,6 +40,11 @@ from database import (
     update_tag,
     delete_tag,
     get_task_statistics,
+    get_cat_by_user,
+    create_cat_for_user,
+    rename_cat,
+    reward_cat_for_task,
+    get_task_state,
 )
 
 # login and register logic is kept in auth.py
@@ -203,14 +208,31 @@ def add_subtasks_to_tasks(tasks, user_id):
 # because the modal lives in base.html and can open from any page
 @app.context_processor
 def inject_global_task_modal_data():
+
     if "user_id" not in session:
+
         return {
-            "global_task_tags": []
+            "global_task_tags": [],
+            "cat_name": "Cat"
         }
+
+
+    user_id = session["user_id"]
+
+    user_cat = get_cat_by_user(
+        user_id
+    )
+
 
     return {
         "global_task_tags": get_tags_by_user(
-            session["user_id"]
+            user_id
+        ),
+
+        "cat_name": (
+            user_cat["cat_name"]
+            if user_cat
+            else "Cat"
         )
     }
 
@@ -384,14 +406,47 @@ def home():
 def toggle_task(task_id):
 
     if "user_id" not in session:
+
         return redirect(
             url_for("login")
         )
 
-    toggle_task_completion(
+
+    user_id = session["user_id"]
+
+
+    # Remember the state before changing it.
+    old_state = get_task_state(
         task_id=task_id,
-        user_id=session["user_id"]
+        user_id=user_id
     )
+
+
+    changed = toggle_task_completion(
+        task_id=task_id,
+        user_id=user_id
+    )
+
+
+    # Only reward the cat when an unfinished task
+    # becomes completed.
+    #
+    # Reopening and completing the same task again
+    # can reward it again, which is fine for this simple system.
+    if (
+        changed
+        and old_state
+        and old_state != "completed"
+    ):
+
+        create_cat_for_user(
+            user_id
+        )
+
+        reward_cat_for_task(
+            user_id
+        )
+
 
     return redirect(
         url_for("home")
@@ -1637,11 +1692,68 @@ def data():
         max_weekly_completed=max_weekly_completed
     )
 
-# virtual cat page
-@app.route("/cat")
+# VIRTUAL CAT PAGE
+@app.route(
+    "/cat",
+    methods=["GET", "POST"]
+)
 def cat():
+
+    if "user_id" not in session:
+
+        return redirect(
+            url_for("login")
+        )
+
+
+    user_id = session["user_id"]
+
+
+    # Every user gets their own cat.
+    create_cat_for_user(
+        user_id
+    )
+
+
+    # Rename the cat.
+    if request.method == "POST":
+
+        cat_name = request.form.get(
+            "cat_name",
+            ""
+        ).strip()
+
+
+        if not cat_name:
+
+            flash(
+                "Cat name cannot be empty."
+            )
+
+            return redirect(
+                url_for("cat")
+            )
+
+
+        rename_cat(
+            user_id=user_id,
+            cat_name=cat_name
+        )
+
+
+        return redirect(
+            url_for("cat")
+        )
+
+
+    user_cat = get_cat_by_user(
+        user_id
+    )
+
+
     return render_template(
-        "cat.html"
+        "cat.html",
+        cat=user_cat
     )
 
 

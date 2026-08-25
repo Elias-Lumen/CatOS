@@ -1197,7 +1197,182 @@ def get_task_statistics(user_id):
 
     return tasks
 
+# Get one user's cat.
+def get_cat_by_user(user_id):
 
+    connection = get_connection()
+
+    cat = connection.execute(
+        """
+        SELECT *
+        FROM cat
+        WHERE user_id = ?
+        """,
+        (user_id,)
+    ).fetchone()
+
+    connection.close()
+
+    return cat
+
+
+# Create a cat if this user does not have one yet.
+def create_cat_for_user(
+    user_id,
+    cat_name="Cat"
+):
+
+    connection = get_connection()
+
+    try:
+
+        existing_cat = connection.execute(
+            """
+            SELECT id
+            FROM cat
+            WHERE user_id = ?
+            """,
+            (user_id,)
+        ).fetchone()
+
+
+        if existing_cat:
+
+            return existing_cat["id"]
+
+
+        cursor = connection.execute(
+            """
+            INSERT INTO cat (
+                user_id,
+                cat_name
+            )
+            VALUES (?, ?)
+            """,
+            (
+                user_id,
+                cat_name
+            )
+        )
+
+
+        connection.commit()
+
+        return cursor.lastrowid
+
+    except sqlite3.Error:
+
+        connection.rollback()
+        raise
+
+    finally:
+
+        connection.close()
+
+
+# Change the cat's name.
+def rename_cat(
+    user_id,
+    cat_name
+):
+
+    connection = get_connection()
+
+    try:
+
+        cursor = connection.execute(
+            """
+            UPDATE cat
+            SET
+                cat_name = ?,
+                last_interaction = CURRENT_TIMESTAMP
+            WHERE user_id = ?
+            """,
+            (
+                cat_name,
+                user_id
+            )
+        )
+
+        connection.commit()
+
+        return cursor.rowcount > 0
+
+    except sqlite3.Error:
+
+        connection.rollback()
+        raise
+
+    finally:
+
+        connection.close()
+
+
+# Reward the cat when its user finishes a task.
+def reward_cat_for_task(user_id):
+
+    connection = get_connection()
+
+    try:
+
+        # Mood goes up by 5,
+        # but it is never allowed to go above 100.
+        connection.execute(
+            """
+            UPDATE cat
+            SET
+                mood = MIN(
+                    mood + 5,
+                    100
+                ),
+                last_interaction = CURRENT_TIMESTAMP
+            WHERE user_id = ?
+            """,
+            (user_id,)
+        )
+
+        connection.commit()
+
+    except sqlite3.Error:
+
+        connection.rollback()
+        raise
+
+    finally:
+
+        connection.close()
+
+
+# Get one task's current state.
+# This lets app.py know whether a task is being completed or reopened.
+def get_task_state(
+    task_id,
+    user_id
+):
+
+    connection = get_connection()
+
+    task = connection.execute(
+        """
+        SELECT state
+        FROM tasks
+        WHERE
+            id = ?
+            AND user_id = ?
+        """,
+        (
+            task_id,
+            user_id
+        )
+    ).fetchone()
+
+    connection.close()
+
+    if task is None:
+
+        return None
+
+    return task["state"]
 
 # put any new database functions above this part
 

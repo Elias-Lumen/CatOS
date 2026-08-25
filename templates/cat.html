@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Cat
+{% endblock %}
+
+
+{% block styles %}
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/cat.css') }}"
+>
+
+{% endblock %}
+
+
+{% block content %}
+
+<main class="cat-page">
+
+
+    <header class="cat-header">
+
+        <h1>
+            {{ cat["cat_name"] }}
+        </h1>
+
+        <p>
+            Completing tasks makes your cat happier.
+        </p>
+
+    </header>
+
+
+    <section class="cat-card">
+
+
+        <!-- CAT -->
+
+        <div class="cat-main">
+
+
+            <!--
+                Simple placeholder cat for now.
+                This can be replaced with a custom SVG later.
+            -->
+
+            <div
+                class="cat-placeholder"
+                aria-hidden="true"
+            >
+                🐈‍⬛
+            </div>
+
+
+            <button
+                type="button"
+                class="rename-cat-button"
+                id="renameCatButton"
+            >
+                Rename
+            </button>
+
+
+            <form
+                method="POST"
+                class="rename-cat-form hidden"
+                id="renameCatForm"
+            >
+
+                <input
+                    type="text"
+                    name="cat_name"
+                    value="{{ cat['cat_name'] }}"
+                    maxlength="30"
+                    required
+                >
+
+                <button
+                    type="submit"
+                    class="cat-save-button"
+                >
+                    Save
+                </button>
+
+                <button
+                    type="button"
+                    class="cat-cancel-button"
+                    id="cancelRenameCat"
+                >
+                    Cancel
+                </button>
+
+            </form>
+
+        </div>
+
+
+
+        <!-- STATS -->
+
+        <div class="cat-stats">
+
+
+            <!-- MOOD -->
+
+            <div class="cat-stat">
+
+                <div class="cat-stat-header">
+
+                    <span>
+                        Mood
+                    </span>
+
+                    <strong>
+                        {{ cat["mood"] }} / 100
+                    </strong>
+
+                </div>
+
+
+                <div class="cat-stat-track">
+
+                    <div
+                        class="cat-stat-fill"
+                        style="width: {{ cat['mood'] }}%;"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ENERGY -->
+
+            <div class="cat-stat">
+
+                <div class="cat-stat-header">
+
+                    <span>
+                        Energy
+                    </span>
+
+                    <strong>
+                        {{ cat["energy"] }} / 100
+                    </strong>
+
+                </div>
+
+
+                <div class="cat-stat-track">
+
+                    <div
+                        class="cat-stat-fill"
+                        style="width: {{ cat['energy'] }}%;"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- HUNGER -->
+
+            <div class="cat-stat">
+
+                <div class="cat-stat-header">
+
+                    <span>
+                        Hunger
+                    </span>
+
+                    <strong>
+                        {{ cat["hunger"] }} / 100
+                    </strong>
+
+                </div>
+
+
+                <div class="cat-stat-track">
+
+                    <div
+                        class="cat-stat-fill"
+                        style="width: {{ cat['hunger'] }}%;"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <div class="cat-message">
+
+            Complete a task to give
+            {{ cat["cat_name"] }}
+            +5 mood.
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        const renameButton =
+            document.getElementById(
+                "renameCatButton"
+            );
+
+        const renameForm =
+            document.getElementById(
+                "renameCatForm"
+            );
+
+        const cancelButton =
+            document.getElementById(
+                "cancelRenameCat"
+            );
+
+
+        if (
+            renameButton
+            && renameForm
+        ) {
+
+            renameButton.addEventListener(
+                "click",
+                () => {
+
+                    renameButton.classList.add(
+                        "hidden"
+                    );
+
+                    renameForm.classList.remove(
+                        "hidden"
+                    );
+
+
+                    const input =
+                        renameForm.querySelector(
+                            "input"
+                        );
+
+
+                    if (input) {
+
+                        input.focus();
+                        input.select();
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        if (
+            cancelButton
+            && renameForm
+        ) {
+
+            cancelButton.addEventListener(
+                "click",
+                () => {
+
+                    renameForm.classList.add(
+                        "hidden"
+                    );
+
+                    renameButton.classList.remove(
+                        "hidden"
+                    );
+
+                }
+            );
+
+        }
+
+    }
+);
+
+</script>
+
+{% endblock %}
