@@ -8,6 +8,11 @@ from flask import (
     url_for,
 )
 
+from pathlib import Path
+from uuid import uuid4
+
+from werkzeug.utils import secure_filename
+
 from datetime import date
 
 # bring the database functions over here
@@ -28,6 +33,8 @@ from database import (
     toggle_subtask_completion,
     update_subtask,
     delete_subtask,
+    get_user_by_id,
+    update_user_avatar,
 )
 
 # login and register logic is kept in auth.py
@@ -40,6 +47,47 @@ app = Flask(__name__)
 # Flask needs this for session and flash messages
 # this is only a development key for now
 app.config["SECRET_KEY"] = "CatOS-development-secret-key"
+
+
+# AVATAR SETTINGS
+
+# Keep uploaded avatars in one folder inside static.
+AVATAR_FOLDER = (
+    Path(app.root_path)
+    / "static"
+    / "uploads"
+    / "avatars"
+)
+
+# Only normal image formats are allowed.
+ALLOWED_AVATAR_EXTENSIONS = {
+    "png",
+    "jpg",
+    "jpeg",
+    "webp",
+}
+
+# Do not allow giant image uploads.
+app.config["MAX_CONTENT_LENGTH"] = (
+    5 * 1024 * 1024
+)
+
+
+# Check the file extension before saving an avatar.
+def allowed_avatar(filename):
+
+    extension = (
+        Path(filename)
+        .suffix
+        .lower()
+        .lstrip(".")
+    )
+
+    return (
+        bool(extension)
+        and extension
+        in ALLOWED_AVATAR_EXTENSIONS
+    )
 
 
 # check that a date is a real date before saving it
@@ -697,14 +745,215 @@ def logout():
     )
 
 
-# settings page
-# avatar stuff will probably live here later
-@app.route("/setting")
+# SETTINGS PAGE
+# The avatar can be viewed and changed here.
+@app.route(
+    "/setting",
+    methods=["GET", "POST"]
+)
 def setting():
-    return render_template(
-        "setting.html"
+
+    # Settings contains private user information.
+    if "user_id" not in session:
+        return redirect(
+            url_for("login")
+        )
+
+    user_id = session["user_id"]
+
+    user = get_user_by_id(
+        user_id
     )
 
+
+    # USER UPLOADED A NEW AVATAR
+    if request.method == "POST":
+
+        avatar = request.files.get(
+            "avatar"
+        )
+
+
+        # Nothing was selected.
+        if (
+            avatar is None
+            or avatar.filename == ""
+        ):
+
+            flash(
+                "Please choose an image."
+            )
+
+            return redirect(
+                url_for("setting")
+            )
+
+
+        # Reject files that are not supported images.
+        if not allowed_avatar(
+            avatar.filename
+        ):
+
+            flash(
+                "Unsupported avatar file type."
+            )
+
+            return redirect(
+                url_for("setting")
+            )
+
+
+        # Clean the uploaded filename before using it.
+        original_name = secure_filename(
+            avatar.filename
+        )
+
+        # secure_filename can sometimes remove strange characters,
+        # so check the cleaned name again before taking the extension.
+        if (
+            not original_name
+            or "." not in original_name
+        ):
+
+            flash(
+                "Unsupported avatar file type."
+            )
+
+            return redirect(
+                url_for("setting")
+            )
+
+
+        extension = (
+            Path(original_name)
+            .suffix
+            .lower()
+            .lstrip(".")
+        )
+
+
+        if (
+            not extension
+            or extension
+            not in ALLOWED_AVATAR_EXTENSIONS
+        ):
+
+            flash(
+                "Unsupported avatar file type."
+            )
+
+            return redirect(
+                url_for("setting")
+            )
+
+
+        # Make sure the upload folder exists.
+        AVATAR_FOLDER.mkdir(
+            parents=True,
+            exist_ok=True
+        )
+
+
+        # A random filename avoids browser caching problems
+        # when the user changes their avatar.
+        filename = (
+            f"user_{user_id}_"
+            f"{uuid4().hex}."
+            f"{extension}"
+        )
+
+        file_path = (
+            AVATAR_FOLDER
+            / filename
+        )
+
+
+        # Save the new image.
+        avatar.save(
+            file_path
+        )
+
+
+        # Save the new path in this user's database row.
+        avatar_url = url_for(
+            "static",
+            filename=(
+                "uploads/avatars/"
+                + filename
+            )
+        )
+
+        update_user_avatar(
+            user_id=user_id,
+            avatar_url=avatar_url
+        )
+
+
+        # Remove the user's old uploaded avatar.
+        old_avatar_url = (
+            user["avatar_url"]
+            if user
+            else None
+        )
+
+        if (
+            old_avatar_url
+            and old_avatar_url.startswith(
+                "/static/uploads/avatars/"
+            )
+        ):
+
+            old_filename = Path(
+                old_avatar_url
+            ).name
+
+            old_file_path = (
+                AVATAR_FOLDER
+                / old_filename
+            )
+
+            if old_file_path.exists():
+
+                old_file_path.unlink()
+
+
+        flash(
+            "Avatar updated."
+        )
+
+        return redirect(
+            url_for("setting")
+        )
+
+        flash(
+            "Avatar updated."
+        )
+
+        return redirect(
+            url_for("setting")
+        )
+
+
+    # PAGE OPENED NORMALLY
+
+    user = get_user_by_id(
+        user_id
+    )
+
+    avatar_url = (
+        user["avatar_url"]
+        if user
+        and user["avatar_url"]
+        else url_for(
+            "static",
+            filename="icons/default_avatar.svg"
+        )
+    )
+
+    return render_template(
+        "setting.html",
+        avatar_url=avatar_url
+    )
 
 # create a task from the floating Add task modal
 @app.route(
