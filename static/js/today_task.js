@@ -31,7 +31,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
             button.addEventListener(
                 "click",
-                () => {
+                (event) => {
+
+                    // Do not let the subtask button trigger other task click events.
+                    event.stopPropagation();
+
 
                     const targetId =
                         button.dataset

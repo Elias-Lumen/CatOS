@@ -1241,3 +1241,14 @@
     }
 
 }
+
+/* Hide the subtask list until it is opened. */
+.subtask-list.hidden {
+    display: none;
+}
+
+
+/* Hide the first Add subtask button after its form opens. */
+.show-subtask-form.hidden {
+    display: none;
+}
