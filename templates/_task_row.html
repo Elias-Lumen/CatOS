@@ -103,6 +103,13 @@
                     value="{{ task['due_date'] or '' }}"
                 >
 
+                <input
+                    type="text"
+                    name="tag"
+                    value="{{ task['tag'] or '' }}"
+                    placeholder="Tag"
+                >
+
                 <select name="priority">
 
                     <option
