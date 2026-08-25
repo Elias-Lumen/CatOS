@@ -240,112 +240,413 @@ document.addEventListener("DOMContentLoaded", () => {
 
         });
 
+// LABEL PICKERS
+// Labels are saved and reused.
+// Search the old ones first, and only create a new one if it really does not exist.
 
-    // LABEL PICKERS
+function getPendingLabels(picker) {
 
-    function getPendingLabels(picker) {
+    const hiddenInput =
+        picker.querySelector(
+            ".new-tags-value"
+        );
 
-        const hiddenInput =
-            picker.querySelector(
-                ".new-tags-value"
-            );
-
-        if (
-            !hiddenInput ||
-            !hiddenInput.value
-        ) {
-            return [];
-        }
-
-        return hiddenInput.value
-            .split(",")
-            .map((label) => label.trim())
-            .filter(Boolean);
-
-    }
-
-
-    function savePendingLabels(
-        picker,
-        labels
+    if (
+        !hiddenInput ||
+        !hiddenInput.value
     ) {
+        return [];
+    }
 
-        const hiddenInput =
-            picker.querySelector(
-                ".new-tags-value"
-            );
+    return hiddenInput.value
+        .split(",")
+        .map((label) => label.trim())
+        .filter(Boolean);
 
-        if (!hiddenInput) {
-            return;
-        }
+}
 
-        hiddenInput.value =
-            labels.join(",");
+
+function savePendingLabels(
+    picker,
+    labels
+) {
+
+    const hiddenInput =
+        picker.querySelector(
+            ".new-tags-value"
+        );
+
+    if (!hiddenInput) {
+        return;
+    }
+
+    hiddenInput.value =
+        labels.join(",");
+
+}
+
+
+// Update the Labels button so the user can see how many are selected.
+function updateLabelButton(picker) {
+
+    const buttonText =
+        picker.querySelector(
+            ".label-button-text"
+        );
+
+    if (!buttonText) {
+        return;
+    }
+
+    const selectedExisting =
+        picker.querySelectorAll(
+            ".label-checkbox:checked"
+        ).length;
+
+    const pendingLabels =
+        getPendingLabels(picker);
+
+    const count =
+        selectedExisting +
+        pendingLabels.length;
+
+    if (count === 0) {
+
+        buttonText.textContent =
+            "Labels";
+
+    } else if (count === 1) {
+
+        buttonText.textContent =
+            "1 Label";
+
+    } else {
+
+        buttonText.textContent =
+            `${count} Labels`;
 
     }
 
+}
 
-    function updateLabelButton(picker) {
 
-        const buttonText =
-            picker.querySelector(
-                ".label-button-text"
+function updateAllLabelButtons(
+    container = document
+) {
+
+    container
+        .querySelectorAll(
+            ".label-picker"
+        )
+        .forEach((picker) => {
+
+            updateLabelButton(picker);
+
+        });
+
+}
+
+
+// Clear the search and show all the saved labels again.
+function resetLabelSearch(picker) {
+
+    const search =
+        picker.querySelector(
+            ".label-search"
+        );
+
+    const createButton =
+        picker.querySelector(
+            ".create-label-button"
+        );
+
+    picker
+        .querySelectorAll(
+            ".label-item"
+        )
+        .forEach((item) => {
+
+            item.classList.remove(
+                "hidden"
             );
 
-        if (!buttonText) {
-            return;
-        }
+        });
 
-        const selectedExisting =
+    if (search) {
+        search.value = "";
+    }
+
+    if (createButton) {
+        createButton.classList.add(
+            "hidden"
+        );
+    }
+
+}
+
+
+// Find a saved label with exactly the same name.
+// Lowercase is used here so School and school count as the same label.
+function findExactLabel(
+    picker,
+    labelName
+) {
+
+    const wantedName =
+        labelName
+            .trim()
+            .toLowerCase();
+
+
+    if (!wantedName) {
+        return null;
+    }
+
+
+    return Array
+        .from(
             picker.querySelectorAll(
-                ".label-checkbox:checked"
-            ).length;
-
-        const pendingLabels =
-            getPendingLabels(picker);
-
-        const count =
-            selectedExisting +
-            pendingLabels.length;
-
-        if (count === 0) {
-
-            buttonText.textContent =
-                "Labels";
-
-        } else if (count === 1) {
-
-            buttonText.textContent =
-                "1 Label";
-
-        } else {
-
-            buttonText.textContent =
-                `${count} Labels`;
-
-        }
-
-    }
-
-
-    function updateAllLabelButtons(
-        container = document
-    ) {
-
-        container
-            .querySelectorAll(
-                ".label-picker"
+                ".label-item:not(.pending-label-item)"
             )
-            .forEach((picker) => {
+        )
+        .find((item) => {
 
-                updateLabelButton(picker);
+            return (
+                item.dataset.labelName ===
+                wantedName
+            );
 
-            });
+        }) || null;
+
+}
+
+
+// Select an existing label instead of accidentally making another copy.
+function selectExistingLabel(
+    picker,
+    item
+) {
+
+    if (!item) {
+        return;
+    }
+
+
+    const checkbox =
+        item.querySelector(
+            ".label-checkbox"
+        );
+
+
+    if (!checkbox) {
+        return;
+    }
+
+
+    checkbox.checked = true;
+
+    updateLabelButton(picker);
+
+    resetLabelSearch(picker);
+
+}
+
+
+// New labels only get here after we already checked the saved ones.
+function addPendingLabel(
+    picker,
+    labelName
+) {
+
+    const cleanName =
+        labelName.trim();
+
+    if (!cleanName) {
+        return;
+    }
+
+
+    // If this label already exists, just select it.
+    const existingLabel =
+        findExactLabel(
+            picker,
+            cleanName
+        );
+
+
+    if (existingLabel) {
+
+        selectExistingLabel(
+            picker,
+            existingLabel
+        );
+
+        return;
+    }
+
+    let pendingLabels =
+        getPendingLabels(picker);
+
+    // Do not create the same new label twice before the task is saved.
+    const alreadyPending =
+        pendingLabels.some(
+            (label) =>
+                label.toLowerCase() ===
+                cleanName.toLowerCase()
+        );
+
+    if (alreadyPending) {
+        return;
+    }
+
+
+    pendingLabels.push(cleanName);
+
+    savePendingLabels(
+        picker,
+        pendingLabels
+    );
+
+
+    const labelList =
+        picker.querySelector(
+            ".label-list"
+        );
+
+    if (labelList) {
+
+        const item =
+            document.createElement(
+                "label"
+            );
+
+        item.className =
+            "label-item pending-label-item";
+
+        item.dataset.labelName =
+            cleanName.toLowerCase();
+
+
+        const left =
+            document.createElement(
+                "span"
+            );
+
+        left.className =
+            "label-item-left";
+
+
+        // New labels are made with JS, so the SVG has to be added here too.
+        const icon =
+            document.createElement(
+                "img"
+            );
+
+        icon.className =
+            "label-tag-icon";
+
+        icon.src =
+            "/static/icons/label.svg";
+
+        icon.alt = "";
+
+
+        const name =
+            document.createElement(
+                "span"
+            );
+
+        name.className =
+            "label-name";
+
+        name.textContent =
+            cleanName;
+
+
+        const checkbox =
+            document.createElement(
+                "input"
+            );
+
+        checkbox.type =
+            "checkbox";
+
+        checkbox.checked =
+            true;
+
+        checkbox.className =
+            "pending-label-checkbox";
+
+
+        // Unticking a new label removes it because it has not been saved yet.
+        checkbox.addEventListener(
+            "change",
+            () => {
+
+                if (
+                    !checkbox.checked
+                ) {
+
+                    pendingLabels =
+                        getPendingLabels(
+                            picker
+                        ).filter(
+                            (label) =>
+                                label
+                                    .toLowerCase() !==
+                                cleanName
+                                    .toLowerCase()
+                        );
+
+                    savePendingLabels(
+                        picker,
+                        pendingLabels
+                    );
+
+                    item.remove();
+
+                    updateLabelButton(
+                        picker
+                    );
+
+                }
+
+            }
+        );
+
+
+        left.appendChild(icon);
+        left.appendChild(name);
+
+        item.appendChild(left);
+        item.appendChild(checkbox);
+
+        labelList.appendChild(item);
 
     }
 
 
-    function resetLabelSearch(picker) {
+    updateLabelButton(picker);
+
+}
+
+
+// Set up every label picker on the page.
+document
+    .querySelectorAll(
+        ".label-picker"
+    )
+    .forEach((picker) => {
+
+        const button =
+            picker.querySelector(
+                ".label-button"
+            );
+
+        const menu =
+            picker.querySelector(
+                ".label-menu"
+            );
 
         const search =
             picker.querySelector(
@@ -357,407 +658,38 @@ document.addEventListener("DOMContentLoaded", () => {
                 ".create-label-button"
             );
 
-        picker
-            .querySelectorAll(
-                ".label-item"
-            )
-            .forEach((item) => {
-
-                item.classList.remove(
-                    "hidden"
-                );
-
-            });
-
-        if (search) {
-            search.value = "";
-        }
-
-        if (createButton) {
-            createButton.classList.add(
-                "hidden"
-            );
-        }
-
-    }
-
-
-    function addPendingLabel(
-        picker,
-        labelName
-    ) {
-
-        const cleanName =
-            labelName.trim();
-
-        if (!cleanName) {
-            return;
-        }
-
-        let pendingLabels =
-            getPendingLabels(picker);
-
-        const alreadyPending =
-            pendingLabels.some(
-                (label) =>
-                    label.toLowerCase() ===
-                    cleanName.toLowerCase()
-            );
-
-        if (alreadyPending) {
-            return;
-        }
-
-
-        const existingNames =
-            Array.from(
-                picker.querySelectorAll(
-                    ".label-item:not(.pending-label-item)"
-                )
-            ).map((item) =>
-                item.dataset.labelName
-            );
-
-
-        if (
-            existingNames.includes(
-                cleanName.toLowerCase()
-            )
-        ) {
-            return;
-        }
-
-
-        pendingLabels.push(cleanName);
-
-        savePendingLabels(
-            picker,
-            pendingLabels
-        );
-
-
-        const labelList =
+        const preview =
             picker.querySelector(
-                ".label-list"
-            );
-
-        if (labelList) {
-
-            const item =
-                document.createElement(
-                    "label"
-                );
-
-            item.className =
-                "label-item pending-label-item";
-
-            item.dataset.labelName =
-                cleanName.toLowerCase();
-
-
-            const left =
-                document.createElement(
-                    "span"
-                );
-
-            left.className =
-                "label-item-left";
-
-
-            const icon =
-                document.createElement(
-                    "img"
-                );
-
-            icon.className =
-                "label-tag-icon";
-
-            icon.src =
-                "/static/icons/label.svg";
-
-            icon.alt = "";
-
-
-            const name =
-                document.createElement(
-                    "span"
-                );
-
-            name.className =
-                "label-name";
-
-            name.textContent =
-                cleanName;
-
-
-            const checkbox =
-                document.createElement(
-                    "input"
-                );
-
-            checkbox.type =
-                "checkbox";
-
-            checkbox.checked =
-                true;
-
-            checkbox.className =
-                "pending-label-checkbox";
-
-
-            checkbox.addEventListener(
-                "change",
-                () => {
-
-                    if (
-                        !checkbox.checked
-                    ) {
-
-                        pendingLabels =
-                            getPendingLabels(
-                                picker
-                            ).filter(
-                                (label) =>
-                                    label
-                                        .toLowerCase() !==
-                                    cleanName
-                                        .toLowerCase()
-                            );
-
-                        savePendingLabels(
-                            picker,
-                            pendingLabels
-                        );
-
-                        item.remove();
-
-                        updateLabelButton(
-                            picker
-                        );
-
-                    }
-
-                }
+                ".new-label-preview"
             );
 
 
-            left.appendChild(icon);
-            left.appendChild(name);
-
-            item.appendChild(left);
-            item.appendChild(checkbox);
-
-            labelList.appendChild(item);
-
+        if (!button || !menu) {
+            return;
         }
 
 
-        updateLabelButton(picker);
+        // Open this label menu and close any other one.
+        button.addEventListener(
+            "click",
+            (event) => {
 
-    }
-
-
-    document
-        .querySelectorAll(
-            ".label-picker"
-        )
-        .forEach((picker) => {
-
-            const button =
-                picker.querySelector(
-                    ".label-button"
-                );
-
-            const menu =
-                picker.querySelector(
-                    ".label-menu"
-                );
-
-            const search =
-                picker.querySelector(
-                    ".label-search"
-                );
-
-            const createButton =
-                picker.querySelector(
-                    ".create-label-button"
-                );
-
-            const preview =
-                picker.querySelector(
-                    ".new-label-preview"
-                );
+                event.stopPropagation();
 
 
-            if (!button || !menu) {
-                return;
-            }
-
-
-            button.addEventListener(
-                "click",
-                (event) => {
-
-                    event.stopPropagation();
-
-
-                    document
-                        .querySelectorAll(
-                            ".label-menu"
-                        )
-                        .forEach(
-                            (otherMenu) => {
-
-                                if (
-                                    otherMenu !==
-                                    menu
-                                ) {
-
-                                    otherMenu
-                                        .classList
-                                        .add(
-                                            "hidden"
-                                        );
-
-                                }
-
-                            }
-                        );
-
-
-                    menu.classList.toggle(
-                        "hidden"
-                    );
-
-
-                    if (
-                        !menu.classList.contains(
-                            "hidden"
-                        )
-                    ) {
-
-                        updateLabelButton(
-                            picker
-                        );
-
-                        if (search) {
-                            search.focus();
-                        }
-
-                    }
-
-                }
-            );
-
-
-            menu.addEventListener(
-                "click",
-                (event) => {
-
-                    event.stopPropagation();
-
-                }
-            );
-
-
-            picker
-                .querySelectorAll(
-                    ".label-checkbox"
-                )
-                .forEach(
-                    (checkbox) => {
-
-                        checkbox.addEventListener(
-                            "change",
-                            () => {
-
-                                updateLabelButton(
-                                    picker
-                                );
-
-                            }
-                        );
-
-                    }
-                );
-
-
-            if (search) {
-
-                search.addEventListener(
-                    "input",
-                    () => {
-
-                        const searchText =
-                            search.value
-                                .trim();
-
-                        const searchValue =
-                            searchText
-                                .toLowerCase();
-
-                        let exactMatch =
-                            false;
-
-
-                        picker
-                            .querySelectorAll(
-                                ".label-item"
-                            )
-                            .forEach(
-                                (item) => {
-
-                                    const name =
-                                        item.dataset
-                                            .labelName;
-
-                                    const matches =
-                                        name.includes(
-                                            searchValue
-                                        );
-
-                                    item.classList.toggle(
-                                        "hidden",
-                                        !matches
-                                    );
-
-
-                                    if (
-                                        name ===
-                                        searchValue
-                                    ) {
-
-                                        exactMatch =
-                                            true;
-
-                                    }
-
-                                }
-                            );
-
-
-                        if (
-                            createButton &&
-                            preview
-                        ) {
+                document
+                    .querySelectorAll(
+                        ".label-menu"
+                    )
+                    .forEach(
+                        (otherMenu) => {
 
                             if (
-                                searchValue &&
-                                !exactMatch
+                                otherMenu !==
+                                menu
                             ) {
 
-                                preview.textContent =
-                                    `"${searchText}"`;
-
-                                createButton
-                                    .classList
-                                    .remove(
-                                        "hidden"
-                                    );
-
-                            } else {
-
-                                createButton
+                                otherMenu
                                     .classList
                                     .add(
                                         "hidden"
@@ -766,82 +698,274 @@ document.addEventListener("DOMContentLoaded", () => {
                             }
 
                         }
+                    );
 
-                    }
+
+                menu.classList.toggle(
+                    "hidden"
                 );
 
 
-                search.addEventListener(
-                    "keydown",
-                    (event) => {
+                if (
+                    !menu.classList.contains(
+                        "hidden"
+                    )
+                ) {
 
-                        if (
-                            event.key !==
-                            "Enter"
-                        ) {
-                            return;
-                        }
+                    updateLabelButton(
+                        picker
+                    );
 
-                        const value =
-                            search.value.trim();
-
-                        if (!value) {
-                            return;
-                        }
-
-                        event.preventDefault();
-
-                        addPendingLabel(
-                            picker,
-                            value
-                        );
-
-                        resetLabelSearch(
-                            picker
-                        );
-
+                    if (search) {
+                        search.focus();
                     }
-                );
+
+                }
 
             }
+        );
 
 
-            if (
-                createButton &&
-                search
-            ) {
+        // Clicking inside the menu should not close it.
+        menu.addEventListener(
+            "click",
+            (event) => {
 
-                createButton.addEventListener(
-                    "click",
-                    () => {
-
-                        const value =
-                            search.value.trim();
-
-                        if (!value) {
-                            return;
-                        }
-
-                        addPendingLabel(
-                            picker,
-                            value
-                        );
-
-                        resetLabelSearch(
-                            picker
-                        );
-
-                    }
-                );
+                event.stopPropagation();
 
             }
+        );
 
 
-            updateLabelButton(
-                picker
+        // Existing labels can be selected and reused as many times as needed.
+        picker
+            .querySelectorAll(
+                ".label-checkbox"
+            )
+            .forEach(
+                (checkbox) => {
+
+                    checkbox.addEventListener(
+                        "change",
+                        () => {
+
+                            updateLabelButton(
+                                picker
+                            );
+
+                        }
+                    );
+
+                }
             );
 
-        });
+
+        if (search) {
+
+            search.addEventListener(
+                "input",
+                () => {
+
+                    const searchText =
+                        search.value.trim();
+
+                    const searchValue =
+                        searchText
+                            .toLowerCase();
+
+                    let exactMatch =
+                        false;
+
+
+                    picker
+                        .querySelectorAll(
+                            ".label-item"
+                        )
+                        .forEach(
+                            (item) => {
+
+                                const name =
+                                    item.dataset
+                                        .labelName;
+
+                                const matches =
+                                    name.includes(
+                                        searchValue
+                                    );
+
+                                item.classList.toggle(
+                                    "hidden",
+                                    !matches
+                                );
+
+
+                                if (
+                                    name ===
+                                    searchValue
+                                ) {
+
+                                    exactMatch =
+                                        true;
+
+                                }
+
+                            }
+                        );
+
+
+                    // Only offer Create when there is no saved label
+                    // with exactly the same name.
+                    if (
+                        createButton &&
+                        preview
+                    ) {
+
+                        if (
+                            searchValue &&
+                            !exactMatch
+                        ) {
+
+                            preview.textContent =
+                                `"${searchText}"`;
+
+                            createButton
+                                .classList
+                                .remove(
+                                    "hidden"
+                                );
+
+                        } else {
+
+                            createButton
+                                .classList
+                                .add(
+                                    "hidden"
+                                );
+
+                        }
+
+                    }
+
+                }
+            );
+
+
+            search.addEventListener(
+                "keydown",
+                (event) => {
+
+                    if (
+                        event.key !==
+                        "Enter"
+                    ) {
+                        return;
+                    }
+
+                    const value =
+                        search.value.trim();
+
+                    if (!value) {
+                        return;
+                    }
+
+                    event.preventDefault();
+
+
+                    // Exact saved label found:
+                    // Enter selects it instead of creating another one.
+                    const existingLabel =
+                        findExactLabel(
+                            picker,
+                            value
+                        );
+
+
+                    if (existingLabel) {
+
+                        selectExistingLabel(
+                            picker,
+                            existingLabel
+                        );
+
+                        return;
+
+                    }
+
+
+                    // No exact saved label exists, so this really is a new one.
+                    addPendingLabel(
+                        picker,
+                        value
+                    );
+
+                    resetLabelSearch(
+                        picker
+                    );
+
+                }
+            );
+
+        }
+
+
+        if (
+            createButton &&
+            search
+        ) {
+
+            createButton.addEventListener(
+                "click",
+                () => {
+
+                    const value =
+                        search.value.trim();
+
+                    if (!value) {
+                        return;
+                    }
+
+
+                    // Check one more time before creating.
+                    // Better to be annoyingly safe than make duplicate labels.
+                    const existingLabel =
+                        findExactLabel(
+                            picker,
+                            value
+                        );
+
+
+                    if (existingLabel) {
+
+                        selectExistingLabel(
+                            picker,
+                            existingLabel
+                        );
+
+                        return;
+
+                    }
+
+
+                    addPendingLabel(
+                        picker,
+                        value
+                    );
+
+                    resetLabelSearch(
+                        picker
+                    );
+
+                }
+            );
+
+        }
+
+
+        updateLabelButton(
+            picker
+        );
+
+    });
 
 
     // Click outside closes label menus
