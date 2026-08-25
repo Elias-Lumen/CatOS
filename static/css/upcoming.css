@@ -1,0 +1,146 @@
+/*
+    CatOS - Upcoming
+    ----------------
+    Future tasks are grouped by the day they start.
+*/
+
+
+.upcoming-page {
+    width:
+        min(
+            900px,
+            calc(100% - 48px)
+        );
+
+    margin: 0 auto;
+
+    padding:
+        42px
+        0
+        70px;
+}
+
+
+/* PAGE HEADER */
+
+.upcoming-header {
+    margin-bottom: 27px;
+}
+
+
+.upcoming-header h1 {
+    margin: 0;
+
+    font-size: 30px;
+    font-weight: 650;
+
+    letter-spacing: -0.03em;
+
+    color: #222222;
+}
+
+
+.upcoming-header p {
+    margin:
+        7px
+        0
+        0;
+
+    font-size: 13px;
+
+    color: #888888;
+}
+
+
+/* DATE GROUPS */
+
+.upcoming-groups {
+    display: flex;
+    flex-direction: column;
+
+    gap: 27px;
+}
+
+
+.upcoming-group {
+    min-width: 0;
+}
+
+
+.upcoming-date-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 9px;
+
+    padding:
+        0
+        3px;
+}
+
+
+.upcoming-date-header h2 {
+    margin: 0;
+
+    font-size: 15px;
+    font-weight: 650;
+
+    color: #333333;
+}
+
+
+.upcoming-date-header span {
+    font-size: 11px;
+
+    color: #999999;
+}
+
+
+/* EMPTY PAGE */
+
+.upcoming-empty {
+    padding:
+        80px
+        20px;
+
+    text-align: center;
+}
+
+
+.upcoming-empty h2 {
+    margin:
+        0
+        0
+        7px;
+
+    font-size: 17px;
+    font-weight: 600;
+
+    color: #555555;
+}
+
+
+.upcoming-empty p {
+    margin: 0;
+
+    font-size: 12px;
+
+    color: #999999;
+}
+
+
+/* SMALL SCREEN */
+
+@media (max-width: 650px) {
+
+    .upcoming-page {
+        width:
+            calc(100% - 28px);
+
+        padding-top: 25px;
+    }
+
+}

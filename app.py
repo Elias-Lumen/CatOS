@@ -1334,11 +1334,120 @@ def remove_label(tag_id):
     )
 
 
-# future tasks will go here
+# UPCOMING PAGE
+# Show tasks that are scheduled to start after today.
 @app.route("/upcoming")
 def upcoming():
+
+    if "user_id" not in session:
+
+        return redirect(
+            url_for("login")
+        )
+
+
+    user_id = session["user_id"]
+
+    today_date = date.today()
+
+
+    # Start with all tasks belonging to this user.
+    tasks = get_tasks_by_user(
+        user_id
+    )
+
+
+    tasks = add_tags_to_tasks(
+        tasks,
+        user_id
+    )
+
+
+    tasks = add_subtasks_to_tasks(
+        tasks,
+        user_id
+    )
+
+
+    upcoming_tasks = []
+
+
+    for task in tasks:
+
+        # No start date means there is no future day
+        # to put the task under.
+        if not task["start_date"]:
+            continue
+
+
+        task_start_date = date.fromisoformat(
+            task["start_date"]
+        )
+
+
+        if task_start_date > today_date:
+
+            upcoming_tasks.append(
+                task
+            )
+
+
+    # Sort by date first.
+    # Inside the same date, unfinished tasks stay above completed ones.
+    priority_order = {
+        "high": 1,
+        "medium": 2,
+        "low": 3,
+        "normal": 4,
+    }
+
+
+    upcoming_tasks.sort(
+        key=lambda task: (
+            task["start_date"],
+
+            1
+            if task["state"] == "completed"
+            else 0,
+
+            priority_order.get(
+                task["priority"],
+                5
+            ),
+
+            -task["id"]
+        )
+    )
+
+
+    # Group tasks under their start date.
+    upcoming_groups = {}
+
+
+    for task in upcoming_tasks:
+
+        start_date = task[
+            "start_date"
+        ]
+
+        if start_date not in upcoming_groups:
+
+            upcoming_groups[
+                start_date
+            ] = []
+
+
+        upcoming_groups[
+            start_date
+        ].append(
+            task
+        )
+
+
     return render_template(
-        "upcoming.html"
+        "upcoming.html",
+        upcoming_groups=upcoming_groups,
+        today=today_date.isoformat()
     )
 
 

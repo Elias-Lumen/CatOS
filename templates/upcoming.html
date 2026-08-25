@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Upcoming
+{% endblock %}
+
+
+{% block styles %}
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/today_task.css') }}"
+>
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/upcoming.css') }}"
+>
+
+{% endblock %}
+
+
+{% block content %}
+
+<main class="upcoming-page">
+
+    <header class="upcoming-header">
+
+        <div>
+
+            <h1>
+                Upcoming
+            </h1>
+
+            <p>
+                Tasks scheduled to start later.
+            </p>
+
+        </div>
+
+    </header>
+
+
+    {% if upcoming_groups %}
+
+        <div class="upcoming-groups">
+
+            {% for start_date, tasks in upcoming_groups.items() %}
+
+                <section class="upcoming-group">
+
+                    <div class="upcoming-date-header">
+
+                        <h2>
+                            {{ start_date }}
+                        </h2>
+
+                        <span>
+                            {{ tasks | length }}
+                            {% if tasks | length == 1 %}
+                                task
+                            {% else %}
+                                tasks
+                            {% endif %}
+                        </span>
+
+                    </div>
+
+
+                    <div class="task-list">
+
+                        {% for task in tasks %}
+
+                            {% include "_task_row.html" %}
+
+                        {% endfor %}
+
+                    </div>
+
+                </section>
+
+            {% endfor %}
+
+        </div>
+
+
+    {% else %}
+
+        <div class="upcoming-empty">
+
+            <h2>
+                Nothing upcoming
+            </h2>
+
+            <p>
+                Tasks with a future start date will appear here.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</main>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script
+    src="{{ url_for('static', filename='js/today_task.js') }}"
+></script>
+
+{% endblock %}
