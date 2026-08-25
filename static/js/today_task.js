@@ -106,6 +106,163 @@ document.addEventListener("DOMContentLoaded", () => {
 
         });
 
+    // EDIT SUBTASK
+    document
+        .querySelectorAll(
+            ".subtask-edit-button"
+        )
+        .forEach((button) => {
+
+            button.addEventListener(
+                "click",
+                (event) => {
+
+                    event.stopPropagation();
+
+                    const subtaskId =
+                        button.dataset.subtaskId;
+
+                    const display =
+                        document.getElementById(
+                            `subtaskDisplay${subtaskId}`
+                        );
+
+                    const form =
+                        document.getElementById(
+                            `subtaskEdit${subtaskId}`
+                        );
+
+                    const actions =
+                        document.getElementById(
+                            `subtaskActions${subtaskId}`
+                        );
+
+                    if (
+                        !display ||
+                        !form ||
+                        !actions
+                    ) {
+                        return;
+                    }
+
+                    display.classList.add(
+                        "hidden"
+                    );
+
+                    actions.classList.add(
+                        "hidden"
+                    );
+
+                    form.classList.remove(
+                        "hidden"
+                    );
+
+
+                    const input =
+                        form.querySelector(
+                            ".subtask-edit-input"
+                        );
+
+                    if (input) {
+
+                        input.focus();
+                        input.select();
+
+                    }
+
+                }
+            );
+
+        });
+
+
+    // CANCEL SUBTASK EDIT
+    document
+        .querySelectorAll(
+            ".subtask-cancel-button"
+        )
+        .forEach((button) => {
+
+            button.addEventListener(
+                "click",
+                (event) => {
+
+                    event.stopPropagation();
+
+                    const subtaskId =
+                        button.dataset.subtaskId;
+
+                    const display =
+                        document.getElementById(
+                            `subtaskDisplay${subtaskId}`
+                        );
+
+                    const form =
+                        document.getElementById(
+                            `subtaskEdit${subtaskId}`
+                        );
+
+                    const actions =
+                        document.getElementById(
+                            `subtaskActions${subtaskId}`
+                        );
+
+                    if (
+                        !display ||
+                        !form ||
+                        !actions
+                    ) {
+                        return;
+                    }
+
+                    form.classList.add(
+                        "hidden"
+                    );
+
+                    display.classList.remove(
+                        "hidden"
+                    );
+
+                    actions.classList.remove(
+                        "hidden"
+                    );
+
+                }
+            );
+
+        });
+
+
+    // CONFIRM BEFORE DELETING A SUBTASK
+    document
+        .querySelectorAll(
+            ".subtask-delete-form"
+        )
+        .forEach((form) => {
+
+            form.addEventListener(
+                "submit",
+                (event) => {
+
+                    const confirmed =
+                        window.confirm(
+                            "Delete this subtask?"
+                        );
+
+                    if (!confirmed) {
+
+                        event.preventDefault();
+
+                    }
+
+                }
+            );
+
+        });
+
+
+
+
 
     // Add task composer
     const showComposerButton =

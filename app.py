@@ -26,6 +26,8 @@ from database import (
     create_subtask,
     get_subtasks_by_task,
     toggle_subtask_completion,
+    update_subtask,
+    delete_subtask,
 )
 
 # login and register logic is kept in auth.py
@@ -508,6 +510,59 @@ def toggle_subtask(subtask_id):
     return redirect(
         url_for("home")
     )
+
+
+# Edit one subtask.
+@app.route(
+    "/subtask/<int:subtask_id>/edit",
+    methods=["POST"]
+)
+def edit_subtask(subtask_id):
+
+    if "user_id" not in session:
+        return redirect(
+            url_for("login")
+        )
+
+    title = request.form.get(
+        "title",
+        ""
+    ).strip()
+
+    if title:
+
+        update_subtask(
+            subtask_id=subtask_id,
+            user_id=session["user_id"],
+            title=title
+        )
+
+    return redirect(
+        url_for("home")
+    )
+
+
+# Delete one subtask.
+@app.route(
+    "/subtask/<int:subtask_id>/delete",
+    methods=["POST"]
+)
+def remove_subtask(subtask_id):
+
+    if "user_id" not in session:
+        return redirect(
+            url_for("login")
+        )
+
+    delete_subtask(
+        subtask_id=subtask_id,
+        user_id=session["user_id"]
+    )
+
+    return redirect(
+        url_for("home")
+    )
+
 
 # register page
 @app.route(

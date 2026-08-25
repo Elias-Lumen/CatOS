@@ -134,8 +134,12 @@
 
             {% for subtask in task["subtasks"] %}
 
-                <div class="subtask-row">
+                <div
+                    class="subtask-row"
+                    id="subtaskRow{{ subtask['id'] }}"
+                >
 
+                    <!-- COMPLETE / REOPEN -->
                     <form
                         method="POST"
                         action="{{ url_for('toggle_subtask', subtask_id=subtask['id']) }}"
@@ -155,16 +159,93 @@
                     </form>
 
 
-                    <span
-                        class="
-                            subtask-title
-                            {% if subtask['state'] == 'completed' %}
-                                completed
-                            {% endif %}
-                        "
+                    <!-- NORMAL DISPLAY -->
+                    <div
+                        class="subtask-display"
+                        id="subtaskDisplay{{ subtask['id'] }}"
                     >
-                        {{ subtask["title"] }}
-                    </span>
+
+                        <span
+                            class="
+                                subtask-title
+                                {% if subtask['state'] == 'completed' %}
+                                    completed
+                                {% endif %}
+                            "
+                        >
+                            {{ subtask["title"] }}
+                        </span>
+
+                    </div>
+
+
+                    <!-- EDIT FORM -->
+                    <form
+                        method="POST"
+                        action="{{ url_for('edit_subtask', subtask_id=subtask['id']) }}"
+                        class="subtask-edit-form hidden"
+                        id="subtaskEdit{{ subtask['id'] }}"
+                    >
+
+                        <input
+                            type="text"
+                            name="title"
+                            class="subtask-edit-input"
+                            value="{{ subtask['title'] }}"
+                            required
+                        >
+
+                        <button
+                            type="submit"
+                            class="subtask-save-button"
+                        >
+                            Save
+                        </button>
+
+                        <button
+                            type="button"
+                            class="subtask-cancel-button"
+                            data-subtask-id="{{ subtask['id'] }}"
+                        >
+                            Cancel
+                        </button>
+
+                    </form>
+
+
+                    <!-- EDIT / DELETE BUTTONS -->
+                    <div
+                        class="subtask-actions"
+                        id="subtaskActions{{ subtask['id'] }}"
+                    >
+
+                        <button
+                            type="button"
+                            class="subtask-edit-button"
+                            data-subtask-id="{{ subtask['id'] }}"
+                            aria-label="Edit subtask"
+                        >
+                            Edit
+                        </button>
+
+
+                        <form
+                            method="POST"
+                            action="{{ url_for('remove_subtask', subtask_id=subtask['id']) }}"
+                            class="subtask-delete-form"
+                        >
+
+                            <button
+                                type="submit"
+                                class="subtask-delete-button"
+                                aria-label="Delete subtask"
+                            >
+                                Delete
+                            </button>
+
+                        </form>
+
+                    </div>
 
                 </div>
 

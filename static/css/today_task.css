@@ -1252,3 +1252,120 @@
 .show-subtask-form.hidden {
     display: none;
 }
+
+/* Let the title take the spare space in the row. */
+.subtask-display {
+    flex: 1;
+
+    min-width: 0;
+}
+
+
+/* Edit and Delete stay quiet until the user needs them. */
+.subtask-actions {
+    display: flex;
+    align-items: center;
+
+    gap: 5px;
+
+    margin-left: auto;
+}
+
+
+.subtask-actions.hidden {
+    display: none;
+}
+
+
+/* Small text buttons suit subtasks better than big task buttons. */
+.subtask-edit-button,
+.subtask-delete-button {
+    padding: 2px 4px;
+
+    border: none;
+    background: transparent;
+
+    font-family: inherit;
+    font-size: 11px;
+
+    color: #999999;
+
+    cursor: pointer;
+}
+
+
+.subtask-edit-button:hover,
+.subtask-delete-button:hover {
+    color: #333333;
+}
+
+
+.subtask-delete-form {
+    margin: 0;
+}
+
+
+/* Inline editor keeps editing inside the subtask list. */
+.subtask-edit-form {
+    flex: 1;
+
+    display: flex;
+    align-items: center;
+
+    gap: 5px;
+}
+
+
+.subtask-edit-form.hidden {
+    display: none;
+}
+
+
+.subtask-edit-input {
+    flex: 1;
+
+    min-width: 0;
+
+    padding: 5px 7px;
+
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+
+    outline: none;
+
+    font-family: inherit;
+    font-size: 12px;
+}
+
+
+.subtask-edit-input:focus {
+    border-color: #888888;
+}
+
+
+.subtask-save-button,
+.subtask-cancel-button {
+    padding: 5px 7px;
+
+    border: none;
+    border-radius: 5px;
+
+    font-family: inherit;
+    font-size: 11px;
+
+    cursor: pointer;
+}
+
+
+.subtask-save-button {
+    background: #222222;
+
+    color: #ffffff;
+}
+
+
+.subtask-cancel-button {
+    background: #eeeeee;
+
+    color: #555555;
+}
