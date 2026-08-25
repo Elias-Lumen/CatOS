@@ -1,8 +1,10 @@
 <article class="task-row">
 
+    <!-- COMPLETE TASK -->
     <form
         method="POST"
         action="{{ url_for('toggle_task', task_id=task['id']) }}"
+        class="task-toggle-form"
     >
         <button
             type="submit"
@@ -13,16 +15,26 @@
                     completed
                 {% endif %}
             "
+            aria-label="Toggle task"
         ></button>
     </form>
 
 
     <div class="task-content">
 
-        <!-- Normal task display -->
+        <!-- NORMAL TASK DISPLAY -->
+        <!--
+            Clicking this area opens the task detail modal.
+            Edit / delete / complete buttons are kept separate so
+            they do not accidentally open the modal.
+        -->
         <div
-            class="task-display"
+            class="task-display task-open-area"
             id="taskDisplay{{ task['id'] }}"
+            data-task-id="{{ task['id'] }}"
+            role="button"
+            tabindex="0"
+            aria-label="Open task details"
         >
 
             <div
@@ -79,7 +91,7 @@
         </div>
 
 
-        <!-- Edit task form -->
+        <!-- EDIT TASK FORM -->
         <form
             method="POST"
             action="{{ url_for('edit_task', task_id=task['id']) }}"
@@ -278,6 +290,7 @@
     </div>
 
 
+    <!-- TASK ROW ACTIONS -->
     <div class="task-actions">
 
         <!-- EDIT BUTTON -->
@@ -313,6 +326,281 @@
                 >
             </button>
         </form>
+
+    </div>
+
+
+    <!--
+        TASK DETAIL MODAL
+
+        Each task owns one hidden modal.
+        JavaScript opens the correct modal when the task row is clicked.
+    -->
+    <div
+        class="task-modal-overlay hidden"
+        id="taskModal{{ task['id'] }}"
+        data-task-modal="{{ task['id'] }}"
+        aria-hidden="true"
+    >
+
+        <div
+            class="task-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="taskModalTitle{{ task['id'] }}"
+        >
+
+            <!-- MODAL HEADER -->
+            <div class="task-modal-header">
+
+                <div class="task-modal-title-area">
+
+                    <!-- Priority indicator -->
+                    <span
+                        class="
+                            task-modal-priority
+                            modal-priority-{{ task['priority'] }}
+                        "
+                        title="{{ task['priority']|capitalize }} priority"
+                    ></span>
+
+                    <h2
+                        class="
+                            task-modal-title
+                            {% if task['state'] == 'completed' %}
+                                completed
+                            {% endif %}
+                        "
+                        id="taskModalTitle{{ task['id'] }}"
+                    >
+                        {{ task["title"] }}
+                    </h2>
+
+                </div>
+
+
+                <!-- CLOSE BUTTON -->
+                <button
+                    type="button"
+                    class="task-modal-close"
+                    data-close-task-modal
+                    aria-label="Close task"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <!-- MODAL BODY -->
+            <div class="task-modal-body">
+
+                <!-- DESCRIPTION -->
+                <section class="task-modal-section">
+
+                    <div class="task-modal-section-label">
+                        Description
+                    </div>
+
+                    {% if task["description"] %}
+
+                        <div class="task-modal-description">
+                            {{ task["description"] }}
+                        </div>
+
+                    {% else %}
+
+                        <div class="task-modal-empty">
+                            No description.
+                        </div>
+
+                    {% endif %}
+
+                </section>
+
+
+                <!-- TASK INFORMATION -->
+                <section class="task-modal-section">
+
+                    <div class="task-modal-section-label">
+                        Task details
+                    </div>
+
+
+                    <div class="task-modal-details">
+
+                        <!-- STATUS -->
+                        <div class="task-modal-detail-row">
+
+                            <span class="task-modal-detail-name">
+                                Status
+                            </span>
+
+                            <span class="task-modal-detail-value">
+
+                                {% if task["state"] == "completed" %}
+
+                                    <span class="task-modal-status completed">
+                                        Completed
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="task-modal-status">
+                                        Not started
+                                    </span>
+
+                                {% endif %}
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- PRIORITY -->
+                        <div class="task-modal-detail-row">
+
+                            <span class="task-modal-detail-name">
+                                Priority
+                            </span>
+
+                            <span class="task-modal-detail-value">
+
+                                <span
+                                    class="
+                                        task-modal-priority
+                                        modal-priority-{{ task['priority'] }}
+                                    "
+                                ></span>
+
+                                {{ task["priority"]|capitalize }}
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- START DATE -->
+                        <div class="task-modal-detail-row">
+
+                            <span class="task-modal-detail-name">
+                                Start date
+                            </span>
+
+                            <span class="task-modal-detail-value">
+
+                                {% if task["start_date"] %}
+                                    {{ task["start_date"] }}
+                                {% else %}
+                                    —
+                                {% endif %}
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- DUE DATE -->
+                        <div class="task-modal-detail-row">
+
+                            <span class="task-modal-detail-name">
+                                Due date
+                            </span>
+
+                            <span class="task-modal-detail-value">
+
+                                {% if task["due_date"] %}
+                                    {{ task["due_date"] }}
+                                {% else %}
+                                    —
+                                {% endif %}
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- LABELS -->
+                <section class="task-modal-section">
+
+                    <div class="task-modal-section-label">
+                        Labels
+                    </div>
+
+                    {% if task["tags"] %}
+
+                        <div class="task-modal-tags">
+
+                            {% for tag in task["tags"] %}
+
+                                <span class="task-modal-tag">
+                                    # {{ tag["name"] }}
+                                </span>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="task-modal-empty">
+                            No labels.
+                        </div>
+
+                    {% endif %}
+
+                </section>
+
+            </div>
+
+
+            <!-- MODAL FOOTER -->
+            <div class="task-modal-footer">
+
+                <!-- DELETE TASK -->
+                <form
+                    method="POST"
+                    action="{{ url_for('remove_task', task_id=task['id']) }}"
+                    class="task-modal-delete-form"
+                >
+                    <button
+                        type="submit"
+                        class="task-modal-delete-button"
+                    >
+                        <img
+                            src="{{ url_for('static', filename='icons/delete.svg') }}"
+                            alt=""
+                        >
+
+                        Delete
+                    </button>
+                </form>
+
+
+                <!--
+                    This does not create a second edit system.
+                    It closes the modal and opens the existing inline editor.
+                -->
+                <button
+                    type="button"
+                    class="task-modal-edit-button"
+                    data-modal-edit-task="{{ task['id'] }}"
+                >
+                    <img
+                        src="{{ url_for('static', filename='icons/edit.svg') }}"
+                        alt=""
+                    >
+
+                    Edit task
+                </button>
+
+            </div>
+
+        </div>
 
     </div>
 

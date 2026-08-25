@@ -1,0 +1,616 @@
+/*
+    CatOS - Task Detail Modal
+    -------------------------
+    Styles for the floating task detail window.
+
+    The modal is intentionally kept in a separate stylesheet
+    so the existing Today page styles remain easier to maintain.
+*/
+
+
+/* CLICKABLE TASK AREA */
+
+.task-open-area {
+    cursor: pointer;
+
+    border-radius: 6px;
+
+    transition:
+        background 0.15s ease;
+}
+
+
+/*
+    Prevent the browser focus outline from looking harsh,
+    but still provide a visible keyboard focus state.
+*/
+.task-open-area:focus-visible {
+    outline: 2px solid #cbb7c1;
+    outline-offset: 4px;
+}
+
+
+/* MODAL OVERLAY */
+
+.task-modal-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 32px;
+
+    /*
+        Dark transparent background behind the floating panel.
+        backdrop-filter gives the page underneath a very light blur.
+    */
+    background: rgba(0, 0, 0, 0.42);
+
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+
+    z-index: 2000;
+
+    /*
+        Fade animation when the modal first appears.
+    */
+    animation:
+        task-modal-overlay-in
+        0.16s ease-out;
+}
+
+
+/*
+    The global .hidden class already exists in today_task.css,
+    but this rule is intentionally repeated here to ensure the
+    modal cannot override it through display:flex.
+*/
+.task-modal-overlay.hidden {
+    display: none;
+}
+
+
+/* MODAL WINDOW */
+
+.task-modal {
+    width: min(620px, 100%);
+
+    max-height: min(
+        760px,
+        calc(100vh - 64px)
+    );
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    border:
+        1px solid
+        rgba(80, 60, 70, 0.10);
+
+    border-radius: 18px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 24px 70px
+        rgba(0, 0, 0, 0.24);
+
+    animation:
+        task-modal-window-in
+        0.18s ease-out;
+}
+
+
+/* MODAL HEADER */
+
+.task-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding:
+        24px
+        26px
+        18px;
+
+    border-bottom:
+        1px solid
+        #eeeeee;
+}
+
+
+.task-modal-title-area {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 12px;
+
+    min-width: 0;
+}
+
+
+.task-modal-title {
+    margin: 0;
+
+    min-width: 0;
+
+    font-size: 22px;
+    font-weight: 650;
+    line-height: 1.3;
+
+    letter-spacing: -0.02em;
+
+    color: #222222;
+
+    overflow-wrap: anywhere;
+}
+
+
+.task-modal-title.completed {
+    color: #999999;
+
+    text-decoration:
+        line-through;
+
+    text-decoration-thickness:
+        1px;
+
+    text-decoration-color:
+        #aaaaaa;
+}
+
+
+/* PRIORITY DOT */
+
+.task-modal-priority {
+    width: 11px;
+    height: 11px;
+
+    margin-top: 8px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+}
+
+
+.modal-priority-normal {
+    background: #d5d5d5;
+}
+
+
+.modal-priority-low {
+    background: #6562ff;
+}
+
+
+.modal-priority-medium {
+    background: #ffb52d;
+}
+
+
+.modal-priority-high {
+    background: #ff5656;
+}
+
+
+/* CLOSE BUTTON */
+
+.task-modal-close {
+    width: 34px;
+    height: 34px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 9px;
+
+    background: transparent;
+
+    font-family: inherit;
+    font-size: 25px;
+    font-weight: 300;
+    line-height: 1;
+
+    color: #888888;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease,
+        color 0.15s ease;
+}
+
+
+.task-modal-close:hover {
+    background: #f2f2f2;
+    color: #333333;
+}
+
+
+/* MODAL BODY */
+
+.task-modal-body {
+    flex: 1;
+
+    overflow-y: auto;
+
+    padding:
+        6px
+        26px
+        22px;
+}
+
+
+/* MODAL SECTION */
+
+.task-modal-section {
+    padding: 20px 0;
+
+    border-bottom:
+        1px solid
+        #eeeeee;
+}
+
+
+.task-modal-section:last-child {
+    border-bottom: none;
+}
+
+
+.task-modal-section-label {
+    margin-bottom: 10px;
+
+    font-size: 12px;
+    font-weight: 650;
+
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+
+    color: #999999;
+}
+
+
+/* DESCRIPTION */
+
+.task-modal-description {
+    font-size: 14px;
+    line-height: 1.65;
+
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+
+    color: #4d4d4d;
+}
+
+
+.task-modal-empty {
+    font-size: 13px;
+
+    color: #aaaaaa;
+}
+
+
+/* DETAIL TABLE */
+
+.task-modal-details {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.task-modal-detail-row {
+    display: grid;
+
+    grid-template-columns:
+        110px
+        minmax(0, 1fr);
+
+    gap: 18px;
+
+    padding: 9px 0;
+
+    font-size: 13px;
+}
+
+
+.task-modal-detail-name {
+    color: #999999;
+}
+
+
+.task-modal-detail-value {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    min-width: 0;
+
+    color: #444444;
+}
+
+
+/*
+    Priority dots inside detail rows do not need
+    the larger top margin used beside the title.
+*/
+.task-modal-detail-value
+.task-modal-priority {
+    margin-top: 0;
+}
+
+
+/* STATUS */
+
+.task-modal-status {
+    display: inline-flex;
+
+    padding:
+        4px
+        8px;
+
+    border-radius: 999px;
+
+    background: #f3f3f3;
+
+    font-size: 12px;
+
+    color: #666666;
+}
+
+
+.task-modal-status.completed {
+    background: #f1edf0;
+
+    color: #876b79;
+}
+
+
+/* LABELS */
+
+.task-modal-tags {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 7px;
+}
+
+
+.task-modal-tag {
+    display: inline-flex;
+    align-items: center;
+
+    padding:
+        6px
+        9px;
+
+    border:
+        1px solid
+        #eadfe4;
+
+    border-radius: 8px;
+
+    background: #faf6f8;
+
+    font-size: 12px;
+
+    color: #876b79;
+}
+
+
+/* MODAL FOOTER */
+
+.task-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    padding:
+        16px
+        26px;
+
+    border-top:
+        1px solid
+        #eeeeee;
+
+    background: #fcfcfc;
+}
+
+
+/* FOOTER BUTTONS */
+
+.task-modal-edit-button,
+.task-modal-delete-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    min-height: 36px;
+
+    padding:
+        8px
+        12px;
+
+    border-radius: 9px;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease;
+}
+
+
+.task-modal-edit-button img,
+.task-modal-delete-button img {
+    width: 15px;
+    height: 15px;
+
+    object-fit: contain;
+}
+
+
+/* EDIT */
+
+.task-modal-edit-button {
+    border:
+        1px solid
+        #d8c9d0;
+
+    background: #f7f0f4;
+
+    color: #674f5c;
+}
+
+
+.task-modal-edit-button:hover {
+    background: #efe3e9;
+
+    border-color: #cbb5c0;
+}
+
+
+/* DELETE */
+
+.task-modal-delete-form {
+    margin: 0;
+}
+
+
+.task-modal-delete-button {
+    border:
+        1px solid
+        transparent;
+
+    background: transparent;
+
+    color: #8f6666;
+}
+
+
+.task-modal-delete-button:hover {
+    border-color: #f0dcdc;
+
+    background: #fff4f4;
+
+    color: #b34f4f;
+}
+
+
+/* BODY SCROLL LOCK */
+
+body.task-modal-open {
+    overflow: hidden;
+}
+
+
+/* OPEN ANIMATIONS */
+
+@keyframes task-modal-overlay-in {
+
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+
+}
+
+
+@keyframes task-modal-window-in {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(8px)
+            scale(0.985);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0)
+            scale(1);
+    }
+
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 650px) {
+
+    .task-modal-overlay {
+        align-items: flex-end;
+
+        padding: 12px;
+    }
+
+
+    .task-modal {
+        width: 100%;
+
+        max-height:
+            calc(100vh - 24px);
+
+        border-radius: 18px;
+    }
+
+
+    .task-modal-header {
+        padding:
+            20px
+            20px
+            16px;
+    }
+
+
+    .task-modal-body {
+        padding:
+            4px
+            20px
+            18px;
+    }
+
+
+    .task-modal-footer {
+        padding:
+            14px
+            20px;
+    }
+
+
+    .task-modal-detail-row {
+        grid-template-columns:
+            90px
+            minmax(0, 1fr);
+    }
+
+}

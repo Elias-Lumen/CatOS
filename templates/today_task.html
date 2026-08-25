@@ -1,15 +1,27 @@
 {% extends "base.html" %}
 
+
 {% block title %}
 Today
 {% endblock %}
 
+
 {% block styles %}
+
+<!-- TODAY PAGE -->
 <link
     rel="stylesheet"
     href="{{ url_for('static', filename='css/today_task.css') }}"
 >
+
+<!-- TASK DETAIL MODAL -->
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/task_modal.css') }}"
+>
+
 {% endblock %}
+
 
 {% block content %}
 
@@ -17,16 +29,21 @@ Today
 
     <div class="today-main">
 
+        <!-- PAGE HEADER -->
         <header class="today-header">
-            <h1>Today</h1>
+
+            <h1>
+                Today
+            </h1>
 
             <div class="today-count">
                 ✓ {{ (today_tasks|length) + (overdue_tasks|length) }} tasks
             </div>
+
         </header>
 
 
-        <!-- OVERDUE -->
+        <!-- OVERDUE TASKS -->
         <section class="task-group">
 
             <button
@@ -34,17 +51,29 @@ Today
                 type="button"
                 data-target="overdueTasks"
             >
+
                 <div class="group-title-wrap">
-                    <span class="group-arrow">⌄</span>
-                    <span class="group-title">Overdue</span>
+
+                    <span class="group-arrow">
+                        ⌄
+                    </span>
+
+                    <span class="group-title">
+                        Overdue
+                    </span>
+
                 </div>
+
 
                 <span class="group-action">
                     Reschedule
                 </span>
+
             </button>
 
+
             <div class="group-line"></div>
+
 
             <div
                 class="group-content"
@@ -72,7 +101,7 @@ Today
         </section>
 
 
-        <!-- TODAY -->
+        <!-- TODAY TASKS -->
         <section class="task-group">
 
             <button
@@ -80,16 +109,24 @@ Today
                 type="button"
                 data-target="todayTasks"
             >
+
                 <div class="group-title-wrap">
-                    <span class="group-arrow">⌄</span>
+
+                    <span class="group-arrow">
+                        ⌄
+                    </span>
 
                     <span class="group-title">
                         Today
                     </span>
+
                 </div>
+
             </button>
 
+
             <div class="group-line"></div>
+
 
             <div
                 class="group-content"
@@ -117,7 +154,7 @@ Today
         </section>
 
 
-        <!-- ADD TASK BUTTON -->
+        <!-- SHOW TASK COMPOSER -->
         <button
             class="show-composer-button"
             id="showComposer"
@@ -127,7 +164,7 @@ Today
         </button>
 
 
-        <!-- TASK COMPOSER -->
+        <!-- ADD TASK COMPOSER -->
         <form
             method="POST"
             action="{{ url_for('home') }}"
@@ -135,6 +172,7 @@ Today
             id="taskComposer"
         >
 
+            <!-- TASK TITLE -->
             <input
                 type="text"
                 name="title"
@@ -143,6 +181,8 @@ Today
                 required
             >
 
+
+            <!-- TASK DESCRIPTION -->
             <textarea
                 name="description"
                 class="composer-description"
@@ -155,7 +195,9 @@ Today
 
                 <div class="composer-options">
 
+                    <!-- START DATE -->
                     <label class="composer-option">
+
                         Start
 
                         <input
@@ -163,10 +205,13 @@ Today
                             name="start_date"
                             value="{{ today }}"
                         >
+
                     </label>
 
 
+                    <!-- DUE DATE -->
                     <label class="composer-option">
+
                         Deadline
 
                         <input
@@ -174,6 +219,7 @@ Today
                             name="due_date"
                             value="{{ today }}"
                         >
+
                     </label>
 
 
@@ -184,6 +230,7 @@ Today
                             type="button"
                             class="composer-option label-button"
                         >
+
                             <span class="label-button-icon">
                                 ◇
                             </span>
@@ -191,11 +238,13 @@ Today
                             <span class="label-button-text">
                                 Labels
                             </span>
+
                         </button>
 
 
                         <div class="label-menu hidden">
 
+                            <!-- LABEL SEARCH -->
                             <input
                                 type="text"
                                 class="label-search"
@@ -204,6 +253,7 @@ Today
                             >
 
 
+                            <!-- EXISTING LABELS -->
                             <div class="label-list">
 
                                 {% for tag in tags %}
@@ -240,6 +290,7 @@ Today
                             </div>
 
 
+                            <!-- CREATE NEW LABEL -->
                             <button
                                 type="button"
                                 class="create-label-button hidden"
@@ -249,6 +300,7 @@ Today
                             </button>
 
 
+                            <!-- NEW LABEL VALUES -->
                             <input
                                 type="hidden"
                                 name="new_tags"
@@ -261,7 +313,7 @@ Today
                     </div>
 
 
-                    <!-- PRIORITY -->
+                    <!-- PRIORITY PICKER -->
                     <div class="priority-picker">
 
                         <button
@@ -289,64 +341,85 @@ Today
                             id="priorityMenu"
                         >
 
+                            <!-- HIGH -->
                             <button
                                 type="button"
                                 class="priority-item"
                                 data-priority="high"
                             >
+
                                 <img
                                     src="{{ url_for('static', filename='icons/priority-high.svg') }}"
                                     alt=""
                                 >
 
-                                <span>High</span>
+                                <span>
+                                    High
+                                </span>
+
                             </button>
 
 
+                            <!-- MEDIUM -->
                             <button
                                 type="button"
                                 class="priority-item"
                                 data-priority="medium"
                             >
+
                                 <img
                                     src="{{ url_for('static', filename='icons/priority-medium.svg') }}"
                                     alt=""
                                 >
 
-                                <span>Medium</span>
+                                <span>
+                                    Medium
+                                </span>
+
                             </button>
 
 
+                            <!-- LOW -->
                             <button
                                 type="button"
                                 class="priority-item"
                                 data-priority="low"
                             >
+
                                 <img
                                     src="{{ url_for('static', filename='icons/priority-low.svg') }}"
                                     alt=""
                                 >
 
-                                <span>Low</span>
+                                <span>
+                                    Low
+                                </span>
+
                             </button>
 
 
+                            <!-- NORMAL -->
                             <button
                                 type="button"
                                 class="priority-item selected"
                                 data-priority="normal"
                             >
+
                                 <img
                                     src="{{ url_for('static', filename='icons/priority-normal.svg') }}"
                                     alt=""
                                 >
 
-                                <span>Normal</span>
+                                <span>
+                                    Normal
+                                </span>
+
                             </button>
 
                         </div>
 
 
+                        <!-- STORED PRIORITY VALUE -->
                         <input
                             type="hidden"
                             name="priority"
@@ -359,6 +432,7 @@ Today
                 </div>
 
 
+                <!-- COMPOSER ACTIONS -->
                 <div class="composer-actions">
 
                     <button
@@ -385,7 +459,7 @@ Today
     </div>
 
 
-    <!-- RIGHT SIDE STATS -->
+    <!-- RIGHT SIDE STATISTICS -->
     <aside class="today-stats">
 
         <div class="progress-ring">
@@ -396,16 +470,24 @@ Today
 
         </div>
 
+
         <div class="progress-legend">
 
             <div>
+
                 <span class="legend-dot done"></span>
+
                 Done
+
             </div>
 
+
             <div>
+
                 <span class="legend-dot incomplete"></span>
+
                 Incomplete
+
             </div>
 
         </div>
@@ -418,7 +500,15 @@ Today
 
 
 {% block scripts %}
+
+<!-- EXISTING TODAY PAGE LOGIC -->
 <script
     src="{{ url_for('static', filename='js/today_task.js') }}"
 ></script>
+
+<!-- TASK DETAIL MODAL LOGIC -->
+<script
+    src="{{ url_for('static', filename='js/task_modal.js') }}"
+></script>
+
 {% endblock %}

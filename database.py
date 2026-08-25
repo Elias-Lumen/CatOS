@@ -415,7 +415,6 @@ def set_task_tags(task_id, user_id, tag_ids):
     connection = get_connection()
 
     try:
-        # make sure this task really belongs to the current user
         task = connection.execute(
             """
             SELECT id
@@ -431,7 +430,6 @@ def set_task_tags(task_id, user_id, tag_ids):
         if task is None:
             return False
 
-        # remove the old tag relationships first
         connection.execute(
             """
             DELETE FROM task_tags
@@ -440,10 +438,8 @@ def set_task_tags(task_id, user_id, tag_ids):
             (task_id,)
         )
 
-        # attach every selected tag
         for tag_id in tag_ids:
 
-            # only allow tags owned by the current user
             tag = connection.execute(
                 """
                 SELECT id
@@ -633,6 +629,279 @@ def delete_task(task_id, user_id):
             """,
             (
                 task_id,
+                user_id
+            )
+        )
+
+        connection.commit()
+
+        return cursor.rowcount > 0
+
+    except sqlite3.Error:
+        connection.rollback()
+        raise
+
+    finally:
+        connection.close()
+
+
+# SUBTASKS
+
+
+# create a subtask under a task
+# also checks that the parent task belongs to the current user
+def create_subtask(
+    task_id,
+    user_id,
+    title,
+    description=None,
+    priority="normal",
+    due_date=None
+):
+    connection = get_connection()
+
+    try:
+        task = connection.execute(
+            """
+            SELECT id
+            FROM tasks
+            WHERE id = ? AND user_id = ?
+            """,
+            (
+                task_id,
+                user_id
+            )
+        ).fetchone()
+
+        if task is None:
+            return None
+
+        cursor = connection.execute(
+            """
+            INSERT INTO subtasks (
+                task_id,
+                title,
+                description,
+                priority,
+                due_date
+            )
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (
+                task_id,
+                title,
+                description,
+                priority,
+                due_date
+            )
+        )
+
+        subtask_id = cursor.lastrowid
+
+        connection.commit()
+
+        return subtask_id
+
+    except sqlite3.Error:
+        connection.rollback()
+        raise
+
+    finally:
+        connection.close()
+
+
+# get all subtasks under one task
+# user_id protects tasks from being read by another logged-in user
+def get_subtasks_by_task(task_id, user_id):
+    connection = get_connection()
+
+    subtasks = connection.execute(
+        """
+        SELECT
+            subtasks.*
+        FROM subtasks
+
+        JOIN tasks
+            ON tasks.id = subtasks.task_id
+
+        WHERE
+            subtasks.task_id = ?
+            AND tasks.user_id = ?
+
+        ORDER BY
+            CASE
+                WHEN subtasks.state = 'completed' THEN 1
+                ELSE 0
+            END,
+            subtasks.created_at ASC
+        """,
+        (
+            task_id,
+            user_id
+        )
+    ).fetchall()
+
+    connection.close()
+
+    return subtasks
+
+
+# toggle a subtask between completed and not started
+def toggle_subtask_completion(
+    subtask_id,
+    user_id
+):
+    connection = get_connection()
+
+    try:
+        subtask = connection.execute(
+            """
+            SELECT
+                subtasks.id,
+                subtasks.state
+            FROM subtasks
+
+            JOIN tasks
+                ON tasks.id = subtasks.task_id
+
+            WHERE
+                subtasks.id = ?
+                AND tasks.user_id = ?
+            """,
+            (
+                subtask_id,
+                user_id
+            )
+        ).fetchone()
+
+        if subtask is None:
+            return False
+
+        if subtask["state"] == "completed":
+            new_state = "not_started"
+
+            connection.execute(
+                """
+                UPDATE subtasks
+                SET
+                    state = ?,
+                    completed_at = NULL
+                WHERE id = ?
+                """,
+                (
+                    new_state,
+                    subtask_id
+                )
+            )
+
+        else:
+            new_state = "completed"
+
+            connection.execute(
+                """
+                UPDATE subtasks
+                SET
+                    state = ?,
+                    completed_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+                """,
+                (
+                    new_state,
+                    subtask_id
+                )
+            )
+
+        connection.commit()
+
+        return True
+
+    except sqlite3.Error:
+        connection.rollback()
+        raise
+
+    finally:
+        connection.close()
+
+
+# update the information of one subtask
+def update_subtask(
+    subtask_id,
+    user_id,
+    title,
+    description=None,
+    priority="normal",
+    due_date=None
+):
+    connection = get_connection()
+
+    try:
+        cursor = connection.execute(
+            """
+            UPDATE subtasks
+            SET
+                title = ?,
+                description = ?,
+                priority = ?,
+                due_date = ?
+            WHERE id IN (
+                SELECT subtasks.id
+                FROM subtasks
+
+                JOIN tasks
+                    ON tasks.id = subtasks.task_id
+
+                WHERE
+                    subtasks.id = ?
+                    AND tasks.user_id = ?
+            )
+            """,
+            (
+                title,
+                description,
+                priority,
+                due_date,
+                subtask_id,
+                user_id
+            )
+        )
+
+        connection.commit()
+
+        return cursor.rowcount > 0
+
+    except sqlite3.Error:
+        connection.rollback()
+        raise
+
+    finally:
+        connection.close()
+
+
+# delete one subtask
+def delete_subtask(
+    subtask_id,
+    user_id
+):
+    connection = get_connection()
+
+    try:
+        cursor = connection.execute(
+            """
+            DELETE FROM subtasks
+            WHERE id IN (
+                SELECT subtasks.id
+                FROM subtasks
+
+                JOIN tasks
+                    ON tasks.id = subtasks.task_id
+
+                WHERE
+                    subtasks.id = ?
+                    AND tasks.user_id = ?
+            )
+            """,
+            (
+                subtask_id,
                 user_id
             )
         )
