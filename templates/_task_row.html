@@ -36,25 +36,33 @@
                 {{ task["title"] }}
             </div>
 
+
             {% if task["description"] %}
+
                 <div class="task-description">
                     {{ task["description"] }}
                 </div>
+
             {% endif %}
 
 
             <div class="task-meta">
 
                 {% if task["start_date"] %}
+
                     <span class="task-date">
                         Start {{ task["start_date"] }}
                     </span>
+
                 {% endif %}
 
+
                 {% if task["due_date"] %}
+
                     <span class="task-date">
                         Due {{ task["due_date"] }}
                     </span>
+
                 {% endif %}
 
 
@@ -94,59 +102,6 @@
             >{{ task["description"] or "" }}</textarea>
 
 
-            <!-- EDIT TAGS -->
-            <div class="tag-selector edit-tag-selector">
-
-                <div class="tag-selector-title">
-                    Tags
-                </div>
-
-
-                {% if tags %}
-
-                    <div class="tag-options">
-
-                        {% for tag in tags %}
-
-                            <label class="tag-option">
-
-                                <input
-                                    type="checkbox"
-                                    name="tag_ids"
-                                    value="{{ tag['id'] }}"
-
-                                    {% for task_tag in task["tags"] %}
-
-                                        {% if task_tag["id"] == tag["id"] %}
-                                            checked
-                                        {% endif %}
-
-                                    {% endfor %}
-                                >
-
-                                <span>
-                                    # {{ tag["name"] }}
-                                </span>
-
-                            </label>
-
-                        {% endfor %}
-
-                    </div>
-
-                {% endif %}
-
-
-                <input
-                    type="text"
-                    name="new_tags"
-                    class="new-tag-input"
-                    placeholder="New tags, separated by commas"
-                >
-
-            </div>
-
-
             <div class="edit-options">
 
                 <input
@@ -160,6 +115,101 @@
                     name="due_date"
                     value="{{ task['due_date'] or '' }}"
                 >
+
+
+                <!-- EDIT LABEL PICKER -->
+                <div class="label-picker">
+
+                    <button
+                        type="button"
+                        class="edit-option-button label-button"
+                    >
+
+                        <span class="label-button-icon">
+                            ◇
+                        </span>
+
+                        <span class="label-button-text">
+                            Labels
+                        </span>
+
+                    </button>
+
+
+                    <div class="label-menu hidden">
+
+                        <input
+                            type="text"
+                            class="label-search"
+                            placeholder="Type a label"
+                            autocomplete="off"
+                        >
+
+
+                        <div class="label-list">
+
+                            {% for tag in tags %}
+
+                                <label
+                                    class="label-item"
+                                    data-label-name="{{ tag['name']|lower }}"
+                                >
+
+                                    <span class="label-item-left">
+
+                                        <span class="label-tag-icon">
+                                            ◇
+                                        </span>
+
+                                        <span class="label-name">
+                                            {{ tag["name"] }}
+                                        </span>
+
+                                    </span>
+
+
+                                    <input
+                                        type="checkbox"
+                                        name="tag_ids"
+                                        value="{{ tag['id'] }}"
+                                        class="label-checkbox"
+
+                                        {% for task_tag in task["tags"] %}
+
+                                            {% if task_tag["id"] == tag["id"] %}
+                                                checked
+                                            {% endif %}
+
+                                        {% endfor %}
+                                    >
+
+                                </label>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <button
+                            type="button"
+                            class="create-label-button hidden"
+                        >
+                            + Create
+                            <span class="new-label-preview"></span>
+                        </button>
+
+
+                        <input
+                            type="hidden"
+                            name="new_tags"
+                            class="new-tags-value"
+                            value=""
+                        >
+
+                    </div>
+
+                </div>
+
 
                 <select name="priority">
 
