@@ -1,4 +1,7 @@
-from flask import Flask
+from flask import (
+    Flask,
+    session,
+)
 
 from database import (
     create_tables,
@@ -41,8 +44,6 @@ register_cat_routes(app)
 # The modal lives in base.html and can open from any page.
 @app.context_processor
 def inject_global_task_modal_data():
-
-    from flask import session
 
     if "user_id" not in session:
 

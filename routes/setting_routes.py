@@ -24,8 +24,8 @@ from utils.auth_helpers import (
 )
 
 from utils.avatar_helpers import (
-    ALLOWED_AVATAR_EXTENSIONS,
     allowed_avatar,
+    get_avatar_extension,
     get_avatar_folder,
 )
 
@@ -95,26 +95,9 @@ def register_setting_routes(app):
                     url_for("setting")
                 )
 
-            extension = (
-                Path(original_name)
-                .suffix
-                .lower()
-                .lstrip(".")
+            extension = get_avatar_extension(
+                original_name
             )
-
-            if (
-                not extension
-                or extension
-                not in ALLOWED_AVATAR_EXTENSIONS
-            ):
-
-                flash(
-                    "Unsupported avatar file type."
-                )
-
-                return redirect(
-                    url_for("setting")
-                )
 
             avatar_folder = get_avatar_folder(
                 app
