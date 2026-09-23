@@ -1,10 +1,12 @@
 from datetime import date
 
 from database import (
+    create_task,
     create_tag,
     get_tasks_by_user,
     get_tags_by_task,
     get_subtasks_by_task,
+    set_task_tags,
 )
 
 
@@ -158,6 +160,40 @@ def get_combined_tag_ids(
             all_tag_ids
         )
     )
+
+
+# Create a task and connect its labels in one place.
+def create_task_with_tags(
+    user_id,
+    task_data
+):
+
+    task_id = create_task(
+        user_id=user_id,
+        title=task_data["title"],
+        description=task_data["description"],
+        priority=task_data["priority"],
+        start_date=task_data["start_date"],
+        due_date=task_data["due_date"]
+    )
+
+    all_tag_ids = get_combined_tag_ids(
+        user_id=user_id,
+        selected_tag_ids=task_data[
+            "selected_tag_ids"
+        ],
+        new_tags_text=task_data[
+            "new_tags_text"
+        ]
+    )
+
+    set_task_tags(
+        task_id=task_id,
+        user_id=user_id,
+        tag_ids=all_tag_ids
+    )
+
+    return task_id
 
 
 # Attach labels to every task before sending them to the page.

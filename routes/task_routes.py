@@ -10,7 +10,6 @@ from flask import (
 )
 
 from database import (
-    create_task,
     get_tags_by_user,
     set_task_tags,
     toggle_task_completion,
@@ -33,6 +32,7 @@ from utils.task_helpers import (
     are_task_dates_valid,
     get_task_form_data,
     get_combined_tag_ids,
+    create_task_with_tags,
     get_tasks_with_details,
 )
 
@@ -71,29 +71,9 @@ def register_task_routes(app):
 
             if task_data["title"]:
 
-                task_id = create_task(
+                create_task_with_tags(
                     user_id=user_id,
-                    title=task_data["title"],
-                    description=task_data["description"],
-                    priority=task_data["priority"],
-                    start_date=task_data["start_date"],
-                    due_date=task_data["due_date"]
-                )
-
-                all_tag_ids = get_combined_tag_ids(
-                    user_id=user_id,
-                    selected_tag_ids=task_data[
-                        "selected_tag_ids"
-                    ],
-                    new_tags_text=task_data[
-                        "new_tags_text"
-                    ]
-                )
-
-                set_task_tags(
-                    task_id=task_id,
-                    user_id=user_id,
-                    tag_ids=all_tag_ids
+                    task_data=task_data
                 )
 
             return redirect(
@@ -405,29 +385,9 @@ def register_task_routes(app):
 
         if task_data["title"]:
 
-            task_id = create_task(
+            create_task_with_tags(
                 user_id=user_id,
-                title=task_data["title"],
-                description=task_data["description"],
-                priority=task_data["priority"],
-                start_date=task_data["start_date"],
-                due_date=task_data["due_date"]
-            )
-
-            all_tag_ids = get_combined_tag_ids(
-                user_id=user_id,
-                selected_tag_ids=task_data[
-                    "selected_tag_ids"
-                ],
-                new_tags_text=task_data[
-                    "new_tags_text"
-                ]
-            )
-
-            set_task_tags(
-                task_id=task_id,
-                user_id=user_id,
-                tag_ids=all_tag_ids
+                task_data=task_data
             )
 
         return redirect(
