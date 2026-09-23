@@ -2,6 +2,7 @@ from datetime import date
 
 from database import (
     create_tag,
+    get_tasks_by_user,
     get_tags_by_task,
     get_subtasks_by_task,
 )
@@ -216,3 +217,24 @@ def add_subtasks_to_tasks(
         )
 
     return tasks_with_subtasks
+
+
+# Load tasks together with the extra information
+# needed by the task pages.
+def get_tasks_with_details(user_id):
+
+    tasks = get_tasks_by_user(
+        user_id
+    )
+
+    tasks = add_tags_to_tasks(
+        tasks,
+        user_id
+    )
+
+    tasks = add_subtasks_to_tasks(
+        tasks,
+        user_id
+    )
+
+    return tasks

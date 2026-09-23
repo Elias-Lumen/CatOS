@@ -11,7 +11,6 @@ from flask import (
 
 from database import (
     create_task,
-    get_tasks_by_user,
     get_tags_by_user,
     set_task_tags,
     toggle_task_completion,
@@ -34,8 +33,7 @@ from utils.task_helpers import (
     are_task_dates_valid,
     get_task_form_data,
     get_combined_tag_ids,
-    add_tags_to_tasks,
-    add_subtasks_to_tasks,
+    get_tasks_with_details,
 )
 
 
@@ -102,17 +100,7 @@ def register_task_routes(app):
                 url_for("home")
             )
 
-        tasks = get_tasks_by_user(
-            user_id
-        )
-
-        tasks = add_tags_to_tasks(
-            tasks,
-            user_id
-        )
-
-        tasks = add_subtasks_to_tasks(
-            tasks,
+        tasks = get_tasks_with_details(
             user_id
         )
 
@@ -456,17 +444,7 @@ def register_task_routes(app):
 
         today_date = date.today()
 
-        tasks = get_tasks_by_user(
-            user_id
-        )
-
-        tasks = add_tags_to_tasks(
-            tasks,
-            user_id
-        )
-
-        tasks = add_subtasks_to_tasks(
-            tasks,
+        tasks = get_tasks_with_details(
             user_id
         )
 

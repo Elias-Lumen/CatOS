@@ -187,11 +187,6 @@ def register_setting_routes(app):
                 url_for("setting")
             )
 
-        # Page opened normally.
-        user = get_user_by_id(
-            user_id
-        )
-
         avatar_url = (
             user["avatar_url"]
 
