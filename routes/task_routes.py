@@ -26,6 +26,10 @@ from database import (
     get_task_state,
 )
 
+from utils.auth_helpers import (
+    login_required,
+)
+
 from utils.task_helpers import (
     are_task_dates_valid,
     get_task_form_data,
@@ -43,13 +47,8 @@ def register_task_routes(app):
         "/",
         methods=["GET", "POST"]
     )
+    @login_required
     def home():
-
-        if "user_id" not in session:
-
-            return redirect(
-                url_for("login")
-            )
 
         user_id = session["user_id"]
 
@@ -179,13 +178,8 @@ def register_task_routes(app):
         "/task/<int:task_id>/toggle",
         methods=["POST"]
     )
+    @login_required
     def toggle_task(task_id):
-
-        if "user_id" not in session:
-
-            return redirect(
-                url_for("login")
-            )
 
         user_id = session["user_id"]
 
@@ -222,13 +216,8 @@ def register_task_routes(app):
         "/task/<int:task_id>/edit",
         methods=["POST"]
     )
+    @login_required
     def edit_task(task_id):
-
-        if "user_id" not in session:
-
-            return redirect(
-                url_for("login")
-            )
 
         user_id = session["user_id"]
 
@@ -288,13 +277,8 @@ def register_task_routes(app):
         "/task/<int:task_id>/delete",
         methods=["POST"]
     )
+    @login_required
     def remove_task(task_id):
-
-        if "user_id" not in session:
-
-            return redirect(
-                url_for("login")
-            )
 
         delete_task(
             task_id=task_id,
@@ -310,13 +294,8 @@ def register_task_routes(app):
         "/task/<int:task_id>/subtask",
         methods=["POST"]
     )
+    @login_required
     def add_subtask(task_id):
-
-        if "user_id" not in session:
-
-            return redirect(
-                url_for("login")
-            )
 
         title = request.form.get(
             "title",
@@ -340,13 +319,8 @@ def register_task_routes(app):
         "/subtask/<int:subtask_id>/toggle",
         methods=["POST"]
     )
+    @login_required
     def toggle_subtask(subtask_id):
-
-        if "user_id" not in session:
-
-            return redirect(
-                url_for("login")
-            )
 
         toggle_subtask_completion(
             subtask_id=subtask_id,
@@ -362,13 +336,8 @@ def register_task_routes(app):
         "/subtask/<int:subtask_id>/edit",
         methods=["POST"]
     )
+    @login_required
     def edit_subtask(subtask_id):
-
-        if "user_id" not in session:
-
-            return redirect(
-                url_for("login")
-            )
 
         title = request.form.get(
             "title",
@@ -392,13 +361,8 @@ def register_task_routes(app):
         "/subtask/<int:subtask_id>/delete",
         methods=["POST"]
     )
+    @login_required
     def remove_subtask(subtask_id):
-
-        if "user_id" not in session:
-
-            return redirect(
-                url_for("login")
-            )
 
         delete_subtask(
             subtask_id=subtask_id,
@@ -415,13 +379,8 @@ def register_task_routes(app):
         "/task",
         methods=["POST"]
     )
+    @login_required
     def task():
-
-        if "user_id" not in session:
-
-            return redirect(
-                url_for("login")
-            )
 
         user_id = session["user_id"]
 
@@ -490,13 +449,8 @@ def register_task_routes(app):
 
     # Upcoming page.
     @app.route("/upcoming")
+    @login_required
     def upcoming():
-
-        if "user_id" not in session:
-
-            return redirect(
-                url_for("login")
-            )
 
         user_id = session["user_id"]
 

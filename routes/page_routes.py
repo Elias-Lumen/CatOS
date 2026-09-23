@@ -6,17 +6,19 @@ from datetime import (
 )
 
 from flask import (
-    redirect,
     render_template,
     request,
     session,
-    url_for,
 )
 
 from database import (
     search_tasks,
     get_tags_by_user,
     get_task_statistics,
+)
+
+from utils.auth_helpers import (
+    login_required,
 )
 
 from utils.task_helpers import (
@@ -28,13 +30,8 @@ def register_page_routes(app):
 
     # Search page.
     @app.route("/search")
+    @login_required
     def search():
-
-        if "user_id" not in session:
-
-            return redirect(
-                url_for("login")
-            )
 
         user_id = session["user_id"]
 
@@ -132,13 +129,8 @@ def register_page_routes(app):
 
     # Data page.
     @app.route("/data")
+    @login_required
     def data():
-
-        if "user_id" not in session:
-
-            return redirect(
-                url_for("login")
-            )
 
         user_id = session["user_id"]
 

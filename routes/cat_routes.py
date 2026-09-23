@@ -13,6 +13,10 @@ from database import (
     rename_cat,
 )
 
+from utils.auth_helpers import (
+    login_required,
+)
+
 
 def register_cat_routes(app):
 
@@ -21,13 +25,8 @@ def register_cat_routes(app):
         "/cat",
         methods=["GET", "POST"]
     )
+    @login_required
     def cat():
-
-        if "user_id" not in session:
-
-            return redirect(
-                url_for("login")
-            )
 
         user_id = session["user_id"]
 

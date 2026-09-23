@@ -14,6 +14,10 @@ from database import (
     delete_tag,
 )
 
+from utils.auth_helpers import (
+    login_required,
+)
+
 from utils.task_helpers import (
     add_tags_to_tasks,
 )
@@ -23,13 +27,8 @@ def register_label_routes(app):
 
     # Labels page.
     @app.route("/labels")
+    @login_required
     def labels():
-
-        if "user_id" not in session:
-
-            return redirect(
-                url_for("login")
-            )
 
         user_id = session["user_id"]
 
@@ -86,13 +85,8 @@ def register_label_routes(app):
         "/label/<int:tag_id>/edit",
         methods=["POST"]
     )
+    @login_required
     def edit_label(tag_id):
-
-        if "user_id" not in session:
-
-            return redirect(
-                url_for("login")
-            )
 
         name = request.form.get(
             "name",
@@ -125,13 +119,8 @@ def register_label_routes(app):
         "/label/<int:tag_id>/delete",
         methods=["POST"]
     )
+    @login_required
     def remove_label(tag_id):
-
-        if "user_id" not in session:
-
-            return redirect(
-                url_for("login")
-            )
 
         delete_tag(
             tag_id=tag_id,

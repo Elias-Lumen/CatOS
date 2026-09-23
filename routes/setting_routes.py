@@ -19,6 +19,10 @@ from database import (
     update_user_avatar,
 )
 
+from utils.auth_helpers import (
+    login_required,
+)
+
 from utils.avatar_helpers import (
     ALLOWED_AVATAR_EXTENSIONS,
     allowed_avatar,
@@ -33,13 +37,8 @@ def register_setting_routes(app):
         "/setting",
         methods=["GET", "POST"]
     )
+    @login_required
     def setting():
-
-        if "user_id" not in session:
-
-            return redirect(
-                url_for("login")
-            )
 
         user_id = session["user_id"]
 
