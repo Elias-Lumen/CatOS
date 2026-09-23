@@ -28,7 +28,8 @@ from database import (
 
 from utils.task_helpers import (
     are_task_dates_valid,
-    get_new_tag_ids,
+    get_task_form_data,
+    get_combined_tag_ids,
     add_tags_to_tasks,
     add_subtasks_to_tasks,
 )
@@ -54,47 +55,13 @@ def register_task_routes(app):
 
         if request.method == "POST":
 
-            title = request.form.get(
-                "title",
-                ""
-            ).strip()
-
-            description = request.form.get(
-                "description",
-                ""
-            ).strip()
-
-            selected_tag_ids = request.form.getlist(
-                "tag_ids"
-            )
-
-            new_tags_text = request.form.get(
-                "new_tags",
-                ""
-            ).strip()
-
-            priority = request.form.get(
-                "priority",
-                "normal"
-            )
-
-            start_date = (
-                request.form.get(
-                    "start_date"
-                )
-                or None
-            )
-
-            due_date = (
-                request.form.get(
-                    "due_date"
-                )
-                or None
+            task_data = get_task_form_data(
+                request
             )
 
             if not are_task_dates_valid(
-                start_date,
-                due_date
+                task_data["start_date"],
+                task_data["due_date"]
             ):
 
                 flash(
@@ -105,31 +72,25 @@ def register_task_routes(app):
                     url_for("home")
                 )
 
-            if title:
+            if task_data["title"]:
 
                 task_id = create_task(
                     user_id=user_id,
-                    title=title,
-                    description=description,
-                    priority=priority,
-                    start_date=start_date,
-                    due_date=due_date
+                    title=task_data["title"],
+                    description=task_data["description"],
+                    priority=task_data["priority"],
+                    start_date=task_data["start_date"],
+                    due_date=task_data["due_date"]
                 )
 
-                new_tag_ids = get_new_tag_ids(
+                all_tag_ids = get_combined_tag_ids(
                     user_id=user_id,
-                    new_tags_text=new_tags_text
-                )
-
-                all_tag_ids = (
-                    selected_tag_ids
-                    + new_tag_ids
-                )
-
-                all_tag_ids = list(
-                    dict.fromkeys(
-                        all_tag_ids
-                    )
+                    selected_tag_ids=task_data[
+                        "selected_tag_ids"
+                    ],
+                    new_tags_text=task_data[
+                        "new_tags_text"
+                    ]
                 )
 
                 set_task_tags(
@@ -271,47 +232,13 @@ def register_task_routes(app):
 
         user_id = session["user_id"]
 
-        title = request.form.get(
-            "title",
-            ""
-        ).strip()
-
-        description = request.form.get(
-            "description",
-            ""
-        ).strip()
-
-        priority = request.form.get(
-            "priority",
-            "normal"
+        task_data = get_task_form_data(
+            request
         )
-
-        start_date = (
-            request.form.get(
-                "start_date"
-            )
-            or None
-        )
-
-        due_date = (
-            request.form.get(
-                "due_date"
-            )
-            or None
-        )
-
-        selected_tag_ids = request.form.getlist(
-            "tag_ids"
-        )
-
-        new_tags_text = request.form.get(
-            "new_tags",
-            ""
-        ).strip()
 
         if not are_task_dates_valid(
-            start_date,
-            due_date
+            task_data["start_date"],
+            task_data["due_date"]
         ):
 
             flash(
@@ -322,34 +249,28 @@ def register_task_routes(app):
                 url_for("home")
             )
 
-        if title:
+        if task_data["title"]:
 
             updated = update_task(
                 task_id=task_id,
                 user_id=user_id,
-                title=title,
-                description=description,
-                priority=priority,
-                start_date=start_date,
-                due_date=due_date
+                title=task_data["title"],
+                description=task_data["description"],
+                priority=task_data["priority"],
+                start_date=task_data["start_date"],
+                due_date=task_data["due_date"]
             )
 
             if updated:
 
-                new_tag_ids = get_new_tag_ids(
+                all_tag_ids = get_combined_tag_ids(
                     user_id=user_id,
-                    new_tags_text=new_tags_text
-                )
-
-                all_tag_ids = (
-                    selected_tag_ids
-                    + new_tag_ids
-                )
-
-                all_tag_ids = list(
-                    dict.fromkeys(
-                        all_tag_ids
-                    )
+                    selected_tag_ids=task_data[
+                        "selected_tag_ids"
+                    ],
+                    new_tags_text=task_data[
+                        "new_tags_text"
+                    ]
                 )
 
                 set_task_tags(
@@ -504,43 +425,9 @@ def register_task_routes(app):
 
         user_id = session["user_id"]
 
-        title = request.form.get(
-            "title",
-            ""
-        ).strip()
-
-        description = request.form.get(
-            "description",
-            ""
-        ).strip()
-
-        priority = request.form.get(
-            "priority",
-            "normal"
+        task_data = get_task_form_data(
+            request
         )
-
-        start_date = (
-            request.form.get(
-                "start_date"
-            )
-            or None
-        )
-
-        due_date = (
-            request.form.get(
-                "due_date"
-            )
-            or None
-        )
-
-        selected_tag_ids = request.form.getlist(
-            "tag_ids"
-        )
-
-        new_tags_text = request.form.get(
-            "new_tags",
-            ""
-        ).strip()
 
         return_to = request.form.get(
             "return_to",
@@ -557,8 +444,8 @@ def register_task_routes(app):
             )
 
         if not are_task_dates_valid(
-            start_date,
-            due_date
+            task_data["start_date"],
+            task_data["due_date"]
         ):
 
             flash(
@@ -569,31 +456,25 @@ def register_task_routes(app):
                 return_to
             )
 
-        if title:
+        if task_data["title"]:
 
             task_id = create_task(
                 user_id=user_id,
-                title=title,
-                description=description,
-                priority=priority,
-                start_date=start_date,
-                due_date=due_date
+                title=task_data["title"],
+                description=task_data["description"],
+                priority=task_data["priority"],
+                start_date=task_data["start_date"],
+                due_date=task_data["due_date"]
             )
 
-            new_tag_ids = get_new_tag_ids(
+            all_tag_ids = get_combined_tag_ids(
                 user_id=user_id,
-                new_tags_text=new_tags_text
-            )
-
-            all_tag_ids = (
-                selected_tag_ids
-                + new_tag_ids
-            )
-
-            all_tag_ids = list(
-                dict.fromkeys(
-                    all_tag_ids
-                )
+                selected_tag_ids=task_data[
+                    "selected_tag_ids"
+                ],
+                new_tags_text=task_data[
+                    "new_tags_text"
+                ]
             )
 
             set_task_tags(

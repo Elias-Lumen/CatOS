@@ -89,6 +89,76 @@ def get_new_tag_ids(
     return tag_ids
 
 
+# Read task form values in one place.
+# Creating and editing tasks use the same fields.
+def get_task_form_data(request):
+
+    return {
+        "title": request.form.get(
+            "title",
+            ""
+        ).strip(),
+
+        "description": request.form.get(
+            "description",
+            ""
+        ).strip(),
+
+        "priority": request.form.get(
+            "priority",
+            "normal"
+        ),
+
+        "start_date": (
+            request.form.get(
+                "start_date"
+            )
+            or None
+        ),
+
+        "due_date": (
+            request.form.get(
+                "due_date"
+            )
+            or None
+        ),
+
+        "selected_tag_ids": request.form.getlist(
+            "tag_ids"
+        ),
+
+        "new_tags_text": request.form.get(
+            "new_tags",
+            ""
+        ).strip(),
+    }
+
+
+# Combine selected labels with newly created labels.
+# dict.fromkeys removes duplicates while keeping the original order.
+def get_combined_tag_ids(
+    user_id,
+    selected_tag_ids,
+    new_tags_text
+):
+
+    new_tag_ids = get_new_tag_ids(
+        user_id=user_id,
+        new_tags_text=new_tags_text
+    )
+
+    all_tag_ids = (
+        selected_tag_ids
+        + new_tag_ids
+    )
+
+    return list(
+        dict.fromkeys(
+            all_tag_ids
+        )
+    )
+
+
 # Attach labels to every task before sending them to the page.
 # Otherwise the template knows the task,
 # but not which labels belong to it.
