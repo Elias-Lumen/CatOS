@@ -11,12 +11,14 @@ from database import (
     get_cat_by_user,
 )
 
-from routes.auth_routes import register_auth_routes
-from routes.task_routes import register_task_routes
-from routes.label_routes import register_label_routes
-from routes.page_routes import register_page_routes
-from routes.setting_routes import register_setting_routes
-from routes.cat_routes import register_cat_routes
+from routes import (
+    register_auth_routes,
+    register_task_routes,
+    register_label_routes,
+    register_page_routes,
+    register_setting_routes,
+    register_cat_routes,
+)
 
 
 app = Flask(__name__)
