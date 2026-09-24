@@ -1,3 +1,5 @@
+"""Routes used for the CatOS settings page and profile picture changes."""
+
 from pathlib import Path
 from uuid import uuid4
 
@@ -31,6 +33,7 @@ from utils.avatar_helpers import (
 
 
 def register_setting_routes(app):
+    """Register the settings routes into the main CatOS app."""
 
     # Settings page.
     @app.route(
@@ -39,20 +42,25 @@ def register_setting_routes(app):
     )
     @login_required
     def setting():
+        """Show Settings and deal with a new avatar if one is uploaded."""
 
         user_id = session["user_id"]
 
+        # Get the current user first.
+        # The old avatar is also stored here and may need to be deleted later.
         user = get_user_by_id(
             user_id
         )
 
-        # User uploaded a new avatar.
+        # POST means the user is trying to upload a new avatar.
         if request.method == "POST":
 
             avatar = request.files.get(
                 "avatar"
             )
 
+            # Nothing was actually selected.
+            # There is no point going through the rest of the upload code.
             if (
                 avatar is None
                 or avatar.filename == ""
@@ -66,6 +74,7 @@ def register_setting_routes(app):
                     url_for("setting")
                 )
 
+            # Check the extension before saving anything.
             if not allowed_avatar(
                 avatar.filename
             ):
@@ -78,10 +87,13 @@ def register_setting_routes(app):
                     url_for("setting")
                 )
 
+            # Clean the original filename before using any part of it.
             original_name = secure_filename(
                 avatar.filename
             )
 
+            # secure_filename can theoretically leave something unusable.
+            # Also make sure there is still an extension to work with.
             if (
                 not original_name
                 or "." not in original_name
@@ -103,11 +115,14 @@ def register_setting_routes(app):
                 app
             )
 
+            # The folder may not exist on a fresh copy of CatOS yet.
             avatar_folder.mkdir(
                 parents=True,
                 exist_ok=True
             )
 
+            # Give every upload a new random name.
+            # This avoids different users or uploads overwriting each other.
             filename = (
                 f"user_{user_id}_"
                 f"{uuid4().hex}."
@@ -119,10 +134,13 @@ def register_setting_routes(app):
                 / filename
             )
 
+            # Save the new image first.
             avatar.save(
                 file_path
             )
 
+            # The database needs the URL used by the webpage,
+            # not the local file path used above.
             avatar_url = url_for(
                 "static",
                 filename=(
@@ -142,6 +160,9 @@ def register_setting_routes(app):
                 else None
             )
 
+            # Delete the previous uploaded avatar so old images
+            # do not slowly pile up in the folder forever.
+            # Only delete files from CatOS's own avatar folder.
             if (
                 old_avatar_url
                 and old_avatar_url.startswith(
@@ -158,6 +179,8 @@ def register_setting_routes(app):
                     / old_filename
                 )
 
+                # The database may point to a file that is already gone,
+                # so check before trying to delete it.
                 if old_file_path.exists():
 
                     old_file_path.unlink()
@@ -170,6 +193,8 @@ def register_setting_routes(app):
                 url_for("setting")
             )
 
+        # Use the saved avatar when the user has one.
+        # Otherwise CatOS falls back to the default cat avatar.
         avatar_url = (
             user["avatar_url"]
 

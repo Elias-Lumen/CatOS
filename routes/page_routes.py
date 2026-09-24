@@ -1,3 +1,5 @@
+"""Routes used for the Search, Data, and Help pages in CatOS."""
+
 from datetime import (
     date,
     datetime,
@@ -27,14 +29,18 @@ from utils.task_helpers import (
 
 
 def register_page_routes(app):
+    """Register the general page routes into the main CatOS app."""
 
     # Search page.
     @app.route("/search")
     @login_required
     def search():
+        """Search the current user's tasks using the selected filters."""
 
         user_id = session["user_id"]
 
+        # Read all filters from the URL.
+        # Missing filters just become empty strings.
         query = request.args.get(
             "q",
             ""
@@ -55,6 +61,8 @@ def register_page_routes(app):
             ""
         ).strip()
 
+        # Label ids should be numbers.
+        # Anything else is treated as no label filter.
         if tag_id.isdigit():
 
             tag_id_value = int(
@@ -66,6 +74,7 @@ def register_page_routes(app):
             tag_id_value = None
             tag_id = ""
 
+        # Only allow priorities that actually exist in CatOS.
         valid_priorities = {
             "normal",
             "low",
@@ -76,6 +85,7 @@ def register_page_routes(app):
         if priority not in valid_priorities:
             priority = ""
 
+        # Same thing for task states.
         valid_states = {
             "not_started",
             "in_progress",
@@ -85,6 +95,8 @@ def register_page_routes(app):
         if state not in valid_states:
             state = ""
 
+        # There is no reason to search the whole database
+        # until the user actually enters at least one filter.
         search_active = bool(
             query
             or tag_id_value
@@ -102,6 +114,8 @@ def register_page_routes(app):
                 state=state or None
             )
 
+            # Search results also need their labels
+            # before they can be displayed on the page.
             tasks = add_tags_to_tasks(
                 tasks,
                 user_id
@@ -111,6 +125,7 @@ def register_page_routes(app):
 
             tasks = []
 
+        # All labels are needed for the search filter menu.
         tags = get_tags_by_user(
             user_id
         )
@@ -131,6 +146,7 @@ def register_page_routes(app):
     @app.route("/data")
     @login_required
     def data():
+        """Calculate and show the user's task statistics."""
 
         user_id = session["user_id"]
 
@@ -143,7 +159,10 @@ def register_page_routes(app):
         def local_date_from_sqlite(
             timestamp
         ):
+            """Turn a SQLite UTC timestamp into a local date."""
 
+            # Some tasks are not completed yet,
+            # so completed_at can be empty.
             if not timestamp:
                 return None
 
@@ -159,6 +178,7 @@ def register_page_routes(app):
                 .date()
             )
 
+        # Basic numbers for the top of the Data page.
         total_tasks = len(
             tasks
         )
@@ -170,6 +190,7 @@ def register_page_routes(app):
             == "completed"
         )
 
+        # Avoid dividing by zero when the user has no tasks yet.
         if total_tasks == 0:
 
             completion_rate = 0
@@ -189,6 +210,7 @@ def register_page_routes(app):
         created_today = 0
         completed_today = 0
 
+        # Count tasks created and completed today separately.
         for task in tasks:
 
             created_date = local_date_from_sqlite(
@@ -205,6 +227,8 @@ def register_page_routes(app):
             if completed_date == today_date:
                 completed_today += 1
 
+        # weekday() uses Monday as 0,
+        # so this finds the Monday of the current week.
         week_start = (
             today_date
             - timedelta(
@@ -214,6 +238,7 @@ def register_page_routes(app):
 
         week_days = []
 
+        # Build one set of data for each day from Monday to Sunday.
         for day_number in range(7):
 
             current_date = (
@@ -223,6 +248,7 @@ def register_page_routes(app):
                 )
             )
 
+            # Count how many tasks were completed on this day.
             completed_count = sum(
                 1
                 for task in tasks
@@ -239,6 +265,8 @@ def register_page_routes(app):
                 "completed": completed_count
             })
 
+        # Find the busiest day so the chart bars
+        # can be scaled relative to the largest value.
         max_weekly_completed = max(
             (
                 day["completed"]
@@ -249,12 +277,16 @@ def register_page_routes(app):
 
         for day in week_days:
 
+            # If nothing was completed this week,
+            # every bar should just have zero height.
             if max_weekly_completed == 0:
 
                 day["height"] = 0
 
             else:
 
+                # The busiest day becomes 100%.
+                # Other bars are shown relative to that day.
                 day["height"] = round(
                     (
                         day["completed"]
@@ -280,8 +312,11 @@ def register_page_routes(app):
 
     # Help page.
     @app.route("/help")
-    def help():
+    def help_page():
+        """Show the CatOS Help page."""
 
+        # Nothing complicated here for now.
+        # It is just a normal static help page.
         return render_template(
             "help.html"
         )

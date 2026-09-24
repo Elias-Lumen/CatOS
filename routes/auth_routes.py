@@ -1,3 +1,5 @@
+"""Routes used for registering, logging in, and logging out of CatOS."""
+
 from flask import (
     flash,
     redirect,
@@ -14,6 +16,7 @@ from routes.auth import (
 
 
 def register_auth_routes(app):
+    """Register all account related routes into the main CatOS app."""
 
     # Register page.
     @app.route(
@@ -21,10 +24,12 @@ def register_auth_routes(app):
         methods=["GET", "POST"]
     )
     def register():
+        """Show the register page and create a new account."""
 
         # POST means the user actually pressed the register button.
         if request.method == "POST":
 
+            # Get whatever the user entered into the form.
             username = request.form.get(
                 "username",
                 ""
@@ -73,9 +78,11 @@ def register_auth_routes(app):
                 )
 
             # Registration worked.
-            # Log the user in straight away.
+            # Clear anything old first and log the user in straight away.
             session.clear()
 
+            # Keep the user information in session
+            # so CatOS knows who is logged in on other pages.
             session["user_id"] = user["id"]
             session["username"] = user["username"]
 
@@ -83,6 +90,7 @@ def register_auth_routes(app):
                 url_for("home")
             )
 
+        # GET just needs to show the empty register page.
         return render_template(
             "register.html"
         )
@@ -94,9 +102,11 @@ def register_auth_routes(app):
         methods=["GET", "POST"]
     )
     def login():
+        """Show the login page and start a session for a valid user."""
 
         if request.method == "POST":
 
+            # Read the login information from the form.
             username = request.form.get(
                 "username",
                 ""
@@ -107,11 +117,13 @@ def register_auth_routes(app):
                 ""
             )
 
+            # auth.py checks the username and password.
             user = login_user(
                 username,
                 password
             )
 
+            # No matching user means the login information was wrong.
             if user is None:
 
                 flash(
@@ -122,6 +134,7 @@ def register_auth_routes(app):
                     "login.html"
                 )
 
+            # Remove any old session before saving this login.
             session.clear()
 
             session["user_id"] = user["id"]
@@ -131,6 +144,7 @@ def register_auth_routes(app):
                 url_for("home")
             )
 
+        # Nothing submitted yet, just show the login page.
         return render_template(
             "login.html"
         )
@@ -139,7 +153,10 @@ def register_auth_routes(app):
     # Log out button from Settings.
     @app.route("/logout")
     def logout():
+        """Log the current user out and send them back to Login."""
 
+        # Removing the session means CatOS no longer
+        # remembers this user as logged in.
         session.clear()
 
         return redirect(

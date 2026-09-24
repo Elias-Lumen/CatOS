@@ -1,3 +1,5 @@
+"""Start CatOS and connect the main parts of the app together."""
+
 from flask import (
     Flask,
     session,
@@ -26,12 +28,14 @@ app.config["SECRET_KEY"] = "CatOS-development-secret-key"
 
 
 # Do not allow giant image uploads.
+# 5 MB should be more than enough for a profile picture.
 app.config["MAX_CONTENT_LENGTH"] = (
     5 * 1024 * 1024
 )
 
 
-# Register CatOS routes.
+# Register all the routes into CatOS.
+# Keeping them in different files stops app.py from becoming giant.
 register_auth_routes(app)
 register_task_routes(app)
 register_label_routes(app)
@@ -44,9 +48,11 @@ register_cat_routes(app)
 # The modal lives in base.html and can open from any page.
 @app.context_processor
 def inject_global_task_modal_data():
+    """Give the floating task modal the data it needs on every page."""
 
     if "user_id" not in session:
 
+        # Nobody is logged in, so just give the template safe default values.
         return {
             "global_task_tags": [],
             "cat_name": "Cat"
@@ -54,15 +60,19 @@ def inject_global_task_modal_data():
 
     user_id = session["user_id"]
 
+    # Find the cat that belongs to this user.
     user_cat = get_cat_by_user(
         user_id
     )
 
     return {
+        # Give the modal all labels saved by this user.
         "global_task_tags": get_tags_by_user(
             user_id
         ),
 
+        # Use the real cat name if there is one.
+        # Otherwise Cat works as a default and nothing becomes empty.
         "cat_name": (
             user_cat["cat_name"]
             if user_cat

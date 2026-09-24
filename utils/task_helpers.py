@@ -1,3 +1,5 @@
+"""Helper functions shared by the different task pages in CatOS."""
+
 from datetime import date
 
 from database import (
@@ -12,16 +14,19 @@ from database import (
 
 # Check that a date is a real date before saving it.
 def is_valid_date(date_value):
+    """Check if a date value is empty or contains a real date."""
 
     # No date is allowed.
     if date_value is None:
         return True
 
     try:
+        # If Python can turn it into a date, the format is usable.
         date.fromisoformat(date_value)
         return True
 
     except (ValueError, TypeError):
+        # Wrong format or wrong data type, so do not save it.
         return False
 
 
@@ -30,6 +35,7 @@ def are_task_dates_valid(
     start_date,
     due_date
 ):
+    """Check that both task dates are valid and in the right order."""
 
     if not is_valid_date(
         start_date
@@ -41,6 +47,7 @@ def are_task_dates_valid(
     ):
         return False
 
+    # Only compare them when the user actually entered both dates.
     if start_date and due_date:
 
         start = date.fromisoformat(
@@ -51,6 +58,7 @@ def are_task_dates_valid(
             due_date
         )
 
+        # A task cannot somehow start after its own deadline.
         if start > due:
             return False
 
@@ -62,9 +70,11 @@ def get_new_tag_ids(
     user_id,
     new_tags_text
 ):
+    """Create any new labels typed by the user and return their ids."""
 
     tag_ids = []
 
+    # Nothing was entered, so there is nothing to create.
     if not new_tags_text:
         return tag_ids
 
@@ -76,6 +86,7 @@ def get_new_tag_ids(
 
     for tag_name in tag_names:
 
+        # Remove accidental spaces around each label.
         tag_name = tag_name.strip()
 
         if tag_name:
@@ -95,6 +106,7 @@ def get_new_tag_ids(
 # Read task form values in one place.
 # Creating and editing tasks use the same fields.
 def get_task_form_data(request):
+    """Collect all task information from a submitted form."""
 
     return {
         "title": request.form.get(
@@ -144,6 +156,7 @@ def get_combined_tag_ids(
     selected_tag_ids,
     new_tags_text
 ):
+    """Put selected and newly created label ids into one list."""
 
     new_tag_ids = get_new_tag_ids(
         user_id=user_id,
@@ -155,6 +168,7 @@ def get_combined_tag_ids(
         + new_tag_ids
     )
 
+    # A label should only be attached once even if it appeared twice.
     return list(
         dict.fromkeys(
             all_tag_ids
@@ -167,6 +181,7 @@ def create_task_with_tags(
     user_id,
     task_data
 ):
+    """Create a task first and then connect all of its labels."""
 
     task_id = create_task(
         user_id=user_id,
@@ -203,11 +218,13 @@ def add_tags_to_tasks(
     tasks,
     user_id
 ):
+    """Add the correct labels to every task before displaying them."""
 
     tasks_with_tags = []
 
     for task in tasks:
 
+        # SQLite rows are changed into dictionaries so I can add more data.
         task_data = dict(
             task
         )
@@ -232,11 +249,13 @@ def add_subtasks_to_tasks(
     tasks,
     user_id
 ):
+    """Add the correct subtasks to every task before displaying them."""
 
     tasks_with_subtasks = []
 
     for task in tasks:
 
+        # Same idea as tags: make a dictionary first so extra data can be added.
         task_data = dict(
             task
         )
@@ -258,11 +277,13 @@ def add_subtasks_to_tasks(
 # Load tasks together with the extra information
 # needed by the task pages.
 def get_tasks_with_details(user_id):
+    """Get a user's tasks together with their labels and subtasks."""
 
     tasks = get_tasks_by_user(
         user_id
     )
 
+    # Add the extra information one layer at a time.
     tasks = add_tags_to_tasks(
         tasks,
         user_id
