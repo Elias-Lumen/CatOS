@@ -7,7 +7,7 @@ from werkzeug.security import (
     generate_password_hash
 )
 
-# Use the same database connection from database.py
+# Use the same database connection as the rest of CatOS
 # so I do not need to write the SQLite connection again here.
 from database import get_connection
 

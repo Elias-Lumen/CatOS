@@ -9,7 +9,7 @@ from flask import (
     url_for,
 )
 
-from routes.auth import (
+from services import (
     login_user,
     register_user,
 )
