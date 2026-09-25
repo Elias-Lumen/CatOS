@@ -21,11 +21,8 @@ from database import (
     update_user_avatar,
 )
 
-from utils.auth_helpers import (
+from utils import (
     login_required,
-)
-
-from utils.avatar_helpers import (
     allowed_avatar,
     get_avatar_extension,
     get_avatar_folder,

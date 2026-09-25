@@ -15,9 +15,7 @@ from database import (
     rename_cat,
 )
 
-from utils.auth_helpers import (
-    login_required,
-)
+from utils import login_required
 
 
 def register_cat_routes(app):

@@ -26,11 +26,8 @@ from database import (
     get_task_state,
 )
 
-from utils.auth_helpers import (
+from utils import (
     login_required,
-)
-
-from utils.task_helpers import (
     are_task_dates_valid,
     get_task_form_data,
     get_combined_tag_ids,
