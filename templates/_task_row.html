@@ -71,7 +71,14 @@
 
                 {% if task["due_date"] %}
 
-                    <span class="task-date">
+                    <span
+                        class="
+                            task-date
+                            {% if task['due_date'] < today and task['state'] != 'completed' %}
+                                task-date-overdue
+                            {% endif %}
+                        "
+                    >
                         Due {{ task["due_date"] }}
                     </span>
 

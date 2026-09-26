@@ -57,7 +57,7 @@ def register_auth_routes(app):
                     "register.html"
                 )
 
-            # auth.py does the actual account creation.
+            # The auth service does the actual account creation.
             user = register_user(
                 username,
                 password

@@ -221,7 +221,13 @@
 }
 
 .task-date {
-    color: #1722ff;
+    color: #8b8b8b;
+}
+
+/* Overdue dates turn red so missed deadlines are easy to spot. */
+.task-date-overdue {
+    color: #ff4040;
+    font-weight: 600;
 }
 
 .task-tag {
