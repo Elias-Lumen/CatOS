@@ -69,6 +69,13 @@
     margin-top: 28px;
 }
 
+.group-header-row {
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+}
+
 /* Whole group header is clickable so collapsing it is easier. */
 .group-header {
     width: 100%;
@@ -1410,4 +1417,146 @@
     background: #eeeeee;
 
     color: #555555;
+}
+
+/* =========================================================
+   BULK RESCHEDULE
+   ========================================================= */
+
+.group-header-row {
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+}
+
+
+/* The left side still controls collapse / expand. */
+.group-header-row .group-header {
+    flex: 1;
+    width: auto;
+}
+
+
+/* Reschedule button beside the Overdue heading. */
+.group-action {
+    flex-shrink: 0;
+
+    margin-left: 16px;
+    padding: 5px 8px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: transparent;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    color: var(--catos-text);
+
+    cursor: pointer;
+}
+
+.group-action:hover {
+    background: var(--catos-hover);
+    color: #ff4040;
+}
+
+
+/* Panel shown after clicking Reschedule. */
+.bulk-reschedule {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    margin-top: 10px;
+    padding: 10px 12px;
+
+    border: 1px solid var(--catos-border);
+    border-radius: 8px;
+
+    background: var(--catos-soft);
+}
+
+.bulk-reschedule.hidden {
+    display: none;
+}
+
+
+.bulk-reschedule-label {
+    flex-shrink: 0;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    color: var(--catos-text-soft);
+}
+
+
+.bulk-reschedule-date {
+    padding: 6px 8px;
+
+    border: 1px solid var(--catos-border);
+    border-radius: 6px;
+    outline: none;
+
+    background: var(--catos-white);
+
+    font-family: inherit;
+    font-size: 12px;
+
+    color: var(--catos-text);
+}
+
+.bulk-reschedule-date:focus {
+    border-color: #aaaaaa;
+}
+
+
+/* Keep the two buttons together on the right. */
+.bulk-reschedule-actions {
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    margin-left: auto;
+}
+
+
+.bulk-reschedule-cancel,
+.bulk-reschedule-submit {
+    padding: 7px 11px;
+
+    border: none;
+    border-radius: 6px;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.bulk-reschedule-cancel {
+    background: #eeeeee;
+    color: var(--catos-text-soft);
+}
+
+.bulk-reschedule-cancel:hover {
+    background: #e3e3e3;
+}
+
+
+.bulk-reschedule-submit {
+    background: var(--catos-black);
+    color: var(--catos-white);
+}
+
+.bulk-reschedule-submit:hover {
+    background: #111111;
 }

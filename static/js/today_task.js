@@ -1,5 +1,114 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+
+    // BULK RESCHEDULE OVERDUE TASKS
+
+    const showBulkReschedule =
+        document.getElementById(
+            "showBulkReschedule"
+        );
+
+    const bulkReschedule =
+        document.getElementById(
+            "bulkReschedule"
+        );
+
+    const bulkRescheduleDate =
+        document.getElementById(
+            "bulkRescheduleDate"
+        );
+
+    const cancelBulkReschedule =
+        document.getElementById(
+            "cancelBulkReschedule"
+        );
+
+
+    if (
+        showBulkReschedule &&
+        bulkReschedule
+    ) {
+
+        showBulkReschedule.addEventListener(
+            "click",
+            () => {
+
+                bulkReschedule.classList.remove(
+                    "hidden"
+                );
+
+                if (bulkRescheduleDate) {
+
+                    bulkRescheduleDate.focus();
+
+                    // Chromium can open the native
+                    // date picker immediately.
+                    if (
+                        typeof bulkRescheduleDate.showPicker
+                        === "function"
+                    ) {
+
+                        try {
+
+                            bulkRescheduleDate.showPicker();
+
+                        }
+
+                        catch (error) {
+
+                            // Focusing the date field is enough
+                            // if the browser blocks showPicker().
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+    }
+
+
+    if (
+        cancelBulkReschedule &&
+        bulkReschedule
+    ) {
+
+        cancelBulkReschedule.addEventListener(
+            "click",
+            () => {
+
+                bulkReschedule.classList.add(
+                    "hidden"
+                );
+
+            }
+        );
+
+    }
+
+
+    // Collapse / expand task groups
+
+    document.querySelectorAll(".group-header").forEach((header) => {
+
+        header.addEventListener("click", () => {
+
+            const targetId = header.dataset.target;
+            const content = document.getElementById(targetId);
+
+            if (!content) {
+                return;
+            }
+
+            content.classList.toggle("collapsed");
+            header.classList.toggle("collapsed");
+
+        });
+
+    });
+
     // Collapse / expand task groups
     document.querySelectorAll(".group-header").forEach((header) => {
 

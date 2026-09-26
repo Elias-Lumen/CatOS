@@ -204,6 +204,42 @@ def update_task(
     finally:
         connection.close()
 
+def reschedule_overdue_tasks(
+    user_id,
+    today,
+    new_due_date
+):
+    """Move all unfinished overdue tasks to one new due date."""
+
+    connection = get_connection()
+
+    try:
+        cursor = connection.execute(
+            """
+            UPDATE tasks
+            SET due_date = ?
+            WHERE user_id = ?
+              AND due_date IS NOT NULL
+              AND due_date < ?
+              AND state != 'completed'
+            """,
+            (
+                new_due_date,
+                user_id,
+                today
+            )
+        )
+
+        connection.commit()
+
+        return cursor.rowcount
+
+    except sqlite3.Error:
+        connection.rollback()
+        raise
+
+    finally:
+        connection.close()
 
 def delete_task(task_id, user_id):
     """Delete one task that belongs to the current user."""

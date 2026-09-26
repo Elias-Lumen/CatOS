@@ -14,6 +14,7 @@ from .tasks import (
     get_tasks_by_user,
     toggle_task_completion,
     update_task,
+    reschedule_overdue_tasks,
     delete_task,
     search_tasks,
     get_task_statistics,

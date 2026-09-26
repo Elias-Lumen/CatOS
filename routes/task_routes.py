@@ -16,6 +16,7 @@ from database import (
     set_task_tags,
     toggle_task_completion,
     update_task,
+    reschedule_overdue_tasks,
     delete_task,
     create_subtask,
     toggle_subtask_completion,
@@ -157,6 +158,67 @@ def register_task_routes(app):
             today_tasks=today_tasks,
             today=today_date.isoformat()
         )
+
+
+
+
+    @app.route(
+        "/tasks/reschedule-overdue",
+        methods=["POST"]
+    )
+    @login_required
+    def bulk_reschedule_overdue():
+        """Reschedule all unfinished overdue tasks."""
+
+        user_id = session["user_id"]
+
+        new_due_date = request.form.get(
+            "due_date",
+            ""
+        ).strip()
+
+        # The browser should already require a date,
+        # but still validate it on the server.
+        try:
+            new_due_date_value = date.fromisoformat(
+                new_due_date
+            )
+
+        except ValueError:
+
+            flash(
+                "Please choose a valid due date."
+            )
+
+            return redirect(
+                url_for("home")
+            )
+
+        today_date = date.today()
+
+        # Rescheduling an overdue task backwards
+        # would immediately leave it overdue again.
+        if new_due_date_value < today_date:
+
+            flash(
+                "The new due date cannot be before today."
+            )
+
+            return redirect(
+                url_for("home")
+            )
+
+        reschedule_overdue_tasks(
+            user_id=user_id,
+            today=today_date.isoformat(),
+            new_due_date=new_due_date_value.isoformat()
+        )
+
+        return redirect(
+            url_for("home")
+        )
+
+
 
 
     @app.route(

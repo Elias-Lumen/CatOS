@@ -46,33 +46,85 @@ Today
         <!-- OVERDUE TASKS -->
         <section class="task-group">
 
-            <button
-                class="group-header"
-                type="button"
-                data-target="overdueTasks"
-            >
+            <div class="group-header-row">
 
-                <div class="group-title-wrap">
+                <button
+                    class="group-header"
+                    type="button"
+                    data-target="overdueTasks"
+                >
 
-                    <span class="group-arrow">
-                        ⌄
-                    </span>
+                    <div class="group-title-wrap">
 
-                    <span class="group-title">
-                        Overdue
-                    </span>
+                        <span class="group-arrow">
+                            ⌄
+                        </span>
 
-                </div>
+                        <span class="group-title">
+                            Overdue
+                        </span>
+
+                    </div>
+
+                </button>
 
 
-                <span class="group-action">
+                <button
+                    class="group-action"
+                    id="showBulkReschedule"
+                    type="button"
+                >
                     Reschedule
-                </span>
+                </button>
 
-            </button>
+            </div>
 
 
             <div class="group-line"></div>
+
+
+            <!-- RESCHEDULE ALL OVERDUE TASKS -->
+            <form
+                method="POST"
+                action="{{ url_for('bulk_reschedule_overdue') }}"
+                class="bulk-reschedule hidden"
+                id="bulkReschedule"
+            >
+
+                <span class="bulk-reschedule-label">
+                    New deadline
+                </span>
+
+                <input
+                    type="date"
+                    name="due_date"
+                    id="bulkRescheduleDate"
+                    class="bulk-reschedule-date"
+                    min="{{ today }}"
+                    value="{{ today }}"
+                    required
+                >
+
+                <div class="bulk-reschedule-actions">
+
+                    <button
+                        type="button"
+                        class="bulk-reschedule-cancel"
+                        id="cancelBulkReschedule"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="bulk-reschedule-submit"
+                    >
+                        Reschedule all
+                    </button>
+
+                </div>
+
+            </form>
 
 
             <div
