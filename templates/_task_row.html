@@ -506,6 +506,53 @@
     <!-- TASK ROW ACTIONS -->
     <div class="task-actions">
 
+        {% if task["due_date"] and task["due_date"] < today and task["state"] != "completed" %}
+
+            <!-- RESCHEDULE OVERDUE TASK -->
+            <!--
+                Reuse the existing task editor instead of making a second
+                date-editing system. The normal Edit button already knows
+                how to open and prepare the form.
+            -->
+            <button
+                type="button"
+                class="task-reschedule-button"
+                data-task-id="{{ task['id'] }}"
+                aria-label="Reschedule task"
+                onclick="
+                    const taskId = this.dataset.taskId;
+                    const editButton = document.querySelector(
+                        `.task-edit-button[data-task-id='${taskId}']`
+                    );
+
+                    if (editButton) {
+                        editButton.click();
+
+                        setTimeout(() => {
+                            const form = document.getElementById(
+                                `taskEdit${taskId}`
+                            );
+
+                            const dueDateInput = form
+                                ? form.querySelector('input[name=&quot;due_date&quot;]')
+                                : null;
+
+                            if (dueDateInput) {
+                                dueDateInput.focus();
+
+                                if (typeof dueDateInput.showPicker === 'function') {
+                                    dueDateInput.showPicker();
+                                }
+                            }
+                        }, 0);
+                    }
+                "
+            >
+                Reschedule
+            </button>
+
+        {% endif %}
+
         <!-- EDIT BUTTON -->
         <button
             type="button"
