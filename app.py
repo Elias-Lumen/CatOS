@@ -3,12 +3,14 @@
 from flask import (
     Flask,
     session,
+    url_for,
 )
 
 from database import (
     create_tables,
     get_tags_by_user,
     get_cat_by_user,
+    get_user_by_id,
 )
 
 from routes import (
@@ -46,18 +48,25 @@ register_setting_routes(app)
 register_cat_routes(app)
 
 
-# Make saved labels available to the floating Add task modal.
-# The modal lives in base.html and can open from any page.
+# Make shared user information available to base.html.
+# This includes the floating Add task modal,
+# the cat name, and the sidebar profile picture.
 @app.context_processor
-def inject_global_task_modal_data():
-    """Give the floating task modal the data it needs on every page."""
+def inject_global_template_data():
+    """Give shared template data to every CatOS page."""
+
+    default_avatar = url_for(
+        "static",
+        filename="icons/default_avatar.svg"
+    )
 
     if "user_id" not in session:
 
-        # Nobody is logged in, so just give the template safe default values.
+        # Nobody is logged in, so give the template safe default values.
         return {
             "global_task_tags": [],
-            "cat_name": "Cat"
+            "cat_name": "Cat",
+            "current_user_avatar": default_avatar
         }
 
     user_id = session["user_id"]
@@ -67,6 +76,21 @@ def inject_global_task_modal_data():
         user_id
     )
 
+    # Get the current user so the sidebar can show
+    # their saved profile picture.
+    user = get_user_by_id(
+        user_id
+    )
+
+    avatar_url = (
+        user["avatar_url"]
+        if (
+            user
+            and user["avatar_url"]
+        )
+        else default_avatar
+    )
+
     return {
         # Give the modal all labels saved by this user.
         "global_task_tags": get_tags_by_user(
@@ -74,12 +98,16 @@ def inject_global_task_modal_data():
         ),
 
         # Use the real cat name if there is one.
-        # Otherwise Cat works as a default and nothing becomes empty.
+        # Otherwise Cat works as a default.
         "cat_name": (
             user_cat["cat_name"]
             if user_cat
             else "Cat"
-        )
+        ),
+
+        # Use the uploaded avatar when available.
+        # Otherwise show CatOS's default avatar.
+        "current_user_avatar": avatar_url
     }
 
 

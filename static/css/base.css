@@ -70,6 +70,21 @@ body {
     object-fit: contain;
 }
 
+/* The user's profile picture replaces the normal Settings icon. */
+
+.sidebar-avatar {
+    width: 36px;
+    height: 36px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    background: var(--catos-soft);
+}
+
 .nav-text {
     overflow: hidden;
 }

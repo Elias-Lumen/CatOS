@@ -47,14 +47,15 @@
         <nav class="sidebar-nav">
 
             <a
-                class="nav-link"
+                class="nav-link profile-nav-link"
                 href="{{ url_for('setting') }}"
             >
                 <img
-                    class="nav-icon"
-                    src="{{ url_for('static', filename='images/user.svg') }}"
-                    alt=""
+                    class="sidebar-avatar"
+                    src="{{ current_user_avatar }}"
+                    alt="Profile"
                 >
+
                 <span class="nav-text">
                     Settings
                 </span>
