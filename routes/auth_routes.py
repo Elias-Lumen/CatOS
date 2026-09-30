@@ -15,6 +15,36 @@ from services import (
 )
 
 
+def validate_password(password):
+    """Check whether a password meets CatOS security requirements."""
+
+    if len(password) < 8:
+        return "Password must be at least 8 characters long."
+
+    if len(password) > 64:
+        return "Password must be no more than 64 characters long."
+
+    if not any(
+        character.isupper()
+        for character in password
+    ):
+        return "Password must contain at least one uppercase letter."
+
+    if not any(
+        character.islower()
+        for character in password
+    ):
+        return "Password must contain at least one lowercase letter."
+
+    if not any(
+        character.isdigit()
+        for character in password
+    ):
+        return "Password must contain at least one number."
+
+    return None
+
+
 def register_auth_routes(app):
     """Register all account related routes into the main CatOS app."""
 
@@ -44,6 +74,21 @@ def register_auth_routes(app):
                 "confirm_password",
                 "",
             )
+
+            # Check the password before creating the account.
+            password_error = validate_password(
+                password
+            )
+
+            if password_error:
+
+                flash(
+                    password_error
+                )
+
+                return render_template(
+                    "register.html"
+                )
 
             # Stop here if they somehow typed
             # two different passwords.
