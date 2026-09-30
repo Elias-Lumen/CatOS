@@ -153,13 +153,29 @@ def register_page_routes(app):
 
         # SQLite CURRENT_TIMESTAMP is stored in UTC.
         # Convert it to local time before comparing dates.
+        # Read the user's date and timezone from the browser.
+        device_date = request.cookies.get(
+            "catos_local_date"
+        )
+
+        device_offset = request.cookies.get(
+            "catos_timezone_offset",
+            type=int
+        )
+
+        try:
+            today_date = date.fromisoformat(
+                device_date
+            )
+        except (TypeError, ValueError):
+            today_date = date.today()
+
+
         def local_date_from_sqlite(
             timestamp
         ):
-            """Turn a SQLite UTC timestamp into a local date."""
+            """Convert a SQLite UTC timestamp into the device's local date."""
 
-            # Some tasks are not completed yet,
-            # so completed_at can be empty.
             if not timestamp:
                 return None
 
@@ -169,6 +185,21 @@ def register_page_routes(app):
                 tzinfo=timezone.utc
             )
 
+            # JavaScript timezone offsets use the opposite sign.
+            # For example, UTC+13 is reported as -780.
+            if device_offset is not None:
+
+                local_time = (
+                    utc_time
+                    - timedelta(
+                        minutes=device_offset
+                    )
+                )
+
+                return local_time.date()
+
+            # Fall back to the server's local timezone
+            # if the browser has not provided an offset.
             return (
                 utc_time
                 .astimezone()
@@ -201,8 +232,6 @@ def register_page_routes(app):
                 )
                 * 100
             )
-
-        today_date = date.today()
 
         created_today = 0
         completed_today = 0
