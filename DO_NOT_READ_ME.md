@@ -157,6 +157,7 @@
 - [ ] Identify improvements required for Sprint 2
 
 ## Sprint 2 --- Complete Task Management and Date-Based
+
 Organisation
 
 ### Task Management
@@ -165,71 +166,71 @@ Organisation
 
 - [x] Delete tasks
 
-- [ ] overdue date change color
+- [x] overdue date change color
 
-- [ ] Reschedule tasks
+- [x] Reschedule tasks
 
-- [ ] Mark tasks as completed
+- [x] Mark tasks as completed
 
-- [ ] Change task status
+- [x] Change task status
 
-- [ ] Change task priority
+- [x] Change task priority
 
-- [ ] Edit task description
+- [x] Edit task description
 
-- [ ] Edit task due date
+- [x] Edit task due date
 
 ### Subtasks
 
-- [ ] Create subtasks
+- [x] Create subtasks
 
-- [ ] Display subtasks under their parent task
+- [x] Display subtasks under their parent task
 
-- [ ] Edit subtasks
+- [x] Edit subtasks
 
-- [ ] Delete subtasks
+- [x] Delete subtasks
 
-- [ ] Mark subtasks as completed
+- [x] Mark subtasks as completed
 
 ### Today
 
-- [ ] Automatically identify tasks due today
+- [x] Automatically identify tasks due today
 
-- [ ] Display today's tasks
+- [x] Display today's tasks
 
-- [ ] Separate completed and incomplete tasks
+- [x] Separate completed and incomplete tasks
 
-- [ ] Display the number of tasks due today
+- [x] Display the number of tasks due today
 
-- [ ] Quickly add tasks from the Today page
+- [x] Quickly add tasks from the Today page
 
-- [ ] Display overdue tasks as reminders
+- [x] Display overdue tasks as reminders
 
 ### Overdue
 
-- [ ] Automatically identify overdue tasks using the due date
+- [x] Automatically identify overdue tasks using the due date
 
-- [ ] Exclude completed tasks from overdue tasks
+- [x] Exclude completed tasks from overdue tasks
 
 - [ ] Create a separate Overdue page
 
-- [ ] Display all overdue tasks
+- [x] Display all overdue tasks
 
-- [ ] Quickly reschedule overdue tasks
+- [x] Quickly reschedule overdue tasks
 
-- [ ] Display the number of overdue tasks
+- [x] Display the number of overdue tasks
 
 ### Upcoming
 
-- [ ] Create an Upcoming page
+- [x] Create an Upcoming page
 
-- [ ] Display future tasks
+- [x] Display future tasks
 
-- [ ] Sort future tasks by date
+- [x] Sort future tasks by date
 
-- [ ] Group future tasks by date
+- [x] Group future tasks by date
 
-- [ ] Allow users to view tasks for upcoming days
+- [x] Allow users to view tasks for upcoming days
 
 ### Task Interface Improvements
 
@@ -281,8 +282,7 @@ Organisation
 
 - [ ] Confirm User B cannot see User A's tasks
 
-- [ ] Attempt to access another user's task by changing the URL/task
-ID
+- [ ] Attempt to access another user's task by changing the URL/task ID
 
 - [ ] Attempt to edit another user's task
 
@@ -355,83 +355,84 @@ ID
 - [ ] Identify improvements required for Sprint 3
 
 ## Sprint 3 --- Search, Progress Tracking, Personalisation and Final
+
 Refinement
 
 ### Search
 
-- [ ] Create Search page
+- [x] Create Search page
 
-- [ ] Search tasks by title
+- [x] Search tasks by title
 
-- [ ] Search tasks by description
+- [x] Search tasks by description
 
-- [ ] Only return search results belonging to the current user
+- [x] Only return search results belonging to the current user
 
-- [ ] Filter search results by tag
+- [x] Filter search results by tag
 
-- [ ] Filter search results by priority
+- [x] Filter search results by priority
 
-- [ ] Filter search results by status
+- [x] Filter search results by status
 
-- [ ] Handle searches with no results
+- [x] Handle searches with no results
 
 ### Labels / Tags
 
-- [ ] Add tags to tasks
+- [x] Add tags to tasks
 
-- [ ] Create Labels page
+- [x] Create Labels page
 
-- [ ] View tasks by tag
+- [x] View tasks by tag
 
 - [ ] Edit tags
 
-- [ ] Delete tags
+- [x] Delete tags
 
 ### Progress and Statistics
 
-- [ ] Display total number of tasks
+- [x] Display total number of tasks
 
-- [ ] Display number of completed tasks
+- [x] Display number of completed tasks
 
-- [ ] Display number of incomplete tasks
+- [x] Display number of incomplete tasks
 
-- [ ] Calculate today's completion rate
+- [x] Calculate today's completion rate
 
-- [ ] Display dynamic completion percentage
+- [x] Display dynamic completion percentage
 
-- [ ] Add a dynamic progress bar
+- [x] Add a dynamic progress bar
 
-- [ ] Update progress immediately when task status changes
+- [x] Update progress immediately when task status changes
 
-- [ ] Display daily task statistics
+- [x] Display daily task statistics
 
-- [ ] Display weekly task statistics
+- [x] Display weekly task statistics
 
-- [ ] Create / complete the Data page
+- [x] Create / complete the Data page
 
 ### User Profile
 
-- [ ] User profile
+- [x] User profile
 
-- [ ] User avatar
+- [x] User avatar
 
-- [ ] Upload avatar
+- [x] Upload avatar
 
-- [ ] Change avatar
+- [x] Change avatar
 
-- [ ] Settings page
+- [x] Settings page
 
 - [ ] Edit user profile
 
 ### Virtual Cat
 
-- [ ] Each user has their own virtual cat
+- [x] Each user has their own virtual cat
 
-- [ ] Cat page
+- [x] Cat page
 
-- [ ] Cat name
+- [x] Cat name
 
-- [ ] Rename cat
+- [x] Rename cat
 
 - [ ] Cat appearance / colour
 
@@ -445,7 +446,7 @@ Refinement
 
 - [ ] Cat statistics change dynamically
 
-- [ ] Completing tasks affects the cat
+- [x] Completing tasks affects the cat
 
 - [ ] Interact with the cat
 
@@ -459,15 +460,15 @@ Refinement
 
 - [ ] Complete Help page
 
-- [ ] Complete Data page
+- [x] Complete Data page
 
-- [ ] Complete Search page
+- [x] Complete Search page
 
-- [ ] Complete Labels page
+- [x] Complete Labels page
 
 - [ ] Complete Cat page
 
-- [ ] Complete Settings page
+- [x] Complete Settings page
 
 - [ ] Remove or complete unused placeholder pages/routes
 
@@ -475,11 +476,11 @@ Refinement
 
 - [ ] Make visual design consistent across all pages
 
-- [ ] Improve spacing and alignment
+- [x] Improve spacing and alignment
 
 - [ ] Improve forms and buttons
 
-- [ ] Improve navigation clarity
+- [x] Improve navigation clarity
 
 - [ ] Check text contrast
 
@@ -612,6 +613,7 @@ Refinement
 #### Error Handling Testing
 
 - [ ] Visit a route that does not exist and confirm the 404 page
+
 appears
 
 - [ ] Test invalid task IDs
@@ -623,6 +625,7 @@ appears
 - [ ] Confirm database constraint errors are handled appropriately
 
 - [ ] Confirm the application does not expose sensitive error
+
 information to users
 
 - [ ] Test important functions after logging out
@@ -647,4 +650,4 @@ information to users
 
 - [ ] Explain how testing improved the final outcome
 
-- [ ] Explain how iteration improved the final outcome
+- [ ] Explain how iteration improved the final outcom

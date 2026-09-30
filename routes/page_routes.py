@@ -92,8 +92,8 @@ def register_page_routes(app):
         if state not in valid_states:
             state = ""
 
-        # There is no reason to search the whole database
-        # until the user actually enters at least one filter.
+        # Check whether the user is actively searching
+        # or filtering the task list.
         search_active = bool(
             query
             or tag_id_value
@@ -101,26 +101,22 @@ def register_page_routes(app):
             or state
         )
 
-        if search_active:
+        # With no filters, search_tasks returns all tasks
+        # belonging to the current user.
+        # This lets the Search page work as an All Tasks view too.
+        tasks = search_tasks(
+            user_id=user_id,
+            query=query,
+            tag_id=tag_id_value,
+            priority=priority or None,
+            state=state or None
+        )
 
-            tasks = search_tasks(
-                user_id=user_id,
-                query=query,
-                tag_id=tag_id_value,
-                priority=priority or None,
-                state=state or None
-            )
-
-            # Search results also need their labels
-            # before they can be displayed on the page.
-            tasks = add_tags_to_tasks(
-                tasks,
-                user_id
-            )
-
-        else:
-
-            tasks = []
+        # Every displayed task also needs its labels.
+        tasks = add_tags_to_tasks(
+            tasks,
+            user_id
+        )
 
         # All labels are needed for the search filter menu.
         tags = get_tags_by_user(

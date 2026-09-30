@@ -219,32 +219,27 @@ Search
     <section class="search-results">
 
 
-        {% if not search_active %}
-
-            <div class="search-empty">
-
-                <h2>
-                    Find a task
-                </h2>
-
-                <p>
-                    Search above or choose a filter to get started.
-                </p>
-
-            </div>
-
-
-        {% elif tasks %}
+        {% if tasks %}
 
             <div class="search-results-header">
 
                 <span>
-                    {{ tasks | length }}
-                    {% if tasks | length == 1 %}
-                        result
+
+                    {% if search_active %}
+
+                        {{ tasks | length }}
+                        {% if tasks | length == 1 %}
+                            result
+                        {% else %}
+                            results
+                        {% endif %}
+
                     {% else %}
-                        results
+
+                        All Tasks · {{ tasks | length }}
+
                     {% endif %}
+
                 </span>
 
             </div>
@@ -343,7 +338,7 @@ Search
             </div>
 
 
-        {% else %}
+        {% elif search_active %}
 
             <div class="search-empty">
 
@@ -353,6 +348,21 @@ Search
 
                 <p>
                     Try another search or change your filters.
+                </p>
+
+            </div>
+
+
+        {% else %}
+
+            <div class="search-empty">
+
+                <h2>
+                    No tasks yet
+                </h2>
+
+                <p>
+                    Create your first task to get started.
                 </p>
 
             </div>
