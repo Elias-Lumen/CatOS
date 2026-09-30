@@ -23,7 +23,7 @@ body {
     min-width: 180px;
     max-width: 420px;
 
-    padding: 12px 8px;
+    padding: 18px 8px 12px;
     background: #f4f4f4;
     border-right: 1px solid #dddddd;
 
@@ -41,7 +41,8 @@ body {
     overflow: hidden;
     flex-direction: column;
     flex: 1;
-    gap: 6px;
+
+    gap: 12px;
 }
 
 .nav-link {
@@ -143,6 +144,30 @@ body {
 
     font-size: 22px;
     cursor: pointer;
+
+    transition:
+    opacity 0.15s ease,
+    background 0.15s ease;
+}
+
+.sidebar-profile-row {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+    margin-bottom: 6px;
+}
+
+.profile-nav-link {
+    flex: 1;
+    min-width: 0;
+}
+
+.sidebar-profile-row .sidebar-toggle {
+    flex-shrink: 0;
+    margin-left: auto;
 }
 
 .sidebar-toggle:hover {
@@ -186,8 +211,43 @@ body {
     display: none;
 }
 
+.sidebar.collapsed .sidebar-profile-row {
+    justify-content: center;
+}
+
+.sidebar.collapsed .profile-nav-link {
+    flex: none;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+}
+
 .sidebar.collapsed .sidebar-toggle {
-    right: -12px;
+    position: absolute;
+
+    top: 0;
+    left: 50%;
+
+    z-index: 10;
+
+    width: 36px;
+    height: 36px;
+
+    margin: 0;
+
+    transform: translateX(-50%);
+
+    border-radius: 50%;
+
+    opacity: 0;
+}
+
+.sidebar.collapsed .sidebar-toggle:hover {
+    opacity: 1;
+
+    background: rgba(0, 0, 0, 0.55);
+
+    color: white;
 }
 
 main {
