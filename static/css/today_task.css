@@ -738,8 +738,8 @@
 
     background:
         conic-gradient(
-            #b5b5b5 0deg 288deg,
-            #dddddd 288deg 360deg
+            #dddddd 0 var(--progress),
+            #b5b5b5 var(--progress) 100%
         );
 }
 

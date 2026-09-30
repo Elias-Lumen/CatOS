@@ -518,10 +518,47 @@ Today
     <!-- RIGHT SIDE STATISTICS -->
     <aside class="today-stats">
 
-        <div class="progress-ring">
+        {% set visible_tasks =
+            (today_tasks|length)
+            + (overdue_tasks|length)
+        %}
+
+        {% set completed_visible_tasks =
+            (today_tasks
+                |selectattr("state", "equalto", "completed")
+                |list
+                |length)
+            +
+            (overdue_tasks
+                |selectattr("state", "equalto", "completed")
+                |list
+                |length)
+        %}
+
+        {% if visible_tasks > 0 %}
+
+            {% set progress =
+                (
+                    completed_visible_tasks
+                    / visible_tasks
+                    * 100
+                ) | round | int
+            %}
+
+        {% else %}
+
+            {% set progress = 0 %}
+
+        {% endif %}
+
+
+        <div
+            class="progress-ring"
+            style="--progress: {{ progress }}%;"
+        >
 
             <div class="progress-value">
-                80%
+                {{ progress }}%
             </div>
 
         </div>
