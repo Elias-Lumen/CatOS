@@ -1,6 +1,11 @@
 """Routes used for creating, editing, displaying, and completing tasks."""
 
-from datetime import date
+from datetime import (
+    date,
+    datetime,
+    timedelta,
+    timezone,
+)
 
 from flask import (
     flash,
@@ -99,7 +104,18 @@ def register_task_routes(app):
             user_id
         )
 
-        today_date = date.today()
+        # Use the date reported by the user's device.
+        # Fall back to the server date if it is unavailable.
+        device_date = request.cookies.get(
+            "catos_local_date"
+        )
+
+        try:
+            today_date = date.fromisoformat(
+                device_date
+            )
+        except (TypeError, ValueError):
+            today_date = date.today()
 
         overdue_tasks = []
         today_tasks = []
@@ -123,6 +139,47 @@ def register_task_routes(app):
                 if task["due_date"]
                 else None
             )
+
+            completed_date = None
+
+            if task["completed_at"]:
+
+                # completed_at is stored in UTC.
+                completed_utc = datetime.strptime(
+                    task["completed_at"],
+                    "%Y-%m-%d %H:%M:%S"
+                ).replace(
+                    tzinfo=timezone.utc
+                )
+
+                device_offset = request.cookies.get(
+                    "catos_timezone_offset",
+                    type=int
+                )
+
+                if device_offset is not None:
+
+                    # JavaScript's timezone offset has the opposite sign:
+                    # NZDT (UTC+13), for example, reports -780.
+                    completed_local = (
+                        completed_utc
+                        - timedelta(
+                            minutes=device_offset
+                        )
+                    )
+
+                    completed_date = (
+                        completed_local.date()
+                    )
+            # Keep a completed task visible on the day
+            # it was completed.
+            # Hide it from Today starting the next day.
+            if (
+                task["state"] == "completed"
+                and completed_date
+                and completed_date < today_date
+            ):
+                continue
 
             # Future tasks belong on Upcoming,
             # so do not put them into Today yet.
@@ -149,6 +206,21 @@ def register_task_routes(app):
                 today_tasks.append(
                     task
                 )
+
+        # Keep unfinished tasks first.
+        # Tasks completed today stay visible,
+        # but move to the bottom of their section.
+        overdue_tasks.sort(
+            key=lambda task:
+                task["state"] == "completed"
+        )
+
+        today_tasks.sort(
+            key=lambda task:
+                task["state"] == "completed"
+        )
+
+
 
         return render_template(
             "today_task.html",
