@@ -67,7 +67,17 @@ def get_tasks_by_user(user_id):
     # Then sort them by priority and creation time.
     tasks = connection.execute(
         """
-        SELECT *
+        SELECT
+            id,
+            user_id,
+            title,
+            description,
+            state,
+            priority,
+            start_date,
+            due_date,
+            created_at,
+            completed_at
         FROM tasks
         WHERE user_id = ?
         ORDER BY
@@ -283,7 +293,16 @@ def search_tasks(
 
     sql = """
         SELECT DISTINCT
-            tasks.*
+            tasks.id,
+            tasks.user_id,
+            tasks.title,
+            tasks.description,
+            tasks.state,
+            tasks.priority,
+            tasks.start_date,
+            tasks.due_date,
+            tasks.created_at,
+            tasks.completed_at
         FROM tasks
     """
 

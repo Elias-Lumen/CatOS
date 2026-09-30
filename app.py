@@ -52,7 +52,7 @@ register_cat_routes(app)
 # Show a friendly page when the user visits a route
 # that does not exist.
 @app.errorhandler(404)
-def page_not_found(error):
+def page_not_found(_error):
     """Show the custom 404 page."""
 
     return render_template(
@@ -63,7 +63,7 @@ def page_not_found(error):
 # Show a safe error page if CatOS encounters
 # an unexpected server error.
 @app.errorhandler(500)
-def internal_server_error(error):
+def internal_server_error(_error):
     """Show the custom 500 page."""
 
     return render_template(

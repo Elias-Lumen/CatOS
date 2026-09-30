@@ -87,7 +87,17 @@ def get_tasks_by_tag(
 
     tasks = connection.execute(
         """
-        SELECT tasks.*
+        SELECT
+            tasks.id,
+            tasks.user_id,
+            tasks.title,
+            tasks.description,
+            tasks.state,
+            tasks.priority,
+            tasks.start_date,
+            tasks.due_date,
+            tasks.created_at,
+            tasks.completed_at
         FROM tasks
 
         JOIN task_tags

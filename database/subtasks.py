@@ -79,7 +79,15 @@ def get_subtasks_by_task(task_id, user_id):
     subtasks = connection.execute(
         """
         SELECT
-            subtasks.*
+            subtasks.id,
+            subtasks.task_id,
+            subtasks.title,
+            subtasks.description,
+            subtasks.state,
+            subtasks.priority,
+            subtasks.due_date,
+            subtasks.created_at,
+            subtasks.completed_at
         FROM subtasks
 
         JOIN tasks
