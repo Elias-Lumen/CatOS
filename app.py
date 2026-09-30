@@ -2,6 +2,7 @@
 
 from flask import (
     Flask,
+    render_template,
     session,
     url_for,
 )
@@ -46,6 +47,28 @@ register_label_routes(app)
 register_page_routes(app)
 register_setting_routes(app)
 register_cat_routes(app)
+
+
+# Show a friendly page when the user visits a route
+# that does not exist.
+@app.errorhandler(404)
+def page_not_found(error):
+    """Show the custom 404 page."""
+
+    return render_template(
+        "404.html"
+    ), 404
+
+
+# Show a safe error page if CatOS encounters
+# an unexpected server error.
+@app.errorhandler(500)
+def internal_server_error(error):
+    """Show the custom 500 page."""
+
+    return render_template(
+        "500.html"
+    ), 500
 
 
 # Make shared user information available to base.html.

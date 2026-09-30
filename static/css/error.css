@@ -1,0 +1,101 @@
+/*
+    CatOS - Error Pages
+    -------------------
+    Simple standalone pages for errors such as 404 and 500.
+*/
+
+
+html,
+body {
+    margin: 0;
+
+    min-height: 100%;
+}
+
+
+body {
+    min-height: 100vh;
+
+    font-family: Arial, sans-serif;
+
+    background: #ffffff;
+}
+
+
+.error-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 100vh;
+
+    padding: 40px;
+}
+
+
+.error-content {
+    width: 100%;
+    max-width: 460px;
+
+    text-align: center;
+}
+
+
+.error-code {
+    margin: 0;
+
+    font-size: 72px;
+    font-weight: 700;
+
+    color: #dddddd;
+}
+
+
+.error-content h1 {
+    margin:
+        8px
+        0
+        10px;
+
+    font-size: 26px;
+
+    color: #222222;
+}
+
+
+.error-message {
+    margin:
+        0
+        0
+        24px;
+
+    font-size: 14px;
+    line-height: 1.6;
+
+    color: #777777;
+}
+
+
+.error-back-button {
+    padding:
+        10px
+        18px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #222222;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+
+    color: #ffffff;
+
+    cursor: pointer;
+}
+
+
+.error-back-button:hover {
+    background: #000000;
+}
