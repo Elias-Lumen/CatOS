@@ -1,20 +1,3 @@
-// Save the device's local date and timezone offset.
-// Flask uses these values so "Today" follows the user's device clock.
-const now = new Date();
-
-const localDate = [
-    now.getFullYear(),
-    String(now.getMonth() + 1).padStart(2, "0"),
-    String(now.getDate()).padStart(2, "0")
-].join("-");
-
-document.cookie =
-    `catos_local_date=${localDate}; path=/; SameSite=Lax`;
-
-document.cookie =
-    `catos_timezone_offset=${now.getTimezoneOffset()}; path=/; SameSite=Lax`;
-
-
 document.addEventListener("DOMContentLoaded", () => {
 
 
@@ -105,26 +88,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-
-    // Collapse / expand task groups
-
-    document.querySelectorAll(".group-header").forEach((header) => {
-
-        header.addEventListener("click", () => {
-
-            const targetId = header.dataset.target;
-            const content = document.getElementById(targetId);
-
-            if (!content) {
-                return;
-            }
-
-            content.classList.toggle("collapsed");
-            header.classList.toggle("collapsed");
-
-        });
-
-    });
 
     // Collapse / expand task groups
     document.querySelectorAll(".group-header").forEach((header) => {

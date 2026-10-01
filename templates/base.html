@@ -456,6 +456,11 @@
     </div>
 
 
+    <!-- Keep the user's local date and timezone available globally. -->
+    <script
+        src="{{ url_for('static', filename='js/device_time.js') }}"
+    ></script>
+
     <!-- Shared sidebar JavaScript -->
     <script
         src="{{ url_for('static', filename='js/sidebar.js') }}"

@@ -41,6 +41,23 @@ from utils import (
     get_tasks_with_details,
 )
 
+def get_device_date():
+    """Get today's date from the user's device."""
+
+    device_date = request.cookies.get(
+        "catos_local_date"
+    )
+
+    try:
+        return date.fromisoformat(
+            device_date
+        )
+
+    except (TypeError, ValueError):
+        # Fall back to the server date if the
+        # browser has not provided its local date.
+        return date.today()
+
 
 def register_task_routes(app):
     """Register all task related routes into the main CatOS app."""
@@ -104,18 +121,7 @@ def register_task_routes(app):
             user_id
         )
 
-        # Use the date reported by the user's device.
-        # Fall back to the server date if it is unavailable.
-        device_date = request.cookies.get(
-            "catos_local_date"
-        )
-
-        try:
-            today_date = date.fromisoformat(
-                device_date
-            )
-        except (TypeError, ValueError):
-            today_date = date.today()
+        today_date = get_device_date()
 
         overdue_tasks = []
         today_tasks = []
@@ -266,7 +272,7 @@ def register_task_routes(app):
                 url_for("home")
             )
 
-        today_date = date.today()
+        today_date = get_device_date()
 
         # Rescheduling an overdue task backwards
         # would immediately leave it overdue again.
@@ -580,7 +586,7 @@ def register_task_routes(app):
 
         user_id = session["user_id"]
 
-        today_date = date.today()
+        today_date = get_device_date()
 
         tasks = get_tasks_with_details(
             user_id
