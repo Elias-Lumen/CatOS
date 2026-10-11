@@ -1,0 +1,232 @@
+
+/* CatOS - Help Page */
+
+.help-page {
+    width: min(850px, calc(100% - 48px));
+    margin: 0 auto;
+    padding: 42px 0 70px;
+    color: #222;
+}
+
+/* Header */
+
+.help-header {
+    margin-bottom: 26px;
+}
+
+.help-header h1 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 650;
+    letter-spacing: -0.03em;
+}
+
+.help-header p {
+    margin: 8px 0 0;
+    font-size: 13px;
+    color: #888;
+}
+
+/* Introduction */
+
+.help-intro {
+    padding: 26px;
+    border: 1px solid #e3e3e3;
+    border-radius: 13px;
+    background: #fafafa;
+}
+
+.help-intro h2 {
+    margin: 0 0 10px;
+    font-size: 20px;
+}
+
+.help-intro p {
+    max-width: 600px;
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.8;
+    color: #666;
+}
+
+.help-start-link {
+    display: inline-block;
+    margin-top: 17px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #222;
+    text-decoration: none;
+}
+
+.help-start-link:hover {
+    text-decoration: underline;
+}
+
+/* Sections */
+
+.help-section {
+    margin-top: 36px;
+}
+
+.help-section > h2 {
+    margin: 0 0 17px;
+    font-size: 19px;
+    font-weight: 650;
+}
+
+.help-section-description {
+    margin: -8px 0 18px;
+    font-size: 12px;
+    color: #888;
+}
+
+/* Guide Cards */
+
+.help-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.help-card {
+    padding: 22px;
+    border: 1px solid #e5e5e5;
+    border-radius: 13px;
+    background: #fff;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.help-card:hover {
+    border-color: #ccc;
+    background: #fcfcfc;
+}
+
+.help-card-number {
+    display: block;
+    margin-bottom: 15px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #aaa;
+}
+
+.help-card h3 {
+    margin: 0 0 9px;
+    font-size: 15px;
+    font-weight: 650;
+}
+
+.help-card p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.8;
+    color: #777;
+}
+
+/* FAQ */
+
+.help-faq {
+    border: 1px solid #e5e5e5;
+    border-radius: 13px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.help-faq details + details {
+    border-top: 1px solid #eee;
+}
+
+.help-faq summary {
+    position: relative;
+    padding: 18px 42px 18px 20px;
+    font-size: 13px;
+    font-weight: 550;
+    cursor: pointer;
+    list-style: none;
+}
+
+.help-faq summary::-webkit-details-marker {
+    display: none;
+}
+
+.help-faq summary::after {
+    content: "+";
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    font-weight: 400;
+    color: #888;
+}
+
+.help-faq details[open] summary::after {
+    content: "−";
+}
+
+.help-faq summary:hover {
+    background: #fafafa;
+}
+
+.help-faq summary:focus-visible,
+.help-start-link:focus-visible,
+.help-footer a:focus-visible {
+    outline: 2px solid #555;
+    outline-offset: 3px;
+}
+
+.help-faq details p {
+    margin: 0;
+    padding: 0 20px 20px;
+    font-size: 12px;
+    line-height: 1.8;
+    color: #777;
+}
+
+/* Footer */
+
+.help-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.help-footer p,
+.help-footer a {
+    margin: 0;
+    font-size: 11px;
+    color: #999;
+}
+
+.help-footer a {
+    text-decoration: none;
+}
+
+.help-footer a:hover {
+    color: #333;
+}
+
+/* Responsive */
+
+@media (max-width: 600px) {
+    .help-page {
+        width: calc(100% - 28px);
+        padding-top: 25px;
+    }
+
+    .help-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .help-intro {
+        padding: 20px;
+    }
+
+    .help-card {
+        padding: 18px;
+    }
+}

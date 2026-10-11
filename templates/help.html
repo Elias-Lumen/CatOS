@@ -1,0 +1,169 @@
+
+{% extends "base.html" %}
+
+{% block title %}Help{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/help.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="help-page">
+
+    <header class="help-header">
+        <h1>Help & Support</h1>
+        <p>Everything you need to get started with CatOS.</p>
+    </header>
+
+    <section class="help-intro">
+        <h2>Welcome to CatOS</h2>
+        <p>
+            CatOS helps you organise tasks, track progress,
+            and stay motivated with your own virtual cat.
+            Here's how to get started.
+        </p>
+        <a href="{{ url_for('home') }}" class="help-start-link">
+            Go to Today &rarr;
+        </a>
+    </section>
+
+    <section class="help-section">
+        <h2>Getting Started</h2>
+
+        <div class="help-grid">
+
+            <article class="help-card">
+                <span class="help-card-number">01</span>
+                <h3>Create a Task</h3>
+                <p>
+                    Click <strong>Add task</strong> in the sidebar.
+                    Enter a title and optionally add a description,
+                    priority, start date, deadline, or labels.
+                </p>
+            </article>
+
+            <article class="help-card">
+                <span class="help-card-number">02</span>
+                <h3>Manage Your Tasks</h3>
+                <p>
+                    Edit tasks, mark them as completed, or delete
+                    tasks you no longer need. Break larger tasks
+                    into smaller subtasks.
+                </p>
+            </article>
+
+            <article class="help-card">
+                <span class="help-card-number">03</span>
+                <h3>Organise with Labels</h3>
+                <p>
+                    Create reusable labels to group related tasks.
+                    You can assign multiple labels to the same task.
+                </p>
+            </article>
+
+            <article class="help-card">
+                <span class="help-card-number">04</span>
+                <h3>Find Your Tasks</h3>
+                <p>
+                    Use <strong>Search</strong> to find tasks by
+                    keyword, label, priority, or completion status.
+                    You can also view all your tasks in one place.
+                </p>
+            </article>
+
+            <article class="help-card">
+                <span class="help-card-number">05</span>
+                <h3>Track Your Progress</h3>
+                <p>
+                    Visit <strong>Data</strong> to see your task
+                    completion rate and daily or weekly statistics.
+                    Check Today to follow your daily progress.
+                </p>
+            </article>
+
+            <article class="help-card">
+                <span class="help-card-number">06</span>
+                <h3>Meet Your Cat</h3>
+                <p>
+                    Every account has its own virtual cat.
+                    Give your cat a name and complete tasks
+                    to increase its Mood by 5, up to 100.
+                </p>
+            </article>
+
+        </div>
+    </section>
+
+    <section class="help-section">
+        <h2>Frequently Asked Questions</h2>
+        <p class="help-section-description">
+            Quick answers to common questions.
+        </p>
+
+        <div class="help-faq">
+
+            <details>
+                <summary>Where can I find upcoming tasks?</summary>
+                <p>
+                    Open <strong>Upcoming</strong> from the sidebar
+                    to view tasks scheduled for future dates.
+                </p>
+            </details>
+
+            <details>
+                <summary>What happens when a task is overdue?</summary>
+                <p>
+                    Incomplete tasks that have passed their deadline
+                    are highlighted as overdue. You can change their
+                    dates or reschedule multiple overdue tasks.
+                </p>
+            </details>
+
+            <details>
+                <summary>Can I use multiple labels on one task?</summary>
+                <p>
+                    Yes. You can select multiple existing labels
+                    or create new ones when adding or editing tasks.
+                </p>
+            </details>
+
+            <details>
+                <summary>Does completing a subtask complete its parent?</summary>
+                <p>
+                    No. Parent tasks and subtasks have independent
+                    completion states.
+                </p>
+            </details>
+
+            <details>
+                <summary>How do I change my profile picture?</summary>
+                <p>
+                    Open <strong>Settings</strong> and upload a
+                    PNG, JPG, JPEG, or WebP image.
+                </p>
+            </details>
+
+            <details>
+                <summary>Can other users see my tasks?</summary>
+                <p>
+                    No. Your tasks and labels are associated
+                    with your account and are not shared
+                    with other CatOS users.
+                </p>
+            </details>
+
+        </div>
+    </section>
+
+    <footer class="help-footer">
+        <p>Made with care for better days and smaller tasks.</p>
+        <a href="https://github.com/Elias-Lumen/CatOS"
+           target="_blank"
+           rel="noopener noreferrer">
+            CatOS on GitHub &nearr;
+        </a>
+    </footer>
+
+</div>
+{% endblock %}
