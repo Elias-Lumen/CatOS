@@ -85,7 +85,6 @@ def register_page_routes(app):
         # Same thing for task states.
         valid_states = {
             "not_started",
-            "in_progress",
             "completed",
         }
 

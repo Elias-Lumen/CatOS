@@ -21,3 +21,12 @@ instance/
 .cache/
 dist/
 build/
+
+# Local database
+CatOS.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# User uploads
+static/uploads/avatars/*
