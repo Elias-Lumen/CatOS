@@ -14,6 +14,24 @@ from services import (
     register_user,
 )
 
+def validate_username(username):
+    """Check whether a username meets CatOS requirements."""
+
+    username = username.strip()
+
+    if not 3 <= len(username) <= 20:
+        return "Username must be between 3 and 20 characters."
+
+    if not all(
+        character.isascii() and (
+            character.isalnum() or character == "_"
+        )
+        for character in username
+    ):
+        return "Username can only contain letters, numbers and underscores."
+
+    return None
+
 
 def validate_password(password):
     """Check whether a password meets CatOS security requirements."""
@@ -75,6 +93,24 @@ def register_auth_routes(app):
                 "",
             )
 
+            # Remove accidental spaces around the username.
+            username = username.strip()
+
+            # Validate the username before creating an account.
+            username_error = validate_username(
+                username
+            )
+
+            if username_error:
+
+                flash(
+                    username_error
+                )
+
+                return render_template(
+                    "register.html"
+                )
+
             # Check the password before creating the account.
             password_error = validate_password(
                 password
@@ -90,8 +126,7 @@ def register_auth_routes(app):
                     "register.html"
                 )
 
-            # Stop here if they somehow typed
-            # two different passwords.
+            # Stop here if the passwords do not match.
             if password != confirm_password:
 
                 flash(
