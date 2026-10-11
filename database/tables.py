@@ -163,19 +163,10 @@ def create_cat_table(connection):
             -- keep these values between 0 and 100
             mood INTEGER NOT NULL DEFAULT 50
                 CHECK (mood BETWEEN 0 AND 100),
-
-            energy INTEGER NOT NULL DEFAULT 100
-                CHECK (energy BETWEEN 0 AND 100),
-
-            hunger INTEGER NOT NULL DEFAULT 0
-                CHECK (hunger BETWEEN 0 AND 100),
-
+                
             -- remember when the user last interacted with their cat
             last_interaction TIMESTAMP NOT NULL
                 DEFAULT CURRENT_TIMESTAMP,
-
-            equipped_item TEXT,
-            cat_color TEXT,
 
             -- connect the cat to its owner
             FOREIGN KEY (user_id)

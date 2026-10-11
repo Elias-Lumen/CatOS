@@ -16,13 +16,8 @@ def get_cat_by_user(user_id):
             id,
             user_id,
             cat_name,
-            status,
             mood,
-            energy,
-            hunger,
-            last_interaction,
-            equipped_item,
-            cat_color
+            last_interaction
         FROM cat
         WHERE user_id = ?
         """,
