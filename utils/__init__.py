@@ -19,3 +19,20 @@ from .task_helpers import (
     add_subtasks_to_tasks,
     get_tasks_with_details,
 )
+
+
+__all__ = [
+    "login_required",
+    "allowed_avatar",
+    "get_avatar_extension",
+    "get_avatar_folder",
+    "is_valid_date",
+    "are_task_dates_valid",
+    "get_new_tag_ids",
+    "get_task_form_data",
+    "get_combined_tag_ids",
+    "create_task_with_tags",
+    "add_tags_to_tasks",
+    "add_subtasks_to_tasks",
+    "get_tasks_with_details",
+]

@@ -6,3 +6,13 @@ from .label_routes import register_label_routes
 from .page_routes import register_page_routes
 from .setting_routes import register_setting_routes
 from .cat_routes import register_cat_routes
+
+
+__all__ = [
+    "register_auth_routes",
+    "register_task_routes",
+    "register_label_routes",
+    "register_page_routes",
+    "register_setting_routes",
+    "register_cat_routes",
+]
